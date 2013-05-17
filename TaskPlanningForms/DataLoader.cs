@@ -11,9 +11,7 @@ namespace TaskPlanningForms
 {
 	internal class DataLoader
 	{
-		private const string m_tfsUrl = @"https://tfs.sts.sitronics.com/sts";
-
-		internal WorkItemCollection GetLeadTasks(string areaPath)
+		internal WorkItemCollection GetLeadTasks(string tfsUrl, string areaPath)
 		{
 			const string queryStr = "SELECT *" +
 				" FROM WorkItems " +
@@ -37,7 +35,7 @@ namespace TaskPlanningForms
 				{"wiState", new List<object>{"Proposed", "Active"}},
 			};
 
-			using (var wiqlAccessor = new TfsWiqlAccessor(m_tfsUrl))
+			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
 				return wiqlAccessor.QueryWorkItems(
 					queryStr,
@@ -46,7 +44,42 @@ namespace TaskPlanningForms
 			}
 		}
 
-		internal DataContainer ProcessLeadTasks(WorkItemCollection leadTasks, string iterationPath)
+		internal WorkItemCollection GetLeadTasks(string tfsUrl, string areaPath, string iterationPath)
+		{
+			const string queryStr = "SELECT *" +
+				" FROM WorkItems " +
+				" WHERE [System.TeamProject] = @project" +
+				" AND [System.AreaPath] Under @areaPath" +
+				" AND [System.IterationPath] Under @iterationPath" +
+				" AND [System.WorkItemType] IN (@wiType)" +
+				" AND [System.State] IN (@wiState)" +
+				" AND [Microsoft.VSTS.Common.Discipline] IN (@discipline)" +
+				" ORDER BY [Priority]";
+
+			var paramValues = new Dictionary<string, object>
+			{
+				{"project", @"FORIS_Mobile"},
+				{"areaPath", areaPath},
+				{"iterationPath", iterationPath},
+			};
+
+			var complexParamValues = new Dictionary<string, List<object>>
+			{
+				{"discipline", new List<object>{"Development"}},
+				{"wiType", new List<object>{"LeadTask"}},
+				{"wiState", new List<object>{"Proposed", "Active"}},
+			};
+
+			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
+			{
+				return wiqlAccessor.QueryWorkItems(
+					queryStr,
+					paramValues,
+					complexParamValues);
+			}
+		}
+
+		internal DataContainer ProcessLeadTasks(string tfsUrl, List<WorkItem> leadTasks)
 		{
 			var result = new DataContainer
 			{
@@ -55,12 +88,9 @@ namespace TaskPlanningForms
 				LeadTaskChildrenDict = new Dictionary<int, List<int>>()
 			};
 
-			AppendLeadTasks(
-				result,
-				leadTasks,
-				iterationPath);
+			AppendLeadTasks(result, leadTasks);
 
-			using (var wiqlAccessor = new TfsWiqlAccessor(m_tfsUrl))
+			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
 				AppendTasks(result, wiqlAccessor);
 				AppendBlockers(result, wiqlAccessor);
@@ -71,18 +101,10 @@ namespace TaskPlanningForms
 			return result;
 		}
 
-		private void AppendLeadTasks(
-			DataContainer dataContainer,
-			WorkItemCollection leadTasks,
-			string iterationPath)
+		private void AppendLeadTasks(DataContainer dataContainer, IEnumerable<WorkItem> leadTasks)
 		{
-			for (int i = 0; i < leadTasks.Count; i++)
+			foreach (var leadTask in leadTasks)
 			{
-				var leadTask = leadTasks[i];
-
-				if (leadTask.IterationPath != iterationPath)
-					continue;
-
 				var leadTaskLinkDict = WorkItemParser.ParseLinks(leadTask);
 
 				dataContainer.LeadTaskChildrenDict.Add(

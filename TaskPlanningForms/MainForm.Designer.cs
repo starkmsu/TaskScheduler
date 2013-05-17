@@ -47,6 +47,9 @@
 			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.tfsUrlLabel = new System.Windows.Forms.Label();
+			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
+			this.refreshButton = new System.Windows.Forms.Button();
 			this.mainTabControl.SuspendLayout();
 			this.settingsTabPage.SuspendLayout();
 			this.dataTabPage.SuspendLayout();
@@ -66,6 +69,8 @@
 			// 
 			// settingsTabPage
 			// 
+			this.settingsTabPage.Controls.Add(this.tfsUrlTextBox);
+			this.settingsTabPage.Controls.Add(this.tfsUrlLabel);
 			this.settingsTabPage.Controls.Add(this.setHolidaysButton);
 			this.settingsTabPage.Controls.Add(this.iterationsComboBox);
 			this.settingsTabPage.Controls.Add(this.loadLeadTasksButton);
@@ -149,6 +154,7 @@
 			// 
 			// dataTabPage
 			// 
+			this.dataTabPage.Controls.Add(this.refreshButton);
 			this.dataTabPage.Controls.Add(this.usersLabel);
 			this.dataTabPage.Controls.Add(this.usersСomboBox);
 			this.dataTabPage.Controls.Add(this.scheduleDataGridView);
@@ -252,6 +258,33 @@
 			this.Past.ReadOnly = true;
 			this.Past.Width = 40;
 			// 
+			// tfsUrlLabel
+			// 
+			this.tfsUrlLabel.AutoSize = true;
+			this.tfsUrlLabel.Location = new System.Drawing.Point(7, 131);
+			this.tfsUrlLabel.Name = "tfsUrlLabel";
+			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
+			this.tfsUrlLabel.TabIndex = 8;
+			this.tfsUrlLabel.Text = "TFS url:";
+			// 
+			// tfsUrlTextBox
+			// 
+			this.tfsUrlTextBox.Location = new System.Drawing.Point(57, 128);
+			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
+			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
+			this.tfsUrlTextBox.TabIndex = 9;
+			this.tfsUrlTextBox.Text = "https://tfs.sts.sitronics.com/sts";
+			// 
+			// refreshButton
+			// 
+			this.refreshButton.Location = new System.Drawing.Point(294, 4);
+			this.refreshButton.Name = "refreshButton";
+			this.refreshButton.Size = new System.Drawing.Size(75, 23);
+			this.refreshButton.TabIndex = 6;
+			this.refreshButton.Text = "Refresh";
+			this.refreshButton.UseVisualStyleBackColor = true;
+			this.refreshButton.Click += new System.EventHandler(this.RefreshButtonClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -291,6 +324,9 @@
 		private System.Windows.Forms.Button loadLeadTasksButton;
 		private System.Windows.Forms.ComboBox iterationsComboBox;
 		private System.Windows.Forms.Button setHolidaysButton;
+		private System.Windows.Forms.Label tfsUrlLabel;
+		private System.Windows.Forms.TextBox tfsUrlTextBox;
+		private System.Windows.Forms.Button refreshButton;
 	}
 }
 

@@ -76,12 +76,25 @@ namespace TaskPlanningForms
 
 		internal void FIlterDataByUser(string user, DataGridView dgv)
 		{
+			int prevLeadTaskRow = -1;
+			bool hasUserTasks = false;
 			for (int i = 0; i < dgv.Rows.Count; i++)
 			{
 				var row = dgv.Rows[i];
 				if (row.Cells[m_leadTaskIdInd].Value != null)
+				{
+					if (!hasUserTasks && prevLeadTaskRow >= 0)
+					{
+						dgv.Rows[prevLeadTaskRow].Visible = false;
+					}
+					hasUserTasks = false;
+					prevLeadTaskRow = i;
 					continue;
-				row.Visible = user == string.Empty || row.Cells[m_assignedToInd].Value.ToString() == user;
+				}
+				bool visible = user == string.Empty || row.Cells[m_assignedToInd].Value.ToString() == user;
+				row.Visible = visible;
+				if (visible)
+					hasUserTasks = true;
 			}
 		}
 
@@ -126,6 +139,7 @@ namespace TaskPlanningForms
 				tasksByUser);
 
 			dgv.Rows.Add(new DataGridViewRow());
+			
 			var taskRow = dgv.Rows[dgv.Rows.Count - 1];
 
 			string assignedTo = FillTaskStartingCells(
@@ -134,7 +148,10 @@ namespace TaskPlanningForms
 				blockerIdsStr);
 
 			if (task.State == WorkItemState.Resolved)
+			{
+				alreadyAdded.Add(task.Id, m_indShift);
 				return m_indShift;
+			}
 
 			if (!assignedTo.StartsWith(m_groupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
 				nextInds.Add(tasksByUser[assignedTo]);

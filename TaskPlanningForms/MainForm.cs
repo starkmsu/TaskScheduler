@@ -72,7 +72,7 @@ namespace TaskPlanningForms
 
 		private void LoadLeadTasks(object state)
 		{
-			m_leadTasks = m_dataLoader.GetLeadTasks(areaPathTextBox.Text);
+			m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPathTextBox.Text);
 
 			var iterations = new List<string>();
 			for (int i = 0; i < m_leadTasks.Count; i++)
@@ -104,14 +104,23 @@ namespace TaskPlanningForms
 			mainTabControl.SelectTab(settingsTabPage);
 			scheduleDataGridView.Rows.Clear();
 
-			string iterationPath = iterationsComboBox.Text;
-
-			ThreadPool.QueueUserWorkItem(x => LoadAndPresentData(iterationPath));
+			ThreadPool.QueueUserWorkItem(x => LoadAndPresentData());
 		}
 
-		private void LoadAndPresentData(object state)
+		private void LoadAndPresentData()
 		{
-			var data = m_dataLoader.ProcessLeadTasks(m_leadTasks, state as string);
+			string iterationPath = null;
+			iterationsComboBox.Invoke(new Action(() => iterationPath = iterationsComboBox.Text));
+
+			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
+			for (int i = 0; i < m_leadTasks.Count; i++)
+			{
+				var leadTask = m_leadTasks[i];
+				if (leadTask.IterationPath != iterationPath)
+					continue;
+				leadTasks.Add(leadTask);
+			}
+			var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
 			scheduleDataGridView.Invoke(new Action(() =>
 			{
@@ -146,6 +155,47 @@ namespace TaskPlanningForms
 				
 			}
 			UpdateHolidays();
+		}
+
+		private void RefreshButtonClick(object sender, EventArgs e)
+		{
+			ThreadPool.QueueUserWorkItem(x => RefreshData());
+		}
+
+		private void RefreshData()
+		{
+			string tfsUrl = null, areaPath = null, iterationPath = null;
+			tfsUrlTextBox.Invoke(new Action(() =>
+				{
+					tfsUrl = tfsUrlTextBox.Text;
+					areaPath = areaPathTextBox.Text;
+					iterationPath = iterationsComboBox.Text;
+					refreshButton.Enabled = false;
+					loadLeadTasksButton.Enabled = false;
+					loadDataButton.Enabled = false;
+					usersLabel.Enabled = false;
+					usersСomboBox.Enabled = false;
+					scheduleDataGridView.Rows.Clear();
+				}));
+
+			var leadTasksCollection = m_dataLoader.GetLeadTasks(tfsUrl, areaPath, iterationPath);
+			var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
+			for (int i = 0; i < leadTasksCollection.Count; i++)
+			{
+				leadTasks.Add(leadTasksCollection[i]);
+			}
+			var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+
+			scheduleDataGridView.Invoke(new Action(() =>
+			{
+				usersСomboBox.DataSource = m_dataPresenter.PresentData(data, scheduleDataGridView);
+
+				usersСomboBox.Enabled = true;
+				usersLabel.Enabled = true;
+				loadDataButton.Enabled = true;
+				loadLeadTasksButton.Enabled = true;
+				refreshButton.Enabled = true;
+			}));
 		}
 	}
 }
