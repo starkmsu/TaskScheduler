@@ -145,7 +145,7 @@ namespace TaskPlanningForms
 		private void UsersСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
 			string user = usersСomboBox.SelectedItem.ToString();
-			m_dataPresenter.FIlterDataByUser(user, scheduleDataGridView);
+			m_dataPresenter.FilterDataByUser(user, scheduleDataGridView);
 		}
 
 		private void SetHolidaysButtonClick(object sender, EventArgs e)
@@ -172,12 +172,13 @@ namespace TaskPlanningForms
 
 		private void RefreshData()
 		{
-			string tfsUrl = null, areaPath = null, iterationPath = null;
+			string tfsUrl = null, areaPath = null, iterationPath = null, currentUser = null;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
 					tfsUrl = tfsUrlTextBox.Text;
 					areaPath = areaPathTextBox.Text;
 					iterationPath = iterationsComboBox.Text;
+					currentUser = usersСomboBox.SelectedItem.ToString();
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
 					loadDataButton.Enabled = false;
@@ -196,7 +197,14 @@ namespace TaskPlanningForms
 
 			scheduleDataGridView.Invoke(new Action(() =>
 			{
-				usersСomboBox.DataSource = m_dataPresenter.PresentData(data, scheduleDataGridView);
+				var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
+				usersСomboBox.DataSource = users;
+
+				if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
+				{
+					usersСomboBox.SelectedItem = currentUser;
+					m_dataPresenter.FilterDataByUser(currentUser, scheduleDataGridView);
+				}
 
 				usersСomboBox.Enabled = true;
 				usersLabel.Enabled = true;

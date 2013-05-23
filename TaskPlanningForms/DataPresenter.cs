@@ -74,7 +74,7 @@ namespace TaskPlanningForms
 			return users;
 		}
 
-		internal void FIlterDataByUser(string user, DataGridView dgv)
+		internal void FilterDataByUser(string user, DataGridView dgv)
 		{
 			int prevLeadTaskRow = -1;
 			bool hasUserTasks = false;
@@ -288,7 +288,7 @@ namespace TaskPlanningForms
 					DateTime date = today.AddDays(i - m_indShift);
 					if (IsHoliday(date))
 						continue;
-					taskRow.Cells[i].Value = "X";
+					taskRow.Cells[i].Value = userMark;
 				}
 				return indFinish + 1;
 			}
