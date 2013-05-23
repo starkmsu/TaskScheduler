@@ -83,19 +83,19 @@ namespace TaskPlanningForms
 				var row = dgv.Rows[i];
 				if (row.Cells[m_leadTaskIdInd].Value != null)
 				{
-					if (!hasUserTasks && prevLeadTaskRow >= 0)
-					{
-						dgv.Rows[prevLeadTaskRow].Visible = false;
-					}
+					if (prevLeadTaskRow >= 0)
+						dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
 					hasUserTasks = false;
 					prevLeadTaskRow = i;
 					continue;
 				}
 				bool visible = user == string.Empty || row.Cells[m_assignedToInd].Value.ToString() == user;
-				row.Visible = visible;
 				if (visible)
 					hasUserTasks = true;
+				row.Visible = visible;
 			}
+			if (prevLeadTaskRow >= 0)
+				dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
 		}
 
 		private int AddLeadTaskRow(DataGridView dgv, WorkItem leadTask)
