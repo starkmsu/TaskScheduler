@@ -30,6 +30,8 @@
 		{
 			this.mainTabControl = new System.Windows.Forms.TabControl();
 			this.settingsTabPage = new System.Windows.Forms.TabPage();
+			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
+			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.setHolidaysButton = new System.Windows.Forms.Button();
 			this.iterationsComboBox = new System.Windows.Forms.ComboBox();
 			this.loadLeadTasksButton = new System.Windows.Forms.Button();
@@ -38,6 +40,7 @@
 			this.areaPathLabel = new System.Windows.Forms.Label();
 			this.iterationPathLabel = new System.Windows.Forms.Label();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersСomboBox = new System.Windows.Forms.ComboBox();
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
@@ -47,9 +50,6 @@
 			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
-			this.refreshButton = new System.Windows.Forms.Button();
 			this.mainTabControl.SuspendLayout();
 			this.settingsTabPage.SuspendLayout();
 			this.dataTabPage.SuspendLayout();
@@ -85,6 +85,22 @@
 			this.settingsTabPage.TabIndex = 1;
 			this.settingsTabPage.Text = "Settings";
 			this.settingsTabPage.UseVisualStyleBackColor = true;
+			// 
+			// tfsUrlTextBox
+			// 
+			this.tfsUrlTextBox.Location = new System.Drawing.Point(57, 128);
+			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
+			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
+			this.tfsUrlTextBox.TabIndex = 9;
+			// 
+			// tfsUrlLabel
+			// 
+			this.tfsUrlLabel.AutoSize = true;
+			this.tfsUrlLabel.Location = new System.Drawing.Point(7, 131);
+			this.tfsUrlLabel.Name = "tfsUrlLabel";
+			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
+			this.tfsUrlLabel.TabIndex = 8;
+			this.tfsUrlLabel.Text = "TFS url:";
 			// 
 			// setHolidaysButton
 			// 
@@ -165,6 +181,16 @@
 			this.dataTabPage.TabIndex = 0;
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
+			// 
+			// refreshButton
+			// 
+			this.refreshButton.Location = new System.Drawing.Point(294, 4);
+			this.refreshButton.Name = "refreshButton";
+			this.refreshButton.Size = new System.Drawing.Size(75, 23);
+			this.refreshButton.TabIndex = 6;
+			this.refreshButton.Text = "Refresh";
+			this.refreshButton.UseVisualStyleBackColor = true;
+			this.refreshButton.Click += new System.EventHandler(this.RefreshButtonClick);
 			// 
 			// usersLabel
 			// 
@@ -258,33 +284,6 @@
 			this.Past.ReadOnly = true;
 			this.Past.Width = 40;
 			// 
-			// tfsUrlLabel
-			// 
-			this.tfsUrlLabel.AutoSize = true;
-			this.tfsUrlLabel.Location = new System.Drawing.Point(7, 131);
-			this.tfsUrlLabel.Name = "tfsUrlLabel";
-			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
-			this.tfsUrlLabel.TabIndex = 8;
-			this.tfsUrlLabel.Text = "TFS url:";
-			// 
-			// tfsUrlTextBox
-			// 
-			this.tfsUrlTextBox.Location = new System.Drawing.Point(57, 128);
-			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
-			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
-			this.tfsUrlTextBox.TabIndex = 9;
-			this.tfsUrlTextBox.Text = "https://tfs.sts.sitronics.com/sts";
-			// 
-			// refreshButton
-			// 
-			this.refreshButton.Location = new System.Drawing.Point(294, 4);
-			this.refreshButton.Name = "refreshButton";
-			this.refreshButton.Size = new System.Drawing.Size(75, 23);
-			this.refreshButton.TabIndex = 6;
-			this.refreshButton.Text = "Refresh";
-			this.refreshButton.UseVisualStyleBackColor = true;
-			this.refreshButton.Click += new System.EventHandler(this.RefreshButtonClick);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -293,6 +292,7 @@
 			this.Controls.Add(this.mainTabControl);
 			this.Name = "MainForm";
 			this.Text = "Task Planning";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.mainTabControl.ResumeLayout(false);
 			this.settingsTabPage.ResumeLayout(false);
 			this.settingsTabPage.PerformLayout();

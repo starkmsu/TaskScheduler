@@ -11,6 +11,8 @@ namespace TaskPlanningForms
 	{
 		private const int m_indShift = 6;
 
+		private readonly Config m_config;
+
 		private readonly DataLoader m_dataLoader = new DataLoader();
 		private readonly HolidaysStorage m_holidaysStorage = new HolidaysStorage();
 		private readonly DataPresenter m_dataPresenter = new DataPresenter(m_indShift);
@@ -21,6 +23,8 @@ namespace TaskPlanningForms
 		public MainForm()
 		{
 			InitializeComponent();
+
+			m_config = ConfigManager.LoadConfig();
 
 			DateTime start = DateTime.Now.Date;
 			DateTime finish = DateTime.Now.AddMonths(1).Date;
@@ -40,6 +44,8 @@ namespace TaskPlanningForms
 
 			m_holidays = m_holidaysStorage.LoadHolidays();
 			m_dataPresenter.Holidays = m_holidays;
+
+			tfsUrlTextBox.Text = m_config.TfsUrl;
 
 			UpdateHolidays();
 		}
@@ -66,6 +72,8 @@ namespace TaskPlanningForms
 		{
 			setHolidaysButton.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
+
+			m_config.TfsUrl = tfsUrlTextBox.Text;
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
@@ -196,6 +204,11 @@ namespace TaskPlanningForms
 				loadLeadTasksButton.Enabled = true;
 				refreshButton.Enabled = true;
 			}));
+		}
+
+		private void MainFormFormClosing(object sender, FormClosingEventArgs e)
+		{
+			ConfigManager.SaveConfig(m_config);
 		}
 	}
 }
