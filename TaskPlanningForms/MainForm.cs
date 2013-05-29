@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskPlanningForms.Properties;
 
 namespace TaskPlanningForms
 {
@@ -14,7 +14,6 @@ namespace TaskPlanningForms
 		private readonly Config m_config;
 
 		private readonly DataLoader m_dataLoader = new DataLoader();
-		private readonly HolidaysStorage m_holidaysStorage = new HolidaysStorage();
 		private readonly DataPresenter m_dataPresenter = new DataPresenter(m_indShift);
 
 		private WorkItemCollection m_leadTasks;
@@ -42,10 +41,11 @@ namespace TaskPlanningForms
 				scheduleDataGridView.Columns.Add(column);
 			}
 
-			m_holidays = m_holidaysStorage.LoadHolidays();
+			m_holidays = m_config.Holidays;
 			m_dataPresenter.Holidays = m_holidays;
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
+			areaPathTextBox.Text = m_config.AreaPath;
 
 			UpdateHolidays();
 		}
@@ -74,13 +74,27 @@ namespace TaskPlanningForms
 			loadLeadTasksButton.Enabled = false;
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
+			m_config.AreaPath = areaPathTextBox.Text;
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
 
 		private void LoadLeadTasks(object state)
 		{
-			m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPathTextBox.Text);
+			try
+			{
+				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPathTextBox.Text);
+			}
+			catch (Exception e)
+			{
+				iterationsComboBox.Invoke(new Action(() =>
+					{
+						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
+						setHolidaysButton.Enabled = true;
+						loadLeadTasksButton.Enabled = true;
+					}));
+				return;
+			}
 
 			var iterations = new List<string>();
 			for (int i = 0; i < m_leadTasks.Count; i++)
@@ -93,14 +107,14 @@ namespace TaskPlanningForms
 			iterations.Sort();
 
 			iterationsComboBox.Invoke(new Action(() =>
-			{
-				iterationsComboBox.DataSource = iterations;
-				iterationsComboBox.SelectedIndex = 0;
-				iterationsComboBox.Enabled = true;
+				{
+					iterationsComboBox.DataSource = iterations;
+					iterationsComboBox.SelectedIndex = 0;
+					iterationsComboBox.Enabled = true;
 
-				loadLeadTasksButton.Enabled = true;
-				loadDataButton.Enabled = true;
-			}));
+					loadLeadTasksButton.Enabled = true;
+					loadDataButton.Enabled = true;
+				}));
 		}
 
 		private void LoadDataButtonClick(object sender, EventArgs e)
@@ -128,18 +142,30 @@ namespace TaskPlanningForms
 					continue;
 				leadTasks.Add(leadTask);
 			}
-			var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
-
-			scheduleDataGridView.Invoke(new Action(() =>
+			try
 			{
-				usersСomboBox.DataSource = m_dataPresenter.PresentData(data, scheduleDataGridView);
+				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
-				usersСomboBox.Enabled = true;
-				usersLabel.Enabled = true;
-				loadDataButton.Enabled = true;
-				loadLeadTasksButton.Enabled = true;
-				mainTabControl.SelectTab(dataTabPage);
-			}));
+				scheduleDataGridView.Invoke(new Action(() =>
+					{
+						usersСomboBox.DataSource = m_dataPresenter.PresentData(data, scheduleDataGridView);
+
+						usersСomboBox.Enabled = true;
+						usersLabel.Enabled = true;
+						loadDataButton.Enabled = true;
+						loadLeadTasksButton.Enabled = true;
+						mainTabControl.SelectTab(dataTabPage);
+					}));
+			}
+			catch (Exception e)
+			{
+				scheduleDataGridView.Invoke(new Action(() =>
+					{
+						MessageBox.Show(e.Message, Resources.LeadTasksParsinigError);
+						loadDataButton.Enabled = true;
+						loadLeadTasksButton.Enabled = true;
+					}));
+			}
 		}
 
 		private void UsersСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
@@ -155,13 +181,8 @@ namespace TaskPlanningForms
 			holidaysForm.ShowDialog();
 			m_holidays = holidaysForm.Holidays;
 
-			m_holidaysStorage.SaveHolidays(m_holidays);
+			m_config.Holidays = m_holidays;
 			m_dataPresenter.Holidays = m_holidays;
-			if (oldHolidays.Count != m_holidays.Count
-				|| oldHolidays.Any(h => !m_holidays.Contains(h)))
-			{
-				
-			}
 			UpdateHolidays();
 		}
 
@@ -186,32 +207,43 @@ namespace TaskPlanningForms
 					usersСomboBox.Enabled = false;
 					scheduleDataGridView.Rows.Clear();
 				}));
-
-			var leadTasksCollection = m_dataLoader.GetLeadTasks(tfsUrl, areaPath, iterationPath);
-			var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-			for (int i = 0; i < leadTasksCollection.Count; i++)
+			try
 			{
-				leadTasks.Add(leadTasksCollection[i]);
-			}
-			var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
-
-			scheduleDataGridView.Invoke(new Action(() =>
-			{
-				var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
-				usersСomboBox.DataSource = users;
-
-				if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
+				var leadTasksCollection = m_dataLoader.GetLeadTasks(tfsUrl, areaPath, iterationPath);
+				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
+				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
-					usersСomboBox.SelectedItem = currentUser;
-					m_dataPresenter.FilterDataByUser(currentUser, scheduleDataGridView);
+					leadTasks.Add(leadTasksCollection[i]);
 				}
+				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
-				usersСomboBox.Enabled = true;
-				usersLabel.Enabled = true;
-				loadDataButton.Enabled = true;
-				loadLeadTasksButton.Enabled = true;
-				refreshButton.Enabled = true;
-			}));
+				scheduleDataGridView.Invoke(new Action(() =>
+				{
+					var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
+					usersСomboBox.DataSource = users;
+
+					if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
+					{
+						usersСomboBox.SelectedItem = currentUser;
+						m_dataPresenter.FilterDataByUser(currentUser, scheduleDataGridView);
+					}
+
+					usersСomboBox.Enabled = true;
+					usersLabel.Enabled = true;
+					loadDataButton.Enabled = true;
+					loadLeadTasksButton.Enabled = true;
+					refreshButton.Enabled = true;
+				}));
+			}
+			catch (Exception exc)
+			{
+				scheduleDataGridView.Invoke(new Action(() =>
+				{
+					MessageBox.Show(exc.Message, Resources.LeadTasksParsinigError);
+					loadDataButton.Enabled = true;
+					loadLeadTasksButton.Enabled = true;
+				}));
+			}
 		}
 
 		private void MainFormFormClosing(object sender, FormClosingEventArgs e)

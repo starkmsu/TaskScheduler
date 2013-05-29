@@ -148,7 +148,6 @@
 			this.areaPathTextBox.Name = "areaPathTextBox";
 			this.areaPathTextBox.Size = new System.Drawing.Size(376, 20);
 			this.areaPathTextBox.TabIndex = 3;
-			this.areaPathTextBox.Text = "FORIS_Mobile\\Product Management Domain\\Order Catalogue";
 			// 
 			// areaPathLabel
 			// 

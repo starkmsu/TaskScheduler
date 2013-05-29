@@ -29,7 +29,7 @@ namespace TaskPlanningForms
 
 		internal static void SaveConfig(Config config)
 		{
-			using (var fs = new FileStream(s_configFIleName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+			using (var fs = new FileStream(s_configFIleName, FileMode.Create, FileAccess.Write, FileShare.Write))
 			{
 				new XmlSerializer(typeof(Config)).Serialize(fs, config);
 			}
