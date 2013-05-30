@@ -10,6 +10,8 @@ namespace TaskPlanningForms
 
 		public string AreaPath { get; set; }
 
+		public string IterationPath { get; set; }
+
 		public List<DateTime> Holidays { get; set; }
 
 		public Config()

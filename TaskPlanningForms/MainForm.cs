@@ -105,11 +105,17 @@ namespace TaskPlanningForms
 				iterations.Add(iteration);
 			}
 			iterations.Sort();
+			int selectedIndex = 0;
+			if (!string.IsNullOrEmpty(m_config.IterationPath)
+				&& iterations.Contains(m_config.IterationPath))
+			{
+				selectedIndex = iterations.IndexOf(m_config.IterationPath);
+			}
 
 			iterationsComboBox.Invoke(new Action(() =>
 				{
 					iterationsComboBox.DataSource = iterations;
-					iterationsComboBox.SelectedIndex = 0;
+					iterationsComboBox.SelectedIndex = selectedIndex;
 					iterationsComboBox.Enabled = true;
 
 					loadLeadTasksButton.Enabled = true;
@@ -133,6 +139,7 @@ namespace TaskPlanningForms
 		{
 			string iterationPath = null;
 			iterationsComboBox.Invoke(new Action(() => iterationPath = iterationsComboBox.Text));
+			m_config.IterationPath = iterationPath;
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
 			for (int i = 0; i < m_leadTasks.Count; i++)

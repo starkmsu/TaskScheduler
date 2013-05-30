@@ -96,7 +96,7 @@ namespace TaskPlanningForms
 				AppendBlockers(result, wiqlAccessor);
 			}
 
-			CleanDict(result.LeadTaskChildrenDict, result.WiDict);
+			CleanDict(result.LeadTaskChildrenDict, result.WiDict, false);
 
 			return result;
 		}
@@ -156,17 +156,23 @@ namespace TaskPlanningForms
 				if (!dataContainer.WiDict.ContainsKey(blocker.Id))
 					dataContainer.WiDict.Add(blocker.Id, blocker);
 			}
-			CleanDict(dataContainer.BlockersDict, dataContainer.WiDict);
+			CleanDict(dataContainer.BlockersDict, dataContainer.WiDict, true);
 		}
 
-		private void CleanDict(Dictionary<int, List<int>> dict, Dictionary<int, WorkItem> wiDict)
+		private void CleanDict(
+			Dictionary<int, List<int>> dict,
+			Dictionary<int, WorkItem> wiDict,
+			bool deleteEmpty)
 		{
 			foreach (var pair in dict)
 			{
 				pair.Value.RemoveAll(i => !wiDict.ContainsKey(i));
 			}
-			var emptyKeys = dict.Keys.Where(k => dict[k].Count == 0).ToList();
-			emptyKeys.ForEach(k => dict.Remove(k));
+			if (deleteEmpty)
+			{
+				var emptyKeys = dict.Keys.Where(k => dict[k].Count == 0).ToList();
+				emptyKeys.ForEach(k => dict.Remove(k));
+			}
 		}
 	}
 }
