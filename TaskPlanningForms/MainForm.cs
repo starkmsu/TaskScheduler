@@ -119,10 +119,19 @@ namespace TaskPlanningForms
 				{
 					iterationsComboBox.DataSource = iterations;
 					iterationsComboBox.Enabled = true;
-					validIterations.ForEach(i => iterationPathListBox.Items.Add(i));
+					validIterations.ForEach(i =>
+						{
+							if (!iterationPathListBox.Items.Contains(i))
+								iterationPathListBox.Items.Add(i);
+						});
 
 					loadLeadTasksButton.Enabled = true;
 					loadDataButton.Enabled = iterationPathListBox.Items.Count > 0;
+					if (iterationPathListBox.Items.Count > 0)
+					{
+						iterationPathAddButton.Enabled = true;
+						iterationPathRemoveButton.Enabled = true;
+					}
 				}));
 		}
 

@@ -31,6 +31,7 @@
 			this.mainTabControl = new System.Windows.Forms.TabControl();
 			this.mainTabPage = new System.Windows.Forms.TabPage();
 			this.iterationPathGroupBox = new System.Windows.Forms.GroupBox();
+			this.iterationPathRemoveButton = new System.Windows.Forms.Button();
 			this.iterationPathListBox = new System.Windows.Forms.ListBox();
 			this.iterationPathAddButton = new System.Windows.Forms.Button();
 			this.iterationsComboBox = new System.Windows.Forms.ComboBox();
@@ -56,7 +57,6 @@
 			this.setHolidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.iterationPathRemoveButton = new System.Windows.Forms.Button();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -107,6 +107,18 @@
 			this.iterationPathGroupBox.TabStop = false;
 			this.iterationPathGroupBox.Text = "Iteration path";
 			// 
+			// iterationPathRemoveButton
+			// 
+			this.iterationPathRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathRemoveButton.Enabled = false;
+			this.iterationPathRemoveButton.Location = new System.Drawing.Point(379, 391);
+			this.iterationPathRemoveButton.Name = "iterationPathRemoveButton";
+			this.iterationPathRemoveButton.Size = new System.Drawing.Size(75, 23);
+			this.iterationPathRemoveButton.TabIndex = 10;
+			this.iterationPathRemoveButton.Text = "Remove";
+			this.iterationPathRemoveButton.UseVisualStyleBackColor = true;
+			this.iterationPathRemoveButton.Click += new System.EventHandler(this.IterationPathRemoveButtonClick);
+			// 
 			// iterationPathListBox
 			// 
 			this.iterationPathListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -121,6 +133,7 @@
 			// iterationPathAddButton
 			// 
 			this.iterationPathAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathAddButton.Enabled = false;
 			this.iterationPathAddButton.Location = new System.Drawing.Point(388, 17);
 			this.iterationPathAddButton.Name = "iterationPathAddButton";
 			this.iterationPathAddButton.Size = new System.Drawing.Size(62, 23);
@@ -375,17 +388,6 @@
 			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
-			// 
-			// iterationPathRemoveButton
-			// 
-			this.iterationPathRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.iterationPathRemoveButton.Location = new System.Drawing.Point(379, 391);
-			this.iterationPathRemoveButton.Name = "iterationPathRemoveButton";
-			this.iterationPathRemoveButton.Size = new System.Drawing.Size(75, 23);
-			this.iterationPathRemoveButton.TabIndex = 10;
-			this.iterationPathRemoveButton.Text = "Remove";
-			this.iterationPathRemoveButton.UseVisualStyleBackColor = true;
-			this.iterationPathRemoveButton.Click += new System.EventHandler(this.IterationPathRemoveButtonClick);
 			// 
 			// MainForm
 			// 
