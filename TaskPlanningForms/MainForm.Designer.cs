@@ -29,16 +29,18 @@
 		private void InitializeComponent()
 		{
 			this.mainTabControl = new System.Windows.Forms.TabControl();
-			this.settingsTabPage = new System.Windows.Forms.TabPage();
-			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
-			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.setHolidaysButton = new System.Windows.Forms.Button();
+			this.mainTabPage = new System.Windows.Forms.TabPage();
+			this.iterationPathGroupBox = new System.Windows.Forms.GroupBox();
+			this.iterationPathListBox = new System.Windows.Forms.ListBox();
+			this.iterationPathAddButton = new System.Windows.Forms.Button();
 			this.iterationsComboBox = new System.Windows.Forms.ComboBox();
-			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.loadDataButton = new System.Windows.Forms.Button();
+			this.areaPathGroupBox = new System.Windows.Forms.GroupBox();
+			this.areaPathRemoveButton = new System.Windows.Forms.Button();
+			this.areaPathAddButton = new System.Windows.Forms.Button();
+			this.areaPathListBox = new System.Windows.Forms.ListBox();
 			this.areaPathTextBox = new System.Windows.Forms.TextBox();
-			this.areaPathLabel = new System.Windows.Forms.Label();
-			this.iterationPathLabel = new System.Windows.Forms.Label();
+			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
 			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
@@ -50,16 +52,25 @@
 			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.settingsPage = new System.Windows.Forms.TabPage();
+			this.setHolidaysButton = new System.Windows.Forms.Button();
+			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
+			this.tfsUrlLabel = new System.Windows.Forms.Label();
+			this.iterationPathRemoveButton = new System.Windows.Forms.Button();
 			this.mainTabControl.SuspendLayout();
-			this.settingsTabPage.SuspendLayout();
+			this.mainTabPage.SuspendLayout();
+			this.iterationPathGroupBox.SuspendLayout();
+			this.areaPathGroupBox.SuspendLayout();
 			this.dataTabPage.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).BeginInit();
+			this.settingsPage.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// mainTabControl
 			// 
-			this.mainTabControl.Controls.Add(this.settingsTabPage);
+			this.mainTabControl.Controls.Add(this.mainTabPage);
 			this.mainTabControl.Controls.Add(this.dataTabPage);
+			this.mainTabControl.Controls.Add(this.settingsPage);
 			this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.mainTabControl.Location = new System.Drawing.Point(0, 0);
 			this.mainTabControl.Name = "mainTabControl";
@@ -67,74 +78,73 @@
 			this.mainTabControl.Size = new System.Drawing.Size(884, 567);
 			this.mainTabControl.TabIndex = 0;
 			// 
-			// settingsTabPage
+			// mainTabPage
 			// 
-			this.settingsTabPage.Controls.Add(this.tfsUrlTextBox);
-			this.settingsTabPage.Controls.Add(this.tfsUrlLabel);
-			this.settingsTabPage.Controls.Add(this.setHolidaysButton);
-			this.settingsTabPage.Controls.Add(this.iterationsComboBox);
-			this.settingsTabPage.Controls.Add(this.loadLeadTasksButton);
-			this.settingsTabPage.Controls.Add(this.loadDataButton);
-			this.settingsTabPage.Controls.Add(this.areaPathTextBox);
-			this.settingsTabPage.Controls.Add(this.areaPathLabel);
-			this.settingsTabPage.Controls.Add(this.iterationPathLabel);
-			this.settingsTabPage.Location = new System.Drawing.Point(4, 22);
-			this.settingsTabPage.Name = "settingsTabPage";
-			this.settingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.settingsTabPage.Size = new System.Drawing.Size(876, 541);
-			this.settingsTabPage.TabIndex = 1;
-			this.settingsTabPage.Text = "Settings";
-			this.settingsTabPage.UseVisualStyleBackColor = true;
+			this.mainTabPage.Controls.Add(this.iterationPathGroupBox);
+			this.mainTabPage.Controls.Add(this.areaPathGroupBox);
+			this.mainTabPage.Location = new System.Drawing.Point(4, 22);
+			this.mainTabPage.Name = "mainTabPage";
+			this.mainTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.mainTabPage.Size = new System.Drawing.Size(876, 541);
+			this.mainTabPage.TabIndex = 1;
+			this.mainTabPage.Text = "Main";
+			this.mainTabPage.UseVisualStyleBackColor = true;
 			// 
-			// tfsUrlTextBox
+			// iterationPathGroupBox
 			// 
-			this.tfsUrlTextBox.Location = new System.Drawing.Point(57, 128);
-			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
-			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
-			this.tfsUrlTextBox.TabIndex = 9;
+			this.iterationPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathGroupBox.Controls.Add(this.iterationPathRemoveButton);
+			this.iterationPathGroupBox.Controls.Add(this.iterationPathListBox);
+			this.iterationPathGroupBox.Controls.Add(this.iterationPathAddButton);
+			this.iterationPathGroupBox.Controls.Add(this.iterationsComboBox);
+			this.iterationPathGroupBox.Controls.Add(this.loadDataButton);
+			this.iterationPathGroupBox.Location = new System.Drawing.Point(408, 6);
+			this.iterationPathGroupBox.Name = "iterationPathGroupBox";
+			this.iterationPathGroupBox.Size = new System.Drawing.Size(460, 420);
+			this.iterationPathGroupBox.TabIndex = 15;
+			this.iterationPathGroupBox.TabStop = false;
+			this.iterationPathGroupBox.Text = "Iteration path";
 			// 
-			// tfsUrlLabel
+			// iterationPathListBox
 			// 
-			this.tfsUrlLabel.AutoSize = true;
-			this.tfsUrlLabel.Location = new System.Drawing.Point(7, 131);
-			this.tfsUrlLabel.Name = "tfsUrlLabel";
-			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
-			this.tfsUrlLabel.TabIndex = 8;
-			this.tfsUrlLabel.Text = "TFS url:";
+			this.iterationPathListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathListBox.FormattingEnabled = true;
+			this.iterationPathListBox.Location = new System.Drawing.Point(6, 45);
+			this.iterationPathListBox.Name = "iterationPathListBox";
+			this.iterationPathListBox.Size = new System.Drawing.Size(448, 342);
+			this.iterationPathListBox.TabIndex = 9;
 			// 
-			// setHolidaysButton
+			// iterationPathAddButton
 			// 
-			this.setHolidaysButton.Location = new System.Drawing.Point(10, 102);
-			this.setHolidaysButton.Name = "setHolidaysButton";
-			this.setHolidaysButton.Size = new System.Drawing.Size(117, 23);
-			this.setHolidaysButton.TabIndex = 7;
-			this.setHolidaysButton.Text = "Configure holidays";
-			this.setHolidaysButton.UseVisualStyleBackColor = true;
-			this.setHolidaysButton.Click += new System.EventHandler(this.SetHolidaysButtonClick);
+			this.iterationPathAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathAddButton.Location = new System.Drawing.Point(388, 17);
+			this.iterationPathAddButton.Name = "iterationPathAddButton";
+			this.iterationPathAddButton.Size = new System.Drawing.Size(62, 23);
+			this.iterationPathAddButton.TabIndex = 8;
+			this.iterationPathAddButton.Text = "Add";
+			this.iterationPathAddButton.UseVisualStyleBackColor = true;
+			this.iterationPathAddButton.Click += new System.EventHandler(this.IterationPathAddButtonClick);
 			// 
 			// iterationsComboBox
 			// 
+			this.iterationsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.iterationsComboBox.Enabled = false;
 			this.iterationsComboBox.FormattingEnabled = true;
-			this.iterationsComboBox.Location = new System.Drawing.Point(86, 37);
+			this.iterationsComboBox.Location = new System.Drawing.Point(6, 19);
 			this.iterationsComboBox.Name = "iterationsComboBox";
 			this.iterationsComboBox.Size = new System.Drawing.Size(376, 21);
 			this.iterationsComboBox.TabIndex = 6;
 			// 
-			// loadLeadTasksButton
-			// 
-			this.loadLeadTasksButton.Location = new System.Drawing.Point(468, 8);
-			this.loadLeadTasksButton.Name = "loadLeadTasksButton";
-			this.loadLeadTasksButton.Size = new System.Drawing.Size(107, 23);
-			this.loadLeadTasksButton.TabIndex = 5;
-			this.loadLeadTasksButton.Text = "Load LeadTasks";
-			this.loadLeadTasksButton.UseVisualStyleBackColor = true;
-			this.loadLeadTasksButton.Click += new System.EventHandler(this.LoadLeadTasksButtonClick);
-			// 
 			// loadDataButton
 			// 
+			this.loadDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.loadDataButton.Enabled = false;
-			this.loadDataButton.Location = new System.Drawing.Point(468, 35);
+			this.loadDataButton.Location = new System.Drawing.Point(6, 391);
 			this.loadDataButton.Name = "loadDataButton";
 			this.loadDataButton.Size = new System.Drawing.Size(107, 23);
 			this.loadDataButton.TabIndex = 4;
@@ -142,30 +152,75 @@
 			this.loadDataButton.UseVisualStyleBackColor = true;
 			this.loadDataButton.Click += new System.EventHandler(this.LoadDataButtonClick);
 			// 
+			// areaPathGroupBox
+			// 
+			this.areaPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathGroupBox.Controls.Add(this.areaPathRemoveButton);
+			this.areaPathGroupBox.Controls.Add(this.areaPathAddButton);
+			this.areaPathGroupBox.Controls.Add(this.areaPathListBox);
+			this.areaPathGroupBox.Controls.Add(this.areaPathTextBox);
+			this.areaPathGroupBox.Controls.Add(this.loadLeadTasksButton);
+			this.areaPathGroupBox.Location = new System.Drawing.Point(8, 6);
+			this.areaPathGroupBox.Name = "areaPathGroupBox";
+			this.areaPathGroupBox.Size = new System.Drawing.Size(394, 420);
+			this.areaPathGroupBox.TabIndex = 14;
+			this.areaPathGroupBox.TabStop = false;
+			this.areaPathGroupBox.Text = "Area path";
+			// 
+			// areaPathRemoveButton
+			// 
+			this.areaPathRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathRemoveButton.Location = new System.Drawing.Point(313, 391);
+			this.areaPathRemoveButton.Name = "areaPathRemoveButton";
+			this.areaPathRemoveButton.Size = new System.Drawing.Size(75, 23);
+			this.areaPathRemoveButton.TabIndex = 8;
+			this.areaPathRemoveButton.Text = "Remove";
+			this.areaPathRemoveButton.UseVisualStyleBackColor = true;
+			this.areaPathRemoveButton.Click += new System.EventHandler(this.AreaPathRemoveButtonClick);
+			// 
+			// areaPathAddButton
+			// 
+			this.areaPathAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathAddButton.Location = new System.Drawing.Point(326, 17);
+			this.areaPathAddButton.Name = "areaPathAddButton";
+			this.areaPathAddButton.Size = new System.Drawing.Size(62, 23);
+			this.areaPathAddButton.TabIndex = 7;
+			this.areaPathAddButton.Text = "Add";
+			this.areaPathAddButton.UseVisualStyleBackColor = true;
+			this.areaPathAddButton.Click += new System.EventHandler(this.AreaPathAddButtonClick);
+			// 
+			// areaPathListBox
+			// 
+			this.areaPathListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathListBox.FormattingEnabled = true;
+			this.areaPathListBox.Location = new System.Drawing.Point(6, 45);
+			this.areaPathListBox.Name = "areaPathListBox";
+			this.areaPathListBox.Size = new System.Drawing.Size(382, 342);
+			this.areaPathListBox.TabIndex = 6;
+			// 
 			// areaPathTextBox
 			// 
-			this.areaPathTextBox.Location = new System.Drawing.Point(86, 11);
+			this.areaPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathTextBox.Location = new System.Drawing.Point(6, 19);
 			this.areaPathTextBox.Name = "areaPathTextBox";
-			this.areaPathTextBox.Size = new System.Drawing.Size(376, 20);
+			this.areaPathTextBox.Size = new System.Drawing.Size(314, 20);
 			this.areaPathTextBox.TabIndex = 3;
 			// 
-			// areaPathLabel
+			// loadLeadTasksButton
 			// 
-			this.areaPathLabel.AutoSize = true;
-			this.areaPathLabel.Location = new System.Drawing.Point(7, 14);
-			this.areaPathLabel.Name = "areaPathLabel";
-			this.areaPathLabel.Size = new System.Drawing.Size(57, 13);
-			this.areaPathLabel.TabIndex = 2;
-			this.areaPathLabel.Text = "Area Path:";
-			// 
-			// iterationPathLabel
-			// 
-			this.iterationPathLabel.AutoSize = true;
-			this.iterationPathLabel.Location = new System.Drawing.Point(7, 40);
-			this.iterationPathLabel.Name = "iterationPathLabel";
-			this.iterationPathLabel.Size = new System.Drawing.Size(73, 13);
-			this.iterationPathLabel.TabIndex = 0;
-			this.iterationPathLabel.Text = "Iteration Path:";
+			this.loadLeadTasksButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.loadLeadTasksButton.Location = new System.Drawing.Point(6, 391);
+			this.loadLeadTasksButton.Name = "loadLeadTasksButton";
+			this.loadLeadTasksButton.Size = new System.Drawing.Size(107, 23);
+			this.loadLeadTasksButton.TabIndex = 5;
+			this.loadLeadTasksButton.Text = "Load LeadTasks";
+			this.loadLeadTasksButton.UseVisualStyleBackColor = true;
+			this.loadLeadTasksButton.Click += new System.EventHandler(this.LoadLeadTasksButtonClick);
 			// 
 			// dataTabPage
 			// 
@@ -283,6 +338,55 @@
 			this.Past.ReadOnly = true;
 			this.Past.Width = 40;
 			// 
+			// settingsPage
+			// 
+			this.settingsPage.Controls.Add(this.setHolidaysButton);
+			this.settingsPage.Controls.Add(this.tfsUrlTextBox);
+			this.settingsPage.Controls.Add(this.tfsUrlLabel);
+			this.settingsPage.Location = new System.Drawing.Point(4, 22);
+			this.settingsPage.Name = "settingsPage";
+			this.settingsPage.Size = new System.Drawing.Size(876, 541);
+			this.settingsPage.TabIndex = 2;
+			this.settingsPage.Text = "Settings";
+			this.settingsPage.UseVisualStyleBackColor = true;
+			// 
+			// setHolidaysButton
+			// 
+			this.setHolidaysButton.Location = new System.Drawing.Point(8, 40);
+			this.setHolidaysButton.Name = "setHolidaysButton";
+			this.setHolidaysButton.Size = new System.Drawing.Size(117, 23);
+			this.setHolidaysButton.TabIndex = 12;
+			this.setHolidaysButton.Text = "Configure holidays";
+			this.setHolidaysButton.UseVisualStyleBackColor = true;
+			this.setHolidaysButton.Click += new System.EventHandler(this.SetHolidaysButtonClick);
+			// 
+			// tfsUrlTextBox
+			// 
+			this.tfsUrlTextBox.Location = new System.Drawing.Point(55, 14);
+			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
+			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
+			this.tfsUrlTextBox.TabIndex = 11;
+			// 
+			// tfsUrlLabel
+			// 
+			this.tfsUrlLabel.AutoSize = true;
+			this.tfsUrlLabel.Location = new System.Drawing.Point(5, 17);
+			this.tfsUrlLabel.Name = "tfsUrlLabel";
+			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
+			this.tfsUrlLabel.TabIndex = 10;
+			this.tfsUrlLabel.Text = "TFS url:";
+			// 
+			// iterationPathRemoveButton
+			// 
+			this.iterationPathRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.iterationPathRemoveButton.Location = new System.Drawing.Point(379, 391);
+			this.iterationPathRemoveButton.Name = "iterationPathRemoveButton";
+			this.iterationPathRemoveButton.Size = new System.Drawing.Size(75, 23);
+			this.iterationPathRemoveButton.TabIndex = 10;
+			this.iterationPathRemoveButton.Text = "Remove";
+			this.iterationPathRemoveButton.UseVisualStyleBackColor = true;
+			this.iterationPathRemoveButton.Click += new System.EventHandler(this.IterationPathRemoveButtonClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -293,11 +397,15 @@
 			this.Text = "Task Planning";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.mainTabControl.ResumeLayout(false);
-			this.settingsTabPage.ResumeLayout(false);
-			this.settingsTabPage.PerformLayout();
+			this.mainTabPage.ResumeLayout(false);
+			this.iterationPathGroupBox.ResumeLayout(false);
+			this.areaPathGroupBox.ResumeLayout(false);
+			this.areaPathGroupBox.PerformLayout();
 			this.dataTabPage.ResumeLayout(false);
 			this.dataTabPage.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).EndInit();
+			this.settingsPage.ResumeLayout(false);
+			this.settingsPage.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -307,7 +415,7 @@
 		private System.Windows.Forms.TabControl mainTabControl;
 		private System.Windows.Forms.TabPage dataTabPage;
 		private System.Windows.Forms.DataGridView scheduleDataGridView;
-		private System.Windows.Forms.TabPage settingsTabPage;
+		private System.Windows.Forms.TabPage mainTabPage;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
@@ -315,17 +423,24 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.TextBox areaPathTextBox;
-		private System.Windows.Forms.Label areaPathLabel;
-		private System.Windows.Forms.Label iterationPathLabel;
 		private System.Windows.Forms.Button loadDataButton;
 		private System.Windows.Forms.Label usersLabel;
 		private System.Windows.Forms.ComboBox usersСomboBox;
 		private System.Windows.Forms.Button loadLeadTasksButton;
 		private System.Windows.Forms.ComboBox iterationsComboBox;
-		private System.Windows.Forms.Button setHolidaysButton;
-		private System.Windows.Forms.Label tfsUrlLabel;
-		private System.Windows.Forms.TextBox tfsUrlTextBox;
 		private System.Windows.Forms.Button refreshButton;
+		private System.Windows.Forms.TabPage settingsPage;
+		private System.Windows.Forms.TextBox tfsUrlTextBox;
+		private System.Windows.Forms.Label tfsUrlLabel;
+		private System.Windows.Forms.Button setHolidaysButton;
+		private System.Windows.Forms.GroupBox areaPathGroupBox;
+		private System.Windows.Forms.ListBox areaPathListBox;
+		private System.Windows.Forms.Button areaPathAddButton;
+		private System.Windows.Forms.Button areaPathRemoveButton;
+		private System.Windows.Forms.GroupBox iterationPathGroupBox;
+		private System.Windows.Forms.Button iterationPathAddButton;
+		private System.Windows.Forms.ListBox iterationPathListBox;
+		private System.Windows.Forms.Button iterationPathRemoveButton;
 	}
 }
 

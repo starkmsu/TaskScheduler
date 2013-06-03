@@ -11,12 +11,12 @@ namespace TaskPlanningForms
 {
 	internal class DataLoader
 	{
-		internal WorkItemCollection GetLeadTasks(string tfsUrl, string areaPath)
+		internal WorkItemCollection GetLeadTasks(string tfsUrl, List<string> areaPaths)
 		{
 			const string queryStr = "SELECT *" +
 				" FROM WorkItems " +
 				" WHERE [System.TeamProject] = @project" +
-				" AND [System.AreaPath] Under @areaPath" +
+				" AND [System.AreaPath] IN (@areaPath)" +
 				" AND [System.WorkItemType] IN (@wiType)" +
 				" AND [System.State] IN (@wiState)" +
 				" AND [Microsoft.VSTS.Common.Discipline] IN (@discipline)" +
@@ -25,11 +25,11 @@ namespace TaskPlanningForms
 			var paramValues = new Dictionary<string, object>
 			{
 				{"project", @"FORIS_Mobile"},
-				{"areaPath", areaPath},
 			};
 
 			var complexParamValues = new Dictionary<string, List<object>>
 			{
+				{"areaPath", areaPaths.Cast<object>().ToList()},
 				{"discipline", new List<object>{"Development"}},
 				{"wiType", new List<object>{"LeadTask"}},
 				{"wiState", new List<object>{"Proposed", "Active"}},

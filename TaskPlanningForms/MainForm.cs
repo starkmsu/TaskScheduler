@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -46,6 +47,7 @@ namespace TaskPlanningForms
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
 			areaPathTextBox.Text = m_config.AreaPath;
+			areaPathListBox.Items.Add(m_config.AreaPath);
 
 			UpdateHolidays();
 		}
@@ -83,7 +85,11 @@ namespace TaskPlanningForms
 		{
 			try
 			{
-				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPathTextBox.Text);
+				var areaPaths = areaPathListBox.Items
+					.Cast<object>()
+					.Select(item => item.ToString())
+					.ToList();
+				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPaths);
 			}
 			catch (Exception e)
 			{
@@ -105,18 +111,15 @@ namespace TaskPlanningForms
 				iterations.Add(iteration);
 			}
 			iterations.Sort();
-			int selectedIndex = 0;
-			if (!string.IsNullOrEmpty(m_config.IterationPath)
-				&& iterations.Contains(m_config.IterationPath))
-			{
-				selectedIndex = iterations.IndexOf(m_config.IterationPath);
-			}
+			var validIterations = new List<string>();
+			if (m_config.IterationPaths != null && m_config.IterationPaths.Count > 0)
+				validIterations = m_config.IterationPaths.Where(iterations.Contains).ToList();
 
 			iterationsComboBox.Invoke(new Action(() =>
 				{
 					iterationsComboBox.DataSource = iterations;
-					iterationsComboBox.SelectedIndex = selectedIndex;
 					iterationsComboBox.Enabled = true;
+					validIterations.ForEach(i => iterationPathListBox.Items.Add(i));
 
 					loadLeadTasksButton.Enabled = true;
 					loadDataButton.Enabled = true;
@@ -129,7 +132,7 @@ namespace TaskPlanningForms
 			loadDataButton.Enabled = false;
 			usersLabel.Enabled = false;
 			usersСomboBox.Enabled = false;
-			mainTabControl.SelectTab(settingsTabPage);
+			mainTabControl.SelectTab(mainTabPage);
 			scheduleDataGridView.Rows.Clear();
 
 			ThreadPool.QueueUserWorkItem(x => LoadAndPresentData());
@@ -137,15 +140,16 @@ namespace TaskPlanningForms
 
 		private void LoadAndPresentData()
 		{
-			string iterationPath = null;
-			iterationsComboBox.Invoke(new Action(() => iterationPath = iterationsComboBox.Text));
-			m_config.IterationPath = iterationPath;
+			List<string> iterationPaths = null;
+			iterationsComboBox.Invoke(
+				new Action(() => iterationPaths = iterationPathListBox.Items.Cast<object>().Cast<string>().ToList()));
+			m_config.IterationPaths = iterationPaths;
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
 				var leadTask = m_leadTasks[i];
-				if (leadTask.IterationPath != iterationPath)
+				if (!iterationPaths.Contains(leadTask.IterationPath))
 					continue;
 				leadTasks.Add(leadTask);
 			}
@@ -179,18 +183,6 @@ namespace TaskPlanningForms
 		{
 			string user = usersСomboBox.SelectedItem.ToString();
 			m_dataPresenter.FilterDataByUser(user, scheduleDataGridView);
-		}
-
-		private void SetHolidaysButtonClick(object sender, EventArgs e)
-		{
-			var oldHolidays = new List<DateTime>(m_holidays);
-			var holidaysForm = new HolidaysForm(m_holidays);
-			holidaysForm.ShowDialog();
-			m_holidays = holidaysForm.Holidays;
-
-			m_config.Holidays = m_holidays;
-			m_dataPresenter.Holidays = m_holidays;
-			UpdateHolidays();
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -256,6 +248,41 @@ namespace TaskPlanningForms
 		private void MainFormFormClosing(object sender, FormClosingEventArgs e)
 		{
 			ConfigManager.SaveConfig(m_config);
+		}
+
+		private void SetHolidaysButtonClick(object sender, EventArgs e)
+		{
+			var holidaysForm = new HolidaysForm(m_holidays);
+			holidaysForm.ShowDialog();
+			m_holidays = holidaysForm.Holidays;
+
+			m_config.Holidays = m_holidays;
+			m_dataPresenter.Holidays = m_holidays;
+			UpdateHolidays();
+		}
+
+		private void AreaPathAddButtonClick(object sender, EventArgs e)
+		{
+			string areaPath = areaPathTextBox.Text;
+			if (!areaPathListBox.Items.Contains(areaPath))
+				areaPathListBox.Items.Add(areaPath);
+		}
+
+		private void AreaPathRemoveButtonClick(object sender, EventArgs e)
+		{
+			areaPathListBox.Items.Remove(areaPathListBox.SelectedItem);
+		}
+
+		private void IterationPathAddButtonClick(object sender, EventArgs e)
+		{
+			string iterationPath = iterationsComboBox.Text;
+			if (!iterationPathListBox.Items.Contains(iterationPath))
+				iterationPathListBox.Items.Add(iterationPath);
+		}
+
+		private void IterationPathRemoveButtonClick(object sender, EventArgs e)
+		{
+			iterationPathListBox.Items.Remove(iterationPathListBox.SelectedItem);
 		}
 	}
 }
