@@ -273,13 +273,20 @@ namespace TaskPlanningForms
 		private void AreaPathAddButtonClick(object sender, EventArgs e)
 		{
 			string areaPath = areaPathTextBox.Text;
-			if (!areaPathListBox.Items.Contains(areaPath))
-				areaPathListBox.Items.Add(areaPath);
+			if (areaPathListBox.Items.Contains(areaPath))
+				return;
+			areaPathListBox.Items.Add(areaPath);
+			loadLeadTasksButton.Enabled = true;
+			areaPathRemoveButton.Enabled = true;
 		}
 
 		private void AreaPathRemoveButtonClick(object sender, EventArgs e)
 		{
 			areaPathListBox.Items.Remove(areaPathListBox.SelectedItem);
+			if (areaPathListBox.Items.Count > 0)
+				return;
+			loadLeadTasksButton.Enabled = false;
+			areaPathRemoveButton.Enabled = false;
 		}
 
 		private void IterationPathAddButtonClick(object sender, EventArgs e)
@@ -289,13 +296,16 @@ namespace TaskPlanningForms
 				return;
 			iterationPathListBox.Items.Add(iterationPath);
 			loadDataButton.Enabled = true;
+			iterationPathRemoveButton.Enabled = true;
 		}
 
 		private void IterationPathRemoveButtonClick(object sender, EventArgs e)
 		{
 			iterationPathListBox.Items.Remove(iterationPathListBox.SelectedItem);
-			if (iterationPathListBox.Items.Count == 0)
-				loadDataButton.Enabled = false;
+			if (iterationPathListBox.Items.Count > 0)
+				return;
+			loadDataButton.Enabled = false;
+			iterationPathRemoveButton.Enabled = false;
 		}
 	}
 }
