@@ -8,7 +8,7 @@ namespace TaskPlanningForms
 	{
 		public string TfsUrl { get; set; }
 
-		public string AreaPath { get; set; }
+		public List<string> AreaPaths { get; set; }
 
 		public List<string> IterationPaths { get; set; }
 
@@ -17,7 +17,6 @@ namespace TaskPlanningForms
 		public Config()
 		{
 			TfsUrl = "https://tfs.sts.sitronics.com/sts";
-			AreaPath = @"FORIS_Mobile\Product Management Domain\Order Catalogue";
 			Holidays = new List<DateTime>();
 		}
 	}

@@ -46,8 +46,11 @@ namespace TaskPlanningForms
 			m_dataPresenter.Holidays = m_holidays;
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
-			areaPathTextBox.Text = m_config.AreaPath;
-			areaPathListBox.Items.Add(m_config.AreaPath);
+			if (m_config.AreaPaths != null && m_config.AreaPaths.Count > 0)
+			{
+				areaPathTextBox.Text = m_config.AreaPaths[0];
+				m_config.AreaPaths.ForEach(i => areaPathListBox.Items.Add(i));
+			}
 
 			UpdateHolidays();
 		}
@@ -76,7 +79,7 @@ namespace TaskPlanningForms
 			loadLeadTasksButton.Enabled = false;
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
-			m_config.AreaPath = areaPathTextBox.Text;
+			m_config.AreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
@@ -85,10 +88,7 @@ namespace TaskPlanningForms
 		{
 			try
 			{
-				var areaPaths = areaPathListBox.Items
-					.Cast<object>()
-					.Select(item => item.ToString())
-					.ToList();
+				var areaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
 				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPaths);
 			}
 			catch (Exception e)
@@ -122,7 +122,7 @@ namespace TaskPlanningForms
 					validIterations.ForEach(i => iterationPathListBox.Items.Add(i));
 
 					loadLeadTasksButton.Enabled = true;
-					loadDataButton.Enabled = true;
+					loadDataButton.Enabled = iterationPathListBox.Items.Count > 0;
 				}));
 		}
 
@@ -276,13 +276,17 @@ namespace TaskPlanningForms
 		private void IterationPathAddButtonClick(object sender, EventArgs e)
 		{
 			string iterationPath = iterationsComboBox.Text;
-			if (!iterationPathListBox.Items.Contains(iterationPath))
-				iterationPathListBox.Items.Add(iterationPath);
+			if (iterationPathListBox.Items.Contains(iterationPath))
+				return;
+			iterationPathListBox.Items.Add(iterationPath);
+			loadDataButton.Enabled = true;
 		}
 
 		private void IterationPathRemoveButtonClick(object sender, EventArgs e)
 		{
 			iterationPathListBox.Items.Remove(iterationPathListBox.SelectedItem);
+			if (iterationPathListBox.Items.Count == 0)
+				loadDataButton.Enabled = false;
 		}
 	}
 }
