@@ -44,13 +44,16 @@ namespace TaskPlanningForms
 			}
 		}
 
-		internal WorkItemCollection GetLeadTasks(string tfsUrl, string areaPath, string iterationPath)
+		internal WorkItemCollection GetLeadTasks(
+			string tfsUrl,
+			List<object> areaPaths,
+			List<object> iterationPaths)
 		{
 			const string queryStr = "SELECT *" +
 				" FROM WorkItems " +
 				" WHERE [System.TeamProject] = @project" +
-				" AND [System.AreaPath] Under @areaPath" +
-				" AND [System.IterationPath] Under @iterationPath" +
+				" AND [System.AreaPath] IN (@areaPath)" +
+				" AND [System.IterationPath] IN (@iterationPath)" +
 				" AND [System.WorkItemType] IN (@wiType)" +
 				" AND [System.State] IN (@wiState)" +
 				" AND [Microsoft.VSTS.Common.Discipline] IN (@discipline)" +
@@ -59,12 +62,12 @@ namespace TaskPlanningForms
 			var paramValues = new Dictionary<string, object>
 			{
 				{"project", @"FORIS_Mobile"},
-				{"areaPath", areaPath},
-				{"iterationPath", iterationPath},
 			};
 
 			var complexParamValues = new Dictionary<string, List<object>>
 			{
+				{"iterationPath", iterationPaths},
+				{"areaPath", areaPaths},
 				{"discipline", new List<object>{"Development"}},
 				{"wiType", new List<object>{"LeadTask"}},
 				{"wiState", new List<object>{"Proposed", "Active"}},

@@ -106,6 +106,7 @@ namespace TaskPlanningForms
 			leadTaskRow.Cells[0].Value = leadTask.Priority();
 			leadTaskRow.Cells[0].SetColorByState(leadTask);
 			leadTaskRow.Cells[1].Value = leadTask.Id;
+			leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
 			leadTaskRow.Cells[1].SetColorByState(leadTask);
 			leadTaskRow.Cells[2].Value = leadTask.Title;
 			leadTaskRow.Cells[2].SetColorByState(leadTask);

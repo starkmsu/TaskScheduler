@@ -217,7 +217,10 @@ namespace TaskPlanningForms
 				}));
 			try
 			{
-				var leadTasksCollection = m_dataLoader.GetLeadTasks(tfsUrl, areaPath, iterationPath);
+				var leadTasksCollection = m_dataLoader.GetLeadTasks(
+					tfsUrl,
+					areaPathListBox.Items.Cast<object>().ToList(),
+					iterationPathListBox.Items.Cast<object>().ToList());
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{

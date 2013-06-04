@@ -167,9 +167,8 @@
 			// 
 			// areaPathGroupBox
 			// 
-			this.areaPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.areaPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.areaPathGroupBox.Controls.Add(this.areaPathRemoveButton);
 			this.areaPathGroupBox.Controls.Add(this.areaPathAddButton);
 			this.areaPathGroupBox.Controls.Add(this.areaPathListBox);
