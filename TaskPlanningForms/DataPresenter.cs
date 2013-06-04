@@ -84,7 +84,7 @@ namespace TaskPlanningForms
 				if (row.Cells[m_leadTaskIdInd].Value != null)
 				{
 					if (prevLeadTaskRow >= 0)
-						dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
+						dgv.Rows[prevLeadTaskRow].Visible = user == string.Empty || hasUserTasks;
 					hasUserTasks = false;
 					prevLeadTaskRow = i;
 					continue;
