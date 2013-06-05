@@ -119,6 +119,7 @@ namespace TaskPlanningForms
 				{
 					iterationsComboBox.DataSource = iterations;
 					iterationsComboBox.Enabled = true;
+					iterationPathAddButton.Enabled = iterations.Count > 0;
 					validIterations.ForEach(i =>
 						{
 							if (!iterationPathListBox.Items.Contains(i))

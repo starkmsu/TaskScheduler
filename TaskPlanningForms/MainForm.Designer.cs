@@ -395,7 +395,7 @@
 			this.ClientSize = new System.Drawing.Size(884, 567);
 			this.Controls.Add(this.mainTabControl);
 			this.Name = "MainForm";
-			this.Text = "Task Planning";
+			this.Text = "Task Scheduler";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
 			this.mainTabControl.ResumeLayout(false);
 			this.mainTabPage.ResumeLayout(false);
