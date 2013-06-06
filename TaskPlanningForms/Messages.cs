@@ -31,5 +31,10 @@
 		{
 			return "Non child blocker";
 		}
+
+		internal static string ProposedLeadTaskHasActiveChild()
+		{
+			return "LeadTask in state Proposed has Child in Active state";
+		}
 	}
 }

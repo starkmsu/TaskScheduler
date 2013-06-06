@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
@@ -45,6 +46,17 @@ namespace TaskPlanningForms
 		internal static void SetErrorColor(this DataGridViewCell cell)
 		{
 			cell.Style.BackColor = CellsPalette.Error;
+		}
+
+		internal static bool IsColorForState(this DataGridViewCell cell, string state)
+		{
+			if (state == WorkItemState.Proposed)
+				return cell.Style.BackColor == CellsPalette.StateProposed;
+			if (state == WorkItemState.Active)
+				return cell.Style.BackColor == CellsPalette.StateActive;
+			if (state == WorkItemState.Resolved)
+				return cell.Style.BackColor == CellsPalette.StateResolved;
+			throw new NotImplementedException("Unkonown state " + state);
 		}
 	}
 }

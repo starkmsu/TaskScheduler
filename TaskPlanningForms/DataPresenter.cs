@@ -65,6 +65,18 @@ namespace TaskPlanningForms
 					dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
 					dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
 				}
+				if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed))
+				{
+					int lasttChildRowInd = dgv.Rows.Count - 1;
+					for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
+					{
+						if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active))
+						{
+							dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
+							dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasActiveChild();
+						}
+					}
+				}
 			}
 
 			List<string> users = tasksByUser.Keys.ToList();
