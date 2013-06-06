@@ -88,7 +88,8 @@ namespace TaskPlanningForms
 			{
 				WiDict = new Dictionary<int, WorkItem>(),
 				BlockersDict = new Dictionary<int, List<int>>(),
-				LeadTaskChildrenDict = new Dictionary<int, List<int>>()
+				LeadTaskChildrenDict = new Dictionary<int, List<int>>(),
+				NonChildBlockers = new HashSet<int>()
 			};
 
 			AppendLeadTasks(result, leadTasks);
@@ -96,17 +97,18 @@ namespace TaskPlanningForms
 			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
 				AppendTasks(result, wiqlAccessor);
-				AppendBlockers(result, wiqlAccessor);
+				CleanDict(result.LeadTaskChildrenDict, result.WiDict, false, wiqlAccessor);
+				CleanDict(result.BlockersDict, result.WiDict, true, wiqlAccessor);
 			}
 
-			CleanDict(result.LeadTaskChildrenDict, result.WiDict, false);
+			InitExternalBlockers(result);
 
 			return result;
 		}
 
 		private void AppendLeadTasks(DataContainer dataContainer, IEnumerable<WorkItem> leadTasks)
 		{
-			foreach (var leadTask in leadTasks)
+			foreach (WorkItem leadTask in leadTasks)
 			{
 				var leadTaskLinkDict = WorkItemParser.ParseLinks(leadTask);
 
@@ -125,7 +127,7 @@ namespace TaskPlanningForms
 
 		private void AppendTasks(DataContainer dataContainer, TfsWiqlAccessor wiqlAccessor)
 		{
-			var ltChildrenIds = dataContainer.LeadTaskChildrenDict.Values.SelectMany(i => i).ToList();
+			List<int> ltChildrenIds = dataContainer.LeadTaskChildrenDict.Values.SelectMany(i => i).ToList();
 			if (ltChildrenIds.Count == 0)
 				return;
 
@@ -133,48 +135,76 @@ namespace TaskPlanningForms
 			for (int i = 0; i < childrenTasks.Count; i++)
 			{
 				WorkItem task = childrenTasks[i];
+				dataContainer.WiDict.Add(task.Id, task);
 				if (task.State == WorkItemState.Closed)
 					continue;
 				if (task.Type.Name != WorkItemType.Task)
 					continue;
-				dataContainer.WiDict.Add(task.Id, task);
-				var taskBlockersIds = WorkItemParser.GetRelationsByType(task, WorkItemLinkType.BlockedBy);
+				List<int> taskBlockersIds = WorkItemParser.GetRelationsByType(task, WorkItemLinkType.BlockedBy);
 				if (taskBlockersIds.Count > 0)
 					dataContainer.BlockersDict.Add(task.Id, taskBlockersIds);
 			}
 		}
 
-		private void AppendBlockers(DataContainer dataContainer, TfsWiqlAccessor wiqlAccessor)
-		{
-			if (dataContainer.BlockersDict.Count == 0)
-				return;
-
-			var blockerIds = dataContainer.BlockersDict.Values.SelectMany(i => i).ToList();
-			var blockersWi = wiqlAccessor.QueryWorkItemsByIds(blockerIds);
-			for (int i = 0; i < blockersWi.Count; i++)
-			{
-				WorkItem blocker = blockersWi[i];
-				if (blocker.State == WorkItemState.Closed)
-					continue;
-				if (!dataContainer.WiDict.ContainsKey(blocker.Id))
-					dataContainer.WiDict.Add(blocker.Id, blocker);
-			}
-			CleanDict(dataContainer.BlockersDict, dataContainer.WiDict, true);
-		}
-
 		private void CleanDict(
 			Dictionary<int, List<int>> dict,
 			Dictionary<int, WorkItem> wiDict,
-			bool deleteEmpty)
+			bool deleteEmpty,
+			TfsWiqlAccessor wiqlAccessor)
 		{
+			var notFoundIdsDict = new Dictionary<int, List<List<int>>>(dict.Keys.Count);
 			foreach (var pair in dict)
 			{
-				pair.Value.RemoveAll(i => !wiDict.ContainsKey(i));
+				var idsToRemove = new HashSet<int>();
+				foreach (int id in pair.Value)
+				{
+					if (wiDict.ContainsKey(id))
+					{
+						if (wiDict[id].State == WorkItemState.Closed)
+							idsToRemove.Add(id);
+					}
+					else
+					{
+						if (notFoundIdsDict.ContainsKey(id))
+							notFoundIdsDict[id].Add(pair.Value);
+						else
+							notFoundIdsDict.Add(id, new List<List<int>>(1){pair.Value});
+					}
+				}
+				foreach (int id in idsToRemove)
+				{
+					pair.Value.Remove(id);
+				}
+			}
+			if (notFoundIdsDict.Keys.Count > 0)
+			{
+				var workItems = wiqlAccessor.QueryWorkItemsByIds(notFoundIdsDict.Keys.ToList());
+				for (int i = 0; i < workItems.Count; i++)
+				{
+					WorkItem workItem = workItems[i];
+					if (workItem.State != WorkItemState.Closed)
+						continue;
+					foreach (List<int> ids in notFoundIdsDict[workItem.Id])
+					{
+						ids.Remove(workItem.Id);
+					}
+				}
 			}
 			if (deleteEmpty)
 			{
 				var emptyKeys = dict.Keys.Where(k => dict[k].Count == 0).ToList();
 				emptyKeys.ForEach(k => dict.Remove(k));
+			}
+		}
+
+		private void InitExternalBlockers(DataContainer dataContainer)
+		{
+			foreach (var pair in dataContainer.BlockersDict)
+			{
+				foreach (int blockerId in pair.Value.Where(i => !dataContainer.WiDict.ContainsKey(i)))
+				{
+					dataContainer.NonChildBlockers.Add(blockerId);
+				}
 			}
 		}
 	}

@@ -26,5 +26,10 @@
 		{
 			return "Estimate not present";
 		}
+
+		internal static string NonChildBlocker()
+		{
+			return "Non child blocker";
+		}
 	}
 }
