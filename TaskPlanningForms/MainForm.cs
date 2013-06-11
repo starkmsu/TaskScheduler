@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskPlanningForms.Properties;
+using TfsUtils.Parsers;
 
 namespace TaskPlanningForms
 {
@@ -35,7 +36,8 @@ namespace TaskPlanningForms
 				{
 					Name = dateText,
 					HeaderText = dateText,
-					Width = 40
+					Width = 40,
+					Resizable = DataGridViewTriState.False
 				};
 				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
 					column.HeaderCell.Style.BackColor = column.DefaultCellStyle.BackColor = CellsPalette.WeekEnd;
@@ -156,10 +158,13 @@ namespace TaskPlanningForms
 			m_config.IterationPaths = iterationPaths;
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
+			bool withDevCompleted = devCmpletedCheckBox.Checked;
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
 				var leadTask = m_leadTasks[i];
 				if (!iterationPaths.Contains(leadTask.IterationPath))
+					continue;
+				if (!withDevCompleted && leadTask.IsDevCompleted())
 					continue;
 				leadTasks.Add(leadTask);
 			}
@@ -202,13 +207,13 @@ namespace TaskPlanningForms
 
 		private void RefreshData()
 		{
-			string tfsUrl = null, areaPath = null, iterationPath = null, currentUser = null;
+			string tfsUrl = null, currentUser = null;
+			bool withDevComplete = true;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
 					tfsUrl = tfsUrlTextBox.Text;
-					areaPath = areaPathTextBox.Text;
-					iterationPath = iterationsComboBox.Text;
 					currentUser = usersСomboBox.SelectedItem.ToString();
+					withDevComplete = devCmpletedCheckBox.Checked;
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
 					loadDataButton.Enabled = false;
@@ -225,6 +230,8 @@ namespace TaskPlanningForms
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
+					if (!withDevComplete && leadTasks[i].IsDevCompleted())
+						continue;
 					leadTasks.Add(leadTasksCollection[i]);
 				}
 				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);

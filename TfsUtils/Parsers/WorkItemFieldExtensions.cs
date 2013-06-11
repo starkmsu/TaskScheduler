@@ -39,5 +39,10 @@ namespace TfsUtils.Parsers
 		{
 			return workItem["Remaining Work"] as double?;
 		}
+
+		public static bool IsDevCompleted(this WorkItem workItem)
+		{
+			return workItem["Dev Completed Agreed"].ToString().Length > 0;
+		}
 	}
 }
