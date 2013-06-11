@@ -121,8 +121,17 @@ namespace TaskPlanningForms
 			leadTaskRow.Cells[0].Value = leadTask.Priority();
 			leadTaskRow.Cells[0].SetColorByState(leadTask);
 			leadTaskRow.Cells[1].Value = leadTask.Id;
-			leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
-			leadTaskRow.Cells[1].SetColorByState(leadTask);
+			string hlaAgeementState = leadTask.HlaAgreementState();
+			if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
+			{
+				leadTaskRow.Cells[1].SetErrorColor();
+				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemtnState(hlaAgeementState);
+			}
+			else
+			{
+				leadTaskRow.Cells[1].SetColorByState(leadTask);
+				leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
+			}
 			leadTaskRow.Cells[2].Value = leadTask.Title;
 			leadTaskRow.Cells[2].SetColorByState(leadTask);
 			if (data.BlockersDict.ContainsKey(leadTask.Id))
@@ -134,7 +143,7 @@ namespace TaskPlanningForms
 				if (nonChildBlockerId > 0)
 				{
 					leadTaskRow.Cells[3].SetErrorColor();
-					leadTaskRow.Cells[3].ToolTipText = nonChildBlockerId + " - " + Messages.NonChildBlocker();
+					leadTaskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 			}
 			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
@@ -266,12 +275,12 @@ namespace TaskPlanningForms
 				if (nonChildBlockerId > 0)
 				{
 					taskRow.Cells[3].SetErrorColor();
-					taskRow.Cells[3].ToolTipText = nonChildBlockerId + " - " + Messages.NonChildBlocker();
+					taskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 				else if (task.State == WorkItemState.Active)
 				{
 					taskRow.Cells[3].SetErrorColor();
-					taskRow.Cells[3].ToolTipText = blockerIdsStr + " - " + Messages.ActiveIsBlocked();
+					taskRow.Cells[3].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
 				}
 			}
 			string assignedTo = task.AssignedTo();

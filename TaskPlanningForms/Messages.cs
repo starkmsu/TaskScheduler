@@ -7,9 +7,9 @@
 			return "Some Child Task will not be finished before current Finish Date";
 		}
 
-		internal static string ActiveIsBlocked()
+		internal static string ActiveIsBlocked(string blockerIds)
 		{
-			return "Active WI is blocked";
+			return blockerIds + " - Active WI is blocked";
 		}
 
 		internal static string TaskIsNotAssigned()
@@ -27,14 +27,19 @@
 			return "Estimate not present";
 		}
 
-		internal static string NonChildBlocker()
+		internal static string NonChildBlocker(int blockerId)
 		{
-			return "Non child blocker";
+			return blockerId + " - Non child blocker";
 		}
 
 		internal static string ProposedLeadTaskHasActiveChild()
 		{
 			return "LeadTask in state Proposed has Child in Active state";
+		}
+
+		internal static string BadHlaAgreemtnState(string state)
+		{
+			return "HLA agreement state is " + state;
 		}
 	}
 }

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accessors\ChangesetAccessor.cs" />
+    <Compile Include="Const\DocumentAgreementState.cs" />
     <Compile Include="Const\WorkItemLinkType.cs" />
     <Compile Include="Const\WorkItemState.cs" />
     <Compile Include="Const\WorkItemType.cs" />

@@ -7,12 +7,12 @@ namespace TfsUtils.Parsers
 	{
 		public static string Discipline(this WorkItem workItem)
 		{
-			return workItem["Discipline"].ToString();
+			return GetStringValue(workItem, "Discipline");
 		}
 
 		public static string AssignedTo(this WorkItem workItem)
 		{
-			return workItem["Assigned To"].ToString();
+			return GetStringValue(workItem, "Assigned To");
 		}
 
 		public static int Priority(this WorkItem workItem)
@@ -42,7 +42,20 @@ namespace TfsUtils.Parsers
 
 		public static bool IsDevCompleted(this WorkItem workItem)
 		{
-			return workItem["Dev Completed Agreed"].ToString().Length > 0;
+			return GetStringValue(workItem, "Dev Completed Agreed").Length > 0;
+		}
+
+		public static string HlaAgreementState(this WorkItem workItem)
+		{
+			return GetStringValue(workItem, "HLA Agreed");
+		}
+
+		private static string GetStringValue(WorkItem workItem, string fieldName)
+		{
+			object fieldObj = workItem[fieldName];
+			if (fieldObj == null)
+				return string.Empty;
+			return fieldObj.ToString();
 		}
 	}
 }
