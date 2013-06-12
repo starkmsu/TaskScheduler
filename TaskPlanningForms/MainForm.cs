@@ -158,13 +158,10 @@ namespace TaskPlanningForms
 			m_config.IterationPaths = iterationPaths;
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
-			bool withDevCompleted = devCmpletedCheckBox.Checked;
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
 				var leadTask = m_leadTasks[i];
 				if (!iterationPaths.Contains(leadTask.IterationPath))
-					continue;
-				if (!withDevCompleted && leadTask.IsDevCompleted())
 					continue;
 				leadTasks.Add(leadTask);
 			}
@@ -208,12 +205,10 @@ namespace TaskPlanningForms
 		private void RefreshData()
 		{
 			string tfsUrl = null, currentUser = null;
-			bool withDevComplete = true;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
 					tfsUrl = tfsUrlTextBox.Text;
 					currentUser = usersСomboBox.SelectedItem.ToString();
-					withDevComplete = devCmpletedCheckBox.Checked;
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
 					loadDataButton.Enabled = false;
@@ -230,8 +225,6 @@ namespace TaskPlanningForms
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
-					if (!withDevComplete && leadTasks[i].IsDevCompleted())
-						continue;
 					leadTasks.Add(leadTasksCollection[i]);
 				}
 				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
@@ -317,6 +310,12 @@ namespace TaskPlanningForms
 				return;
 			loadDataButton.Enabled = false;
 			iterationPathRemoveButton.Enabled = false;
+		}
+
+		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
+		{
+			bool withDevCompleted = devCmpletedCheckBox.Checked;
+			m_dataPresenter.FilterDataByDevCompleted(withDevCompleted, scheduleDataGridView);
 		}
 	}
 }

@@ -16,7 +16,9 @@ namespace TaskPlanningForms
 					cell.Style.BackColor = CellsPalette.StateProposed;
 					break;
 				case WorkItemState.Active:
-					cell.Style.BackColor = CellsPalette.StateActive;
+					cell.Style.BackColor = workItem.IsDevCompleted()
+						? CellsPalette.StateDevCompleted
+						: CellsPalette.StateActive;
 					break;
 				case WorkItemState.Resolved:
 					cell.Style.BackColor = CellsPalette.StateResolved;
@@ -56,6 +58,8 @@ namespace TaskPlanningForms
 				return cell.Style.BackColor == CellsPalette.StateActive;
 			if (state == WorkItemState.Resolved)
 				return cell.Style.BackColor == CellsPalette.StateResolved;
+			if (state == WorkItemState.DevCompleted)
+				return cell.Style.BackColor == CellsPalette.StateDevCompleted;
 			throw new NotImplementedException("Unkonown state " + state);
 		}
 	}

@@ -8,9 +8,11 @@ namespace TaskPlanningForms
 
 		internal static Color StateProposed = Color.Yellow;
 
-		internal static Color StateActive = Color.LimeGreen;
+		internal static Color StateActive = Color.LawnGreen;
 
 		internal static Color StateResolved = Color.SandyBrown;
+
+		internal static Color StateDevCompleted = Color.Green;
 
 		internal static Color DisciplineDevelopment = Color.Cyan;
 

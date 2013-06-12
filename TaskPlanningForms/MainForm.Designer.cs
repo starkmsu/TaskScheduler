@@ -43,6 +43,7 @@
 			this.areaPathTextBox = new System.Windows.Forms.TextBox();
 			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.devCmpletedCheckBox = new System.Windows.Forms.CheckBox();
 			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersСomboBox = new System.Windows.Forms.ComboBox();
@@ -57,7 +58,6 @@
 			this.setHolidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.devCmpletedCheckBox = new System.Windows.Forms.CheckBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -96,7 +96,6 @@
 			this.iterationPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.iterationPathGroupBox.Controls.Add(this.devCmpletedCheckBox);
 			this.iterationPathGroupBox.Controls.Add(this.iterationPathRemoveButton);
 			this.iterationPathGroupBox.Controls.Add(this.iterationPathListBox);
 			this.iterationPathGroupBox.Controls.Add(this.iterationPathAddButton);
@@ -238,6 +237,7 @@
 			// 
 			// dataTabPage
 			// 
+			this.dataTabPage.Controls.Add(this.devCmpletedCheckBox);
 			this.dataTabPage.Controls.Add(this.refreshButton);
 			this.dataTabPage.Controls.Add(this.usersLabel);
 			this.dataTabPage.Controls.Add(this.usersСomboBox);
@@ -250,9 +250,22 @@
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
 			// 
+			// devCmpletedCheckBox
+			// 
+			this.devCmpletedCheckBox.AutoSize = true;
+			this.devCmpletedCheckBox.Checked = true;
+			this.devCmpletedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.devCmpletedCheckBox.Location = new System.Drawing.Point(376, 8);
+			this.devCmpletedCheckBox.Name = "devCmpletedCheckBox";
+			this.devCmpletedCheckBox.Size = new System.Drawing.Size(121, 17);
+			this.devCmpletedCheckBox.TabIndex = 12;
+			this.devCmpletedCheckBox.Text = "with Dev Completed";
+			this.devCmpletedCheckBox.UseVisualStyleBackColor = true;
+			this.devCmpletedCheckBox.CheckedChanged += new System.EventHandler(this.DevCmpletedCheckBoxCheckedChanged);
+			// 
 			// refreshButton
 			// 
-			this.refreshButton.Location = new System.Drawing.Point(294, 4);
+			this.refreshButton.Location = new System.Drawing.Point(8, 4);
 			this.refreshButton.Name = "refreshButton";
 			this.refreshButton.Size = new System.Drawing.Size(75, 23);
 			this.refreshButton.TabIndex = 6;
@@ -264,7 +277,7 @@
 			// 
 			this.usersLabel.AutoSize = true;
 			this.usersLabel.Enabled = false;
-			this.usersLabel.Location = new System.Drawing.Point(7, 9);
+			this.usersLabel.Location = new System.Drawing.Point(89, 9);
 			this.usersLabel.Name = "usersLabel";
 			this.usersLabel.Size = new System.Drawing.Size(66, 13);
 			this.usersLabel.TabIndex = 5;
@@ -274,7 +287,7 @@
 			// 
 			this.usersСomboBox.Enabled = false;
 			this.usersСomboBox.FormattingEnabled = true;
-			this.usersСomboBox.Location = new System.Drawing.Point(79, 6);
+			this.usersСomboBox.Location = new System.Drawing.Point(161, 6);
 			this.usersСomboBox.Name = "usersСomboBox";
 			this.usersСomboBox.Size = new System.Drawing.Size(209, 21);
 			this.usersСomboBox.TabIndex = 4;
@@ -393,19 +406,6 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// devCmpletedCheckBox
-			// 
-			this.devCmpletedCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.devCmpletedCheckBox.AutoSize = true;
-			this.devCmpletedCheckBox.Checked = true;
-			this.devCmpletedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.devCmpletedCheckBox.Location = new System.Drawing.Point(119, 395);
-			this.devCmpletedCheckBox.Name = "devCmpletedCheckBox";
-			this.devCmpletedCheckBox.Size = new System.Drawing.Size(121, 17);
-			this.devCmpletedCheckBox.TabIndex = 11;
-			this.devCmpletedCheckBox.Text = "with Dev Completed";
-			this.devCmpletedCheckBox.UseVisualStyleBackColor = true;
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -418,7 +418,6 @@
 			this.mainTabControl.ResumeLayout(false);
 			this.mainTabPage.ResumeLayout(false);
 			this.iterationPathGroupBox.ResumeLayout(false);
-			this.iterationPathGroupBox.PerformLayout();
 			this.areaPathGroupBox.ResumeLayout(false);
 			this.areaPathGroupBox.PerformLayout();
 			this.dataTabPage.ResumeLayout(false);

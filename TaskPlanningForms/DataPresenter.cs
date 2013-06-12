@@ -110,6 +110,18 @@ namespace TaskPlanningForms
 				dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
 		}
 
+		internal void FilterDataByDevCompleted(bool withDevCompleted, DataGridView dgv)
+		{
+			bool visible = true;
+			for (int i = 0; i < dgv.Rows.Count; i++)
+			{
+				var row = dgv.Rows[i];
+				if (row.Cells[m_leadTaskIdInd].Value != null)
+					visible = withDevCompleted || !row.Cells[0].IsColorForState(WorkItemState.DevCompleted);
+				row.Visible = visible;
+			}
+		}
+
 		private int AddLeadTaskRow(
 			DataGridView dgv,
 			WorkItem leadTask,
@@ -118,8 +130,25 @@ namespace TaskPlanningForms
 			dgv.Rows.Add(new DataGridViewRow());
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
 
+			FillLeadTaskStarttingCells(
+				leadTask,
+				leadTaskRow,
+				data);
+
+			if (leadTask.State == WorkItemState.Proposed)
+				return AddDatesProposed(leadTask, leadTaskRow, m_indShift, "O");
+			return AddDatesActive(leadTask, leadTaskRow, m_indShift, "X");
+		}
+
+		private void FillLeadTaskStarttingCells(
+			WorkItem leadTask,
+			DataGridViewRow leadTaskRow,
+			DataContainer data)
+		{
 			leadTaskRow.Cells[0].Value = leadTask.Priority();
 			leadTaskRow.Cells[0].SetColorByState(leadTask);
+			leadTaskRow.Cells[0].ToolTipText = leadTask.State;
+
 			leadTaskRow.Cells[1].Value = leadTask.Id;
 			string hlaAgeementState = leadTask.HlaAgreementState();
 			if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
@@ -132,8 +161,10 @@ namespace TaskPlanningForms
 				leadTaskRow.Cells[1].SetColorByState(leadTask);
 				leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
 			}
+
 			leadTaskRow.Cells[2].Value = leadTask.Title;
 			leadTaskRow.Cells[2].SetColorByState(leadTask);
+
 			if (data.BlockersDict.ContainsKey(leadTask.Id))
 			{
 				List<int> blockerIds = data.BlockersDict[leadTask.Id];
@@ -146,11 +177,8 @@ namespace TaskPlanningForms
 					leadTaskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 			}
-			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
 
-			if (leadTask.State == WorkItemState.Proposed)
-				return AddDatesProposed(leadTask, leadTaskRow, m_indShift, "O");
-			return AddDatesActive(leadTask, leadTaskRow, m_indShift, "X");
+			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
 		}
 
 		private int AddTaskRow(
@@ -259,6 +287,8 @@ namespace TaskPlanningForms
 		{
 			taskRow.Cells[0].Value = task.Priority();
 			taskRow.Cells[0].SetColorByState(task);
+			taskRow.Cells[0].ToolTipText = task.State;
+
 			taskRow.Cells[2].Value = task.Id;
 			taskRow.Cells[2].ToolTipText =
 				task.Discipline() + " "
@@ -267,6 +297,7 @@ namespace TaskPlanningForms
 					? "Remaining " + task.Remaining().ToString()
 					: "Estimate " + task.Estimate().ToString());
 			taskRow.Cells[2].SetColorByDiscipline(task);
+
 			if (blockerIds != null)
 			{
 				string blockerIdsStr = string.Join(",", blockerIds);
@@ -283,6 +314,7 @@ namespace TaskPlanningForms
 					taskRow.Cells[3].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
 				}
 			}
+
 			string assignedTo = task.AssignedTo();
 			taskRow.Cells[4].Value = assignedTo;
 			if (assignedTo.StartsWith(m_groupPrefix))
@@ -290,6 +322,7 @@ namespace TaskPlanningForms
 				taskRow.Cells[4].SetErrorColor();
 				taskRow.Cells[4].ToolTipText = Messages.TaskIsNotAssigned();
 			}
+
 			return assignedTo;
 		}
 

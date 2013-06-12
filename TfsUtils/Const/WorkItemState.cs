@@ -9,5 +9,7 @@
 		public const string Active = "Active";
 
 		public const string Proposed = "Proposed";
+
+		public const string DevCompleted = "DevCompleted";
 	}
 }

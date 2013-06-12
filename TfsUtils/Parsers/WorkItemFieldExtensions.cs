@@ -52,9 +52,13 @@ namespace TfsUtils.Parsers
 
 		private static string GetStringValue(WorkItem workItem, string fieldName)
 		{
+			if (!workItem.Fields.Contains(fieldName))
+				return string.Empty;
+
 			object fieldObj = workItem[fieldName];
 			if (fieldObj == null)
 				return string.Empty;
+
 			return fieldObj.ToString();
 		}
 	}
