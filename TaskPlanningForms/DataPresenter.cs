@@ -176,6 +176,11 @@ namespace TaskPlanningForms
 					leadTaskRow.Cells[3].SetErrorColor();
 					leadTaskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
+				else
+				{
+					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
+					leadTaskRow.Cells[3].ToolTipText = blockerIdsStr;
+				}
 			}
 
 			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
@@ -210,8 +215,8 @@ namespace TaskPlanningForms
 			string assignedTo = FillTaskStartingCells(
 				task,
 				taskRow,
-				blockerIds,
-				data.NonChildBlockers);
+				data,
+				blockerIds);
 
 			if (task.State == WorkItemState.Resolved)
 			{
@@ -282,8 +287,8 @@ namespace TaskPlanningForms
 		private string FillTaskStartingCells(
 			WorkItem task,
 			DataGridViewRow taskRow,
-			List<int> blockerIds,
-			HashSet<int> nonChildBlockerIds)
+			DataContainer data,
+			List<int> blockerIds)
 		{
 			taskRow.Cells[0].Value = task.Priority();
 			taskRow.Cells[0].SetColorByState(task);
@@ -302,7 +307,7 @@ namespace TaskPlanningForms
 			{
 				string blockerIdsStr = string.Join(",", blockerIds);
 				taskRow.Cells[3].Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(nonChildBlockerIds.Contains);
+				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.Contains);
 				if (nonChildBlockerId > 0)
 				{
 					taskRow.Cells[3].SetErrorColor();
@@ -312,6 +317,11 @@ namespace TaskPlanningForms
 				{
 					taskRow.Cells[3].SetErrorColor();
 					taskRow.Cells[3].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
+				}
+				else
+				{
+					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
+					taskRow.Cells[3].ToolTipText = blockerIdsStr;
 				}
 			}
 
