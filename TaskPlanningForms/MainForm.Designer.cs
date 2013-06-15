@@ -58,6 +58,7 @@
 			this.setHolidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
+			this.subAreaPathsCheckBox = new System.Windows.Forms.CheckBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -170,6 +171,7 @@
 			// 
 			this.areaPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.areaPathGroupBox.Controls.Add(this.subAreaPathsCheckBox);
 			this.areaPathGroupBox.Controls.Add(this.areaPathRemoveButton);
 			this.areaPathGroupBox.Controls.Add(this.areaPathAddButton);
 			this.areaPathGroupBox.Controls.Add(this.areaPathListBox);
@@ -406,6 +408,19 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
+			// subAreaPathsCheckBox
+			// 
+			this.subAreaPathsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.subAreaPathsCheckBox.AutoSize = true;
+			this.subAreaPathsCheckBox.Checked = true;
+			this.subAreaPathsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.subAreaPathsCheckBox.Location = new System.Drawing.Point(119, 395);
+			this.subAreaPathsCheckBox.Name = "subAreaPathsCheckBox";
+			this.subAreaPathsCheckBox.Size = new System.Drawing.Size(115, 17);
+			this.subAreaPathsCheckBox.TabIndex = 16;
+			this.subAreaPathsCheckBox.Text = "with subarea paths";
+			this.subAreaPathsCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -461,6 +476,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
+		private System.Windows.Forms.CheckBox subAreaPathsCheckBox;
 	}
 }
 

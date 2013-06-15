@@ -5,7 +5,6 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskPlanningForms.Properties;
-using TfsUtils.Parsers;
 
 namespace TaskPlanningForms
 {
@@ -20,6 +19,11 @@ namespace TaskPlanningForms
 
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
+
+		private string m_lastTfsUrl;
+		private List<string> m_lastAreaPaths;
+		private List<string> m_lastIterationPaths;
+		private bool m_lastWithSubAreas;
 
 		public MainForm()
 		{
@@ -90,8 +94,8 @@ namespace TaskPlanningForms
 		{
 			try
 			{
-				var areaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
-				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, areaPaths);
+				m_lastAreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
+				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, m_lastAreaPaths, subAreaPathsCheckBox.Checked);
 			}
 			catch (Exception e)
 			{
@@ -165,9 +169,12 @@ namespace TaskPlanningForms
 					continue;
 				leadTasks.Add(leadTask);
 			}
+			m_lastTfsUrl = tfsUrlTextBox.Text;
+			m_lastIterationPaths = iterationPaths;
+			m_lastWithSubAreas = subAreaPathsCheckBox.Checked;
 			try
 			{
-				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				var data = m_dataLoader.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
@@ -204,10 +211,9 @@ namespace TaskPlanningForms
 
 		private void RefreshData()
 		{
-			string tfsUrl = null, currentUser = null;
+			string currentUser = null;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
-					tfsUrl = tfsUrlTextBox.Text;
 					currentUser = usersСomboBox.SelectedItem.ToString();
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
@@ -219,9 +225,10 @@ namespace TaskPlanningForms
 			try
 			{
 				var leadTasksCollection = m_dataLoader.GetLeadTasks(
-					tfsUrl,
-					areaPathListBox.Items.Cast<object>().ToList(),
-					iterationPathListBox.Items.Cast<object>().ToList());
+					m_lastTfsUrl,
+					m_lastAreaPaths.Cast<object>().ToList(),
+					m_lastWithSubAreas,
+					m_lastIterationPaths.Cast<object>().ToList());
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
