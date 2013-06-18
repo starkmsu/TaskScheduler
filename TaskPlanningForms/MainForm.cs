@@ -57,6 +57,7 @@ namespace TaskPlanningForms
 				areaPathTextBox.Text = m_config.AreaPaths[0];
 				m_config.AreaPaths.ForEach(i => areaPathListBox.Items.Add(i));
 			}
+			subAreaPathsCheckBox.Checked = m_config.WithSubAreaPaths;
 
 			UpdateHolidays();
 		}
@@ -82,10 +83,12 @@ namespace TaskPlanningForms
 		private void LoadLeadTasksButtonClick(object sender, EventArgs e)
 		{
 			setHolidaysButton.Enabled = false;
+			subAreaPathsCheckBox.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
 			m_config.AreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
+			m_config.WithSubAreaPaths = subAreaPathsCheckBox.Checked;
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
@@ -103,6 +106,7 @@ namespace TaskPlanningForms
 					{
 						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
 						setHolidaysButton.Enabled = true;
+						subAreaPathsCheckBox.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
 				return;

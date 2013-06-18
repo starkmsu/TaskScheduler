@@ -14,6 +14,8 @@ namespace TaskPlanningForms
 
 		public List<DateTime> Holidays { get; set; }
 
+		public bool WithSubAreaPaths { get; set; }
+
 		public Config()
 		{
 			TfsUrl = "https://tfs.sts.sitronics.com/sts";

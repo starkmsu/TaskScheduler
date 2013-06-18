@@ -147,7 +147,7 @@ namespace TaskPlanningForms
 		{
 			leadTaskRow.Cells[0].Value = leadTask.Priority();
 			leadTaskRow.Cells[0].SetColorByState(leadTask);
-			leadTaskRow.Cells[0].ToolTipText = leadTask.State;
+			leadTaskRow.Cells[0].ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
 
 			leadTaskRow.Cells[1].Value = leadTask.Id;
 			string hlaAgeementState = leadTask.HlaAgreementState();
