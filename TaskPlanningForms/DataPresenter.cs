@@ -86,7 +86,7 @@ namespace TaskPlanningForms
 			return users;
 		}
 
-		internal void FilterDataByUser(string user, DataGridView dgv)
+		internal void FilterDataByUser(DataGridView dgv, string user)
 		{
 			int prevLeadTaskRow = -1;
 			bool hasUserTasks = false;
@@ -110,7 +110,7 @@ namespace TaskPlanningForms
 				dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
 		}
 
-		internal void FilterDataByDevCompleted(bool withDevCompleted, DataGridView dgv)
+		internal void FilterDataByDevCompleted(DataGridView dgv, bool withDevCompleted)
 		{
 			bool visible = true;
 			for (int i = 0; i < dgv.Rows.Count; i++)
@@ -119,6 +119,19 @@ namespace TaskPlanningForms
 				if (row.Cells[m_leadTaskIdInd].Value != null)
 					visible = withDevCompleted || !row.Cells[0].IsColorForState(WorkItemState.DevCompleted);
 				row.Visible = visible;
+			}
+		}
+
+		internal void FilterDataByLTMode(DataGridView dgv, bool ltOnly)
+		{
+			bool visible = true;
+			for (int i = 0; i < dgv.Rows.Count; i++)
+			{
+				var row = dgv.Rows[i];
+				if (row.Cells[m_leadTaskIdInd].Value != null)
+					visible = row.Visible;
+				else
+					row.Visible = visible && !ltOnly;
 			}
 		}
 

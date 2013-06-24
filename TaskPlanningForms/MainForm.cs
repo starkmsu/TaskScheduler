@@ -205,7 +205,7 @@ namespace TaskPlanningForms
 		private void UsersСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
 			string user = usersСomboBox.SelectedItem.ToString();
-			m_dataPresenter.FilterDataByUser(user, scheduleDataGridView);
+			m_dataPresenter.FilterDataByUser(scheduleDataGridView, user);
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -248,7 +248,7 @@ namespace TaskPlanningForms
 					if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
 					{
 						usersСomboBox.SelectedItem = currentUser;
-						m_dataPresenter.FilterDataByUser(currentUser, scheduleDataGridView);
+						m_dataPresenter.FilterDataByUser(scheduleDataGridView, currentUser);
 					}
 
 					usersСomboBox.Enabled = true;
@@ -326,7 +326,13 @@ namespace TaskPlanningForms
 		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool withDevCompleted = devCmpletedCheckBox.Checked;
-			m_dataPresenter.FilterDataByDevCompleted(withDevCompleted, scheduleDataGridView);
+			m_dataPresenter.FilterDataByDevCompleted(scheduleDataGridView, withDevCompleted);
+		}
+
+		private void LtOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
+		{
+			bool ltOnly = ltOnlyCheckBox.Checked;
+			m_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnly);
 		}
 	}
 }

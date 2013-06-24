@@ -37,6 +37,7 @@
 			this.iterationsComboBox = new System.Windows.Forms.ComboBox();
 			this.loadDataButton = new System.Windows.Forms.Button();
 			this.areaPathGroupBox = new System.Windows.Forms.GroupBox();
+			this.subAreaPathsCheckBox = new System.Windows.Forms.CheckBox();
 			this.areaPathRemoveButton = new System.Windows.Forms.Button();
 			this.areaPathAddButton = new System.Windows.Forms.Button();
 			this.areaPathListBox = new System.Windows.Forms.ListBox();
@@ -58,7 +59,7 @@
 			this.setHolidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.subAreaPathsCheckBox = new System.Windows.Forms.CheckBox();
+			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -184,6 +185,19 @@
 			this.areaPathGroupBox.TabStop = false;
 			this.areaPathGroupBox.Text = "Area path";
 			// 
+			// subAreaPathsCheckBox
+			// 
+			this.subAreaPathsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.subAreaPathsCheckBox.AutoSize = true;
+			this.subAreaPathsCheckBox.Checked = true;
+			this.subAreaPathsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.subAreaPathsCheckBox.Location = new System.Drawing.Point(119, 395);
+			this.subAreaPathsCheckBox.Name = "subAreaPathsCheckBox";
+			this.subAreaPathsCheckBox.Size = new System.Drawing.Size(115, 17);
+			this.subAreaPathsCheckBox.TabIndex = 16;
+			this.subAreaPathsCheckBox.Text = "with subarea paths";
+			this.subAreaPathsCheckBox.UseVisualStyleBackColor = true;
+			// 
 			// areaPathRemoveButton
 			// 
 			this.areaPathRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -239,6 +253,7 @@
 			// 
 			// dataTabPage
 			// 
+			this.dataTabPage.Controls.Add(this.ltOnlyCheckBox);
 			this.dataTabPage.Controls.Add(this.devCmpletedCheckBox);
 			this.dataTabPage.Controls.Add(this.refreshButton);
 			this.dataTabPage.Controls.Add(this.usersLabel);
@@ -408,18 +423,16 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// subAreaPathsCheckBox
+			// ltOnlyCheckBox
 			// 
-			this.subAreaPathsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.subAreaPathsCheckBox.AutoSize = true;
-			this.subAreaPathsCheckBox.Checked = true;
-			this.subAreaPathsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.subAreaPathsCheckBox.Location = new System.Drawing.Point(119, 395);
-			this.subAreaPathsCheckBox.Name = "subAreaPathsCheckBox";
-			this.subAreaPathsCheckBox.Size = new System.Drawing.Size(115, 17);
-			this.subAreaPathsCheckBox.TabIndex = 16;
-			this.subAreaPathsCheckBox.Text = "with subarea paths";
-			this.subAreaPathsCheckBox.UseVisualStyleBackColor = true;
+			this.ltOnlyCheckBox.AutoSize = true;
+			this.ltOnlyCheckBox.Location = new System.Drawing.Point(503, 8);
+			this.ltOnlyCheckBox.Name = "ltOnlyCheckBox";
+			this.ltOnlyCheckBox.Size = new System.Drawing.Size(61, 17);
+			this.ltOnlyCheckBox.TabIndex = 13;
+			this.ltOnlyCheckBox.Text = "LT only";
+			this.ltOnlyCheckBox.UseVisualStyleBackColor = true;
+			this.ltOnlyCheckBox.CheckedChanged += new System.EventHandler(this.LtOnlyCheckBoxCheckedChanged);
 			// 
 			// MainForm
 			// 
@@ -477,6 +490,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
 		private System.Windows.Forms.CheckBox subAreaPathsCheckBox;
+		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
 	}
 }
 
