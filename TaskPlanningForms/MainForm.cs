@@ -49,7 +49,7 @@ namespace TaskPlanningForms
 			}
 
 			m_holidays = m_config.Holidays;
-			m_dataPresenter.Holidays = m_holidays;
+			m_dataPresenter.SetHolidays(m_holidays);
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
 			if (m_config.AreaPaths != null && m_config.AreaPaths.Count > 0)
@@ -60,6 +60,15 @@ namespace TaskPlanningForms
 			subAreaPathsCheckBox.Checked = m_config.WithSubAreaPaths;
 
 			UpdateHolidays();
+
+			if (m_config.Vacations.Count > 0)
+			{
+				vacationsButton.Enabled = true;
+				var vacationsUsers = m_config.Vacations.Select(v => v.User).ToList();
+				vacationsUsers.Sort();
+				usersVacationsComboBox.DataSource = vacationsUsers;
+				m_dataPresenter.SetVacations(m_config.Vacations);
+			}
 		}
 
 		private void UpdateHolidays()
@@ -82,7 +91,7 @@ namespace TaskPlanningForms
 
 		private void LoadLeadTasksButtonClick(object sender, EventArgs e)
 		{
-			setHolidaysButton.Enabled = false;
+			holidaysButton.Enabled = false;
 			subAreaPathsCheckBox.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
 
@@ -105,7 +114,7 @@ namespace TaskPlanningForms
 				iterationsComboBox.Invoke(new Action(() =>
 					{
 						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
-						setHolidaysButton.Enabled = true;
+						holidaysButton.Enabled = true;
 						subAreaPathsCheckBox.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
@@ -136,6 +145,7 @@ namespace TaskPlanningForms
 								iterationPathListBox.Items.Add(i);
 						});
 
+					subAreaPathsCheckBox.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					loadDataButton.Enabled = iterationPathListBox.Items.Count > 0;
 					if (iterationPathListBox.Items.Count > 0)
@@ -151,7 +161,7 @@ namespace TaskPlanningForms
 			loadLeadTasksButton.Enabled = false;
 			loadDataButton.Enabled = false;
 			usersLabel.Enabled = false;
-			usersСomboBox.Enabled = false;
+			usersFilterСomboBox.Enabled = false;
 			mainTabControl.SelectTab(mainTabPage);
 			scheduleDataGridView.Rows.Clear();
 
@@ -182,9 +192,13 @@ namespace TaskPlanningForms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						usersСomboBox.DataSource = m_dataPresenter.PresentData(data, scheduleDataGridView);
-
-						usersСomboBox.Enabled = true;
+						var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
+						usersVacationsComboBox.DataSource = users;
+						vacationsButton.Enabled = users.Count > 0;
+						var users2 = new List<string>(users);
+						users2.Insert(0, string.Empty);
+						usersFilterСomboBox.DataSource = users2;
+						usersFilterСomboBox.Enabled = true;
 						usersLabel.Enabled = true;
 						loadDataButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
@@ -202,9 +216,9 @@ namespace TaskPlanningForms
 			}
 		}
 
-		private void UsersСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
+		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
-			string user = usersСomboBox.SelectedItem.ToString();
+			string user = usersFilterСomboBox.SelectedItem.ToString();
 			m_dataPresenter.FilterDataByUser(scheduleDataGridView, user);
 		}
 
@@ -218,12 +232,12 @@ namespace TaskPlanningForms
 			string currentUser = null;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
-					currentUser = usersСomboBox.SelectedItem.ToString();
+					currentUser = usersFilterСomboBox.SelectedItem.ToString();
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
 					loadDataButton.Enabled = false;
 					usersLabel.Enabled = false;
-					usersСomboBox.Enabled = false;
+					usersFilterСomboBox.Enabled = false;
 					scheduleDataGridView.Rows.Clear();
 				}));
 			try
@@ -243,15 +257,19 @@ namespace TaskPlanningForms
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
 					var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
-					usersСomboBox.DataSource = users;
+					usersVacationsComboBox.DataSource = users;
+					vacationsButton.Enabled = users.Count > 0;
+					var users2 = new List<string>(users);
+					users2.Insert(0, string.Empty);
+					usersFilterСomboBox.DataSource = users2;
 
 					if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
 					{
-						usersСomboBox.SelectedItem = currentUser;
+						usersFilterСomboBox.SelectedItem = currentUser;
 						m_dataPresenter.FilterDataByUser(scheduleDataGridView, currentUser);
 					}
 
-					usersСomboBox.Enabled = true;
+					usersFilterСomboBox.Enabled = true;
 					usersLabel.Enabled = true;
 					loadDataButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
@@ -274,14 +292,14 @@ namespace TaskPlanningForms
 			ConfigManager.SaveConfig(m_config);
 		}
 
-		private void SetHolidaysButtonClick(object sender, EventArgs e)
+		private void HolidaysButtonClick(object sender, EventArgs e)
 		{
-			var holidaysForm = new HolidaysForm(m_holidays);
+			var holidaysForm = new HolidaysForm(m_holidays, null);
 			holidaysForm.ShowDialog();
 			m_holidays = holidaysForm.Holidays;
 
 			m_config.Holidays = m_holidays;
-			m_dataPresenter.Holidays = m_holidays;
+			m_dataPresenter.SetHolidays(m_holidays);
 			UpdateHolidays();
 		}
 
@@ -333,6 +351,19 @@ namespace TaskPlanningForms
 		{
 			bool ltOnly = ltOnlyCheckBox.Checked;
 			m_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnly);
+		}
+
+		private void VacationsButtonClick(object sender, EventArgs e)
+		{
+			string user = usersVacationsComboBox.Text;
+			var userVacations = m_config.Vacations.FirstOrDefault(v => v.User == user);
+			var holidaysForm = new HolidaysForm(userVacations != null ? userVacations.VacationDays : new List<DateTime>(), user);
+			holidaysForm.ShowDialog();
+			if (userVacations != null)
+				m_config.Vacations.Remove(userVacations);
+			if (holidaysForm.Holidays.Count > 0)
+				m_config.Vacations.Add(new VacationData { User = user, VacationDays = holidaysForm.Holidays });
+			m_dataPresenter.SetVacations(m_config.Vacations);
 		}
 	}
 }

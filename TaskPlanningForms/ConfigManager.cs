@@ -31,7 +31,15 @@ namespace TaskPlanningForms
 		{
 			using (var fs = new FileStream(s_configFIleName, FileMode.Create, FileAccess.Write, FileShare.Write))
 			{
-				new XmlSerializer(typeof(Config)).Serialize(fs, config);
+				try
+				{
+					var serializer = new XmlSerializer(typeof(Config));
+					serializer.Serialize(fs, config);
+				}
+				catch (Exception)
+				{
+					throw;
+				}
 			}
 		}
 	}

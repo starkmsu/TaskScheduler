@@ -14,12 +14,15 @@ namespace TaskPlanningForms
 
 		public List<DateTime> Holidays { get; set; }
 
+		public List<VacationData> Vacations { get; set; }
+
 		public bool WithSubAreaPaths { get; set; }
 
 		public Config()
 		{
 			TfsUrl = "https://tfs.sts.sitronics.com/sts";
 			Holidays = new List<DateTime>();
+			Vacations = new List<VacationData>();
 		}
 	}
 }

@@ -18,11 +18,27 @@ namespace TaskPlanningForms
 		private const string m_groupPrefix = "g ";
 		private readonly int m_indShift;
 
-		internal List<DateTime> Holidays { get; set; }
+		private List<DateTime> m_holidays;
+
+		private Dictionary<string, List<DateTime>> m_vacations;
 
 		internal DataPresenter(int indShift)
 		{
 			m_indShift = indShift;
+		}
+
+		internal void SetHolidays(List<DateTime> holidays)
+		{
+			m_holidays = holidays;
+		}
+
+		internal void SetVacations(List<VacationData> vacations)
+		{
+			m_vacations = new Dictionary<string, List<DateTime>>();
+			foreach (VacationData vacation in vacations)
+			{
+				m_vacations.Add(vacation.User.Substring(0, 3), vacation.VacationDays);
+			}
 		}
 
 		internal List<string> PresentData(DataContainer data, DataGridView dgv)
@@ -81,7 +97,6 @@ namespace TaskPlanningForms
 
 			List<string> users = tasksByUser.Keys.ToList();
 			users.Sort();
-			users.Insert(0, string.Empty);
 
 			return users;
 		}
@@ -249,6 +264,8 @@ namespace TaskPlanningForms
 				? AddDatesProposed(task, taskRow, maxNextInd, userMark)
 				: AddDatesActive(task, taskRow, maxNextInd, userMark);
 
+			SetVacations(taskRow, userMark);
+
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;
 			return nextInd;
@@ -389,6 +406,11 @@ namespace TaskPlanningForms
 					DateTime date = today.AddDays(i - m_indShift);
 					if (IsHoliday(date))
 						continue;
+					if (IsVacation(date, userMark))
+					{
+						taskRow.Cells[i].Style.BackColor = CellsPalette.WeekEnd;
+						continue;
+					}
 					taskRow.Cells[i].Value = userMark;
 				}
 				return indFinish + 1;
@@ -438,6 +460,12 @@ namespace TaskPlanningForms
 				if (startInd - m_indShift + ind > m_maxInd)
 					return m_indShift + m_maxInd + 1;
 				var cell = row.Cells[startInd + ind];
+				if (IsVacation(date, userMark))
+				{
+					++ind;
+					cell.Style.BackColor = CellsPalette.WeekEnd;
+					continue;
+				}
 				if (cell.Value == null)
 					cell.Value = userMark;
 				else
@@ -448,15 +476,43 @@ namespace TaskPlanningForms
 			return startInd + ind;
 		}
 
+		private void SetVacations(DataGridViewRow row, string user)
+		{
+			if (!m_vacations.ContainsKey(user) || m_vacations[user].Count == 0)
+				return;
+			DateTime start = DateTime.Now.Date;
+			DateTime finish = DateTime.Now.AddMonths(1).Date;
+			var vacationsDays = m_vacations[user];
+			if (finish < vacationsDays[0])
+				return;
+			if (start > vacationsDays[vacationsDays.Count-1])
+				return;
+			int ind = m_indShift;
+			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
+			{
+				if (vacationsDays.Any(d => d == i))
+					row.Cells[ind].Style.BackColor = CellsPalette.WeekEnd;
+				++ind;
+			}
+		}
+
 		private bool IsHoliday(DateTime dateTime)
 		{
 			var date = dateTime.Date;
 			var dayOfWeek = date.DayOfWeek;
 			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
 				return true;
-			if (Holidays == null)
+			if (m_holidays == null)
 				return false;
-			return Holidays.Contains(date);
+			return m_holidays.Contains(date);
+		}
+
+		private bool IsVacation(DateTime dateTime, string user)
+		{
+			if (!m_vacations.ContainsKey(user) || m_vacations[user].Count == 0)
+				return false;
+			var date = dateTime.Date;
+			return m_vacations[user].Any(v => v == date);
 		}
 	}
 }

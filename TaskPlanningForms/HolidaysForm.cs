@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace TaskPlanningForms
@@ -11,17 +10,17 @@ namespace TaskPlanningForms
 
 		public List<DateTime> Holidays
 		{
-			get
-			{
-				return m_holidays;
-			}
+			get { return new List<DateTime>(m_holidays); }
 		}
 
-		public HolidaysForm(List<DateTime> holidays)
+		public HolidaysForm(List<DateTime> holidays, string user)
 		{
 			m_holidays = holidays;
 
 			InitializeComponent();
+
+			if (!string.IsNullOrEmpty(user))
+				Text = user + " Holidays";
 
 			holidaysListBox.DataSource = m_holidays;
 		}

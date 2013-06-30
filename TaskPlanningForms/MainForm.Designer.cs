@@ -44,10 +44,11 @@
 			this.areaPathTextBox = new System.Windows.Forms.TextBox();
 			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
 			this.devCmpletedCheckBox = new System.Windows.Forms.CheckBox();
 			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
-			this.usersСomboBox = new System.Windows.Forms.ComboBox();
+			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
 			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -56,10 +57,11 @@
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.settingsPage = new System.Windows.Forms.TabPage();
-			this.setHolidaysButton = new System.Windows.Forms.Button();
+			this.vacationsButton = new System.Windows.Forms.Button();
+			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
+			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
-			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -257,7 +259,7 @@
 			this.dataTabPage.Controls.Add(this.devCmpletedCheckBox);
 			this.dataTabPage.Controls.Add(this.refreshButton);
 			this.dataTabPage.Controls.Add(this.usersLabel);
-			this.dataTabPage.Controls.Add(this.usersСomboBox);
+			this.dataTabPage.Controls.Add(this.usersFilterСomboBox);
 			this.dataTabPage.Controls.Add(this.scheduleDataGridView);
 			this.dataTabPage.Location = new System.Drawing.Point(4, 22);
 			this.dataTabPage.Name = "dataTabPage";
@@ -266,6 +268,17 @@
 			this.dataTabPage.TabIndex = 0;
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
+			// 
+			// ltOnlyCheckBox
+			// 
+			this.ltOnlyCheckBox.AutoSize = true;
+			this.ltOnlyCheckBox.Location = new System.Drawing.Point(503, 8);
+			this.ltOnlyCheckBox.Name = "ltOnlyCheckBox";
+			this.ltOnlyCheckBox.Size = new System.Drawing.Size(61, 17);
+			this.ltOnlyCheckBox.TabIndex = 13;
+			this.ltOnlyCheckBox.Text = "LT only";
+			this.ltOnlyCheckBox.UseVisualStyleBackColor = true;
+			this.ltOnlyCheckBox.CheckedChanged += new System.EventHandler(this.LtOnlyCheckBoxCheckedChanged);
 			// 
 			// devCmpletedCheckBox
 			// 
@@ -300,15 +313,15 @@
 			this.usersLabel.TabIndex = 5;
 			this.usersLabel.Text = "Filter by user";
 			// 
-			// usersСomboBox
+			// usersFilterСomboBox
 			// 
-			this.usersСomboBox.Enabled = false;
-			this.usersСomboBox.FormattingEnabled = true;
-			this.usersСomboBox.Location = new System.Drawing.Point(161, 6);
-			this.usersСomboBox.Name = "usersСomboBox";
-			this.usersСomboBox.Size = new System.Drawing.Size(209, 21);
-			this.usersСomboBox.TabIndex = 4;
-			this.usersСomboBox.SelectionChangeCommitted += new System.EventHandler(this.UsersСomboBoxSelectionChangeCommitted);
+			this.usersFilterСomboBox.Enabled = false;
+			this.usersFilterСomboBox.FormattingEnabled = true;
+			this.usersFilterСomboBox.Location = new System.Drawing.Point(161, 6);
+			this.usersFilterСomboBox.Name = "usersFilterСomboBox";
+			this.usersFilterСomboBox.Size = new System.Drawing.Size(209, 21);
+			this.usersFilterСomboBox.TabIndex = 4;
+			this.usersFilterСomboBox.SelectionChangeCommitted += new System.EventHandler(this.UsersFilterСomboBoxSelectionChangeCommitted);
 			// 
 			// scheduleDataGridView
 			// 
@@ -387,7 +400,9 @@
 			// 
 			// settingsPage
 			// 
-			this.settingsPage.Controls.Add(this.setHolidaysButton);
+			this.settingsPage.Controls.Add(this.vacationsButton);
+			this.settingsPage.Controls.Add(this.usersVacationsComboBox);
+			this.settingsPage.Controls.Add(this.holidaysButton);
 			this.settingsPage.Controls.Add(this.tfsUrlTextBox);
 			this.settingsPage.Controls.Add(this.tfsUrlLabel);
 			this.settingsPage.Location = new System.Drawing.Point(4, 22);
@@ -397,15 +412,33 @@
 			this.settingsPage.Text = "Settings";
 			this.settingsPage.UseVisualStyleBackColor = true;
 			// 
-			// setHolidaysButton
+			// vacationsButton
 			// 
-			this.setHolidaysButton.Location = new System.Drawing.Point(8, 40);
-			this.setHolidaysButton.Name = "setHolidaysButton";
-			this.setHolidaysButton.Size = new System.Drawing.Size(117, 23);
-			this.setHolidaysButton.TabIndex = 12;
-			this.setHolidaysButton.Text = "Configure holidays";
-			this.setHolidaysButton.UseVisualStyleBackColor = true;
-			this.setHolidaysButton.Click += new System.EventHandler(this.SetHolidaysButtonClick);
+			this.vacationsButton.Location = new System.Drawing.Point(302, 67);
+			this.vacationsButton.Name = "vacationsButton";
+			this.vacationsButton.Size = new System.Drawing.Size(158, 23);
+			this.vacationsButton.TabIndex = 14;
+			this.vacationsButton.Text = "Configure Vacations";
+			this.vacationsButton.UseVisualStyleBackColor = true;
+			this.vacationsButton.Click += new System.EventHandler(this.VacationsButtonClick);
+			// 
+			// usersVacationsComboBox
+			// 
+			this.usersVacationsComboBox.FormattingEnabled = true;
+			this.usersVacationsComboBox.Location = new System.Drawing.Point(8, 69);
+			this.usersVacationsComboBox.Name = "usersVacationsComboBox";
+			this.usersVacationsComboBox.Size = new System.Drawing.Size(288, 21);
+			this.usersVacationsComboBox.TabIndex = 13;
+			// 
+			// holidaysButton
+			// 
+			this.holidaysButton.Location = new System.Drawing.Point(8, 40);
+			this.holidaysButton.Name = "holidaysButton";
+			this.holidaysButton.Size = new System.Drawing.Size(117, 23);
+			this.holidaysButton.TabIndex = 12;
+			this.holidaysButton.Text = "Configure holidays";
+			this.holidaysButton.UseVisualStyleBackColor = true;
+			this.holidaysButton.Click += new System.EventHandler(this.HolidaysButtonClick);
 			// 
 			// tfsUrlTextBox
 			// 
@@ -422,17 +455,6 @@
 			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
-			// 
-			// ltOnlyCheckBox
-			// 
-			this.ltOnlyCheckBox.AutoSize = true;
-			this.ltOnlyCheckBox.Location = new System.Drawing.Point(503, 8);
-			this.ltOnlyCheckBox.Name = "ltOnlyCheckBox";
-			this.ltOnlyCheckBox.Size = new System.Drawing.Size(61, 17);
-			this.ltOnlyCheckBox.TabIndex = 13;
-			this.ltOnlyCheckBox.Text = "LT only";
-			this.ltOnlyCheckBox.UseVisualStyleBackColor = true;
-			this.ltOnlyCheckBox.CheckedChanged += new System.EventHandler(this.LtOnlyCheckBoxCheckedChanged);
 			// 
 			// MainForm
 			// 
@@ -466,14 +488,14 @@
 		private System.Windows.Forms.TextBox areaPathTextBox;
 		private System.Windows.Forms.Button loadDataButton;
 		private System.Windows.Forms.Label usersLabel;
-		private System.Windows.Forms.ComboBox usersСomboBox;
+		private System.Windows.Forms.ComboBox usersFilterСomboBox;
 		private System.Windows.Forms.Button loadLeadTasksButton;
 		private System.Windows.Forms.ComboBox iterationsComboBox;
 		private System.Windows.Forms.Button refreshButton;
 		private System.Windows.Forms.TabPage settingsPage;
 		private System.Windows.Forms.TextBox tfsUrlTextBox;
 		private System.Windows.Forms.Label tfsUrlLabel;
-		private System.Windows.Forms.Button setHolidaysButton;
+		private System.Windows.Forms.Button holidaysButton;
 		private System.Windows.Forms.GroupBox areaPathGroupBox;
 		private System.Windows.Forms.ListBox areaPathListBox;
 		private System.Windows.Forms.Button areaPathAddButton;
@@ -491,6 +513,8 @@
 		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
 		private System.Windows.Forms.CheckBox subAreaPathsCheckBox;
 		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
+		private System.Windows.Forms.Button vacationsButton;
+		private System.Windows.Forms.ComboBox usersVacationsComboBox;
 	}
 }
 
