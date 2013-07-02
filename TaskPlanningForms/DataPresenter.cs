@@ -20,7 +20,7 @@ namespace TaskPlanningForms
 
 		private List<DateTime> m_holidays;
 
-		private Dictionary<string, List<DateTime>> m_vacations;
+		private Dictionary<string, List<DateTime>> m_vacations = new Dictionary<string, List<DateTime>>(0);
 
 		internal DataPresenter(int indShift)
 		{
