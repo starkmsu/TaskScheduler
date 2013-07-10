@@ -42,7 +42,7 @@ namespace TfsUtils.Parsers
 
 		public static bool IsDevCompleted(this WorkItem workItem)
 		{
-			return GetStringValue(workItem, "Dev Completed Agreed").Length > 0;
+			return GetStringValue(workItem, "Dev Completed Agreed") == "Yes";
 		}
 
 		public static string HlaAgreementState(this WorkItem workItem)
