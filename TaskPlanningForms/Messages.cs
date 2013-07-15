@@ -32,9 +32,9 @@
 			return blockerId + " - Non child blocker";
 		}
 
-		internal static string ProposedLeadTaskHasActiveChild()
+		internal static string ProposedLeadTaskHasNotProposedChild()
 		{
-			return "LeadTask in state Proposed has Child in Active state";
+			return "LeadTask in state Proposed has Child in non Proposed state";
 		}
 
 		internal static string BadHlaAgreemtnState(string state)

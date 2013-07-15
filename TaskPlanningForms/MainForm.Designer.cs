@@ -50,18 +50,18 @@
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
-			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.settingsPage = new System.Windows.Forms.TabPage();
 			this.vacationsButton = new System.Windows.Forms.Button();
 			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
 			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
+			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -347,57 +347,6 @@
 			this.scheduleDataGridView.Size = new System.Drawing.Size(870, 505);
 			this.scheduleDataGridView.TabIndex = 0;
 			// 
-			// Priority
-			// 
-			this.Priority.Frozen = true;
-			this.Priority.HeaderText = "Pr";
-			this.Priority.Name = "Priority";
-			this.Priority.ReadOnly = true;
-			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Priority.Width = 20;
-			// 
-			// LeadTask
-			// 
-			this.LeadTask.Frozen = true;
-			this.LeadTask.HeaderText = "LeadTask";
-			this.LeadTask.Name = "LeadTask";
-			this.LeadTask.ReadOnly = true;
-			this.LeadTask.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.LeadTask.Width = 60;
-			// 
-			// Task
-			// 
-			this.Task.Frozen = true;
-			this.Task.HeaderText = "Task";
-			this.Task.Name = "Task";
-			this.Task.ReadOnly = true;
-			this.Task.Width = 60;
-			// 
-			// BlockedBy
-			// 
-			this.BlockedBy.Frozen = true;
-			this.BlockedBy.HeaderText = "BlockedBy";
-			this.BlockedBy.Name = "BlockedBy";
-			this.BlockedBy.ReadOnly = true;
-			this.BlockedBy.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.BlockedBy.Width = 60;
-			// 
-			// AssignedTo
-			// 
-			this.AssignedTo.Frozen = true;
-			this.AssignedTo.HeaderText = "AssignedTo";
-			this.AssignedTo.Name = "AssignedTo";
-			this.AssignedTo.ReadOnly = true;
-			this.AssignedTo.Width = 80;
-			// 
-			// Past
-			// 
-			this.Past.HeaderText = "Past";
-			this.Past.Name = "Past";
-			this.Past.ReadOnly = true;
-			this.Past.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Past.Width = 40;
-			// 
 			// settingsPage
 			// 
 			this.settingsPage.Controls.Add(this.vacationsButton);
@@ -456,6 +405,57 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
+			// Priority
+			// 
+			this.Priority.Frozen = true;
+			this.Priority.HeaderText = "Pr";
+			this.Priority.Name = "Priority";
+			this.Priority.ReadOnly = true;
+			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Priority.Width = 20;
+			// 
+			// LeadTask
+			// 
+			this.LeadTask.Frozen = true;
+			this.LeadTask.HeaderText = "LeadTask";
+			this.LeadTask.Name = "LeadTask";
+			this.LeadTask.ReadOnly = true;
+			this.LeadTask.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.LeadTask.Width = 60;
+			// 
+			// Task
+			// 
+			this.Task.Frozen = true;
+			this.Task.HeaderText = "Task";
+			this.Task.Name = "Task";
+			this.Task.ReadOnly = true;
+			this.Task.Width = 200;
+			// 
+			// BlockedBy
+			// 
+			this.BlockedBy.Frozen = true;
+			this.BlockedBy.HeaderText = "BlockedBy";
+			this.BlockedBy.Name = "BlockedBy";
+			this.BlockedBy.ReadOnly = true;
+			this.BlockedBy.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.BlockedBy.Width = 60;
+			// 
+			// AssignedTo
+			// 
+			this.AssignedTo.Frozen = true;
+			this.AssignedTo.HeaderText = "AssignedTo";
+			this.AssignedTo.Name = "AssignedTo";
+			this.AssignedTo.ReadOnly = true;
+			this.AssignedTo.Width = 80;
+			// 
+			// Past
+			// 
+			this.Past.HeaderText = "Past";
+			this.Past.Name = "Past";
+			this.Past.ReadOnly = true;
+			this.Past.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Past.Width = 40;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -504,17 +504,17 @@
 		private System.Windows.Forms.Button iterationPathAddButton;
 		private System.Windows.Forms.ListBox iterationPathListBox;
 		private System.Windows.Forms.Button iterationPathRemoveButton;
+		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
+		private System.Windows.Forms.CheckBox subAreaPathsCheckBox;
+		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
+		private System.Windows.Forms.Button vacationsButton;
+		private System.Windows.Forms.ComboBox usersVacationsComboBox;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
 		private System.Windows.Forms.DataGridViewTextBoxColumn BlockedBy;
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
-		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
-		private System.Windows.Forms.CheckBox subAreaPathsCheckBox;
-		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
-		private System.Windows.Forms.Button vacationsButton;
-		private System.Windows.Forms.ComboBox usersVacationsComboBox;
 	}
 }
 

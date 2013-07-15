@@ -86,10 +86,10 @@ namespace TaskPlanningForms
 					int lasttChildRowInd = dgv.Rows.Count - 1;
 					for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
 					{
-						if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active))
+						if (!dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Proposed))
 						{
 							dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
-							dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasActiveChild();
+							dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
 						}
 					}
 				}
