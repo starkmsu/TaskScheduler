@@ -10,12 +10,11 @@ namespace TaskPlanningForms
 {
 	public partial class MainForm : Form
 	{
-		private const int m_indShift = 6;
-
 		private readonly Config m_config;
 
 		private readonly DataLoader m_dataLoader = new DataLoader();
-		private readonly DataPresenter m_dataPresenter = new DataPresenter(m_indShift);
+		private readonly ScheduleColumnsPresenter m_columnsPresenter = new ScheduleColumnsPresenter();
+		private readonly DataPresenter m_dataPresenter;
 
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
@@ -31,22 +30,9 @@ namespace TaskPlanningForms
 
 			m_config = ConfigManager.LoadConfig();
 
-			DateTime start = DateTime.Now.Date;
-			DateTime finish = DateTime.Now.AddMonths(1).Date;
-			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
-			{
-				string dateText = i.Date.ToString("dd.MM");
-				var column = new DataGridViewTextBoxColumn
-				{
-					Name = dateText,
-					HeaderText = dateText,
-					Width = 40,
-					Resizable = DataGridViewTriState.False
-				};
-				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
-					column.HeaderCell.Style.BackColor = column.DefaultCellStyle.BackColor = CellsPalette.WeekEnd;
-				scheduleDataGridView.Columns.Add(column);
-			}
+			m_columnsPresenter.InitColumns(scheduleDataGridView);
+
+			m_dataPresenter = new DataPresenter(m_columnsPresenter.FirstDataColumnIndex);
 
 			m_holidays = m_config.Holidays;
 			m_dataPresenter.SetHolidays(m_holidays);
@@ -81,7 +67,7 @@ namespace TaskPlanningForms
 				++ind;
 				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
 					continue;
-				var column = scheduleDataGridView.Columns[m_indShift + ind];
+				var column = scheduleDataGridView.Columns[m_columnsPresenter.FirstDataColumnIndex + ind];
 				var color = m_holidays.Contains(i)
 					? CellsPalette.Holiday
 					: scheduleDataGridView.Columns[1].HeaderCell.Style.BackColor;
@@ -256,6 +242,9 @@ namespace TaskPlanningForms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
+					bool isDateChanged = scheduleDataGridView.Columns[m_columnsPresenter.FirstDataColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
+					if (isDateChanged)
+						m_columnsPresenter.InitColumns(scheduleDataGridView);
 					var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
 					usersVacationsComboBox.DataSource = users;
 					vacationsButton.Enabled = users.Count > 0;
