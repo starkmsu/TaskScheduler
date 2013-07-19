@@ -50,6 +50,11 @@ namespace TfsUtils.Parsers
 			return GetStringValue(workItem, "HLA Agreed");
 		}
 
+		public static string VisionAgreementState(this WorkItem workItem)
+		{
+			return GetStringValue(workItem, "Vision Agreed");
+		}
+
 		private static string GetStringValue(WorkItem workItem, string fieldName)
 		{
 			if (!workItem.Fields.Contains(fieldName))

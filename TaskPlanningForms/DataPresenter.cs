@@ -178,11 +178,17 @@ namespace TaskPlanningForms
 			leadTaskRow.Cells[0].ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
 
 			leadTaskRow.Cells[1].Value = leadTask.Id;
+			string visionAgreementState = leadTask.VisionAgreementState();
 			string hlaAgeementState = leadTask.HlaAgreementState();
-			if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
+			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
 			{
 				leadTaskRow.Cells[1].SetErrorColor();
-				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemtnState(hlaAgeementState);
+				leadTaskRow.Cells[1].ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
+			}
+			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
+			{
+				leadTaskRow.Cells[1].SetErrorColor();
+				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
 			}
 			else
 			{

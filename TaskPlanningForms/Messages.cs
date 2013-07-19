@@ -37,9 +37,14 @@
 			return "LeadTask in state Proposed has Child in non Proposed state";
 		}
 
-		internal static string BadHlaAgreemtnState(string state)
+		internal static string BadHlaAgreemntState(string state)
 		{
 			return "HLA agreement state is " + state;
+		}
+
+		internal static string BadVisionAgreemntState(string state)
+		{
+			return "Vision agreement state is " + state;
 		}
 	}
 }
