@@ -412,7 +412,7 @@
 			this.Priority.Name = "Priority";
 			this.Priority.ReadOnly = true;
 			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Priority.Width = 20;
+			this.Priority.Width = 30;
 			// 
 			// LeadTask
 			// 
