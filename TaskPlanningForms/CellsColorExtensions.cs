@@ -50,6 +50,11 @@ namespace TaskPlanningForms
 			cell.Style.BackColor = CellsPalette.Error;
 		}
 
+		internal static void SetWarningColor(this DataGridViewCell cell)
+		{
+			cell.Style.BackColor = CellsPalette.Warning;
+		}
+
 		internal static bool IsColorForState(this DataGridViewCell cell, string state)
 		{
 			if (state == WorkItemState.Proposed)

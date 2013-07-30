@@ -46,5 +46,10 @@
 		{
 			return "Vision agreement state is " + state;
 		}
+
+		internal static string LTHasNoChildren()
+		{
+			return "LeadTask has no child tasks";
+		}
 	}
 }

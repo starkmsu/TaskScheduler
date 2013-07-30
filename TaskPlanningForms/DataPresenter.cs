@@ -190,6 +190,11 @@ namespace TaskPlanningForms
 				leadTaskRow.Cells[1].SetErrorColor();
 				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
 			}
+			else if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
+			{
+				leadTaskRow.Cells[1].SetWarningColor();
+				leadTaskRow.Cells[1].ToolTipText = Messages.LTHasNoChildren();
+			}
 			else
 			{
 				leadTaskRow.Cells[1].SetColorByState(leadTask);
@@ -365,7 +370,7 @@ namespace TaskPlanningForms
 			taskRow.Cells[4].Value = assignedTo;
 			if (assignedTo.StartsWith(m_groupPrefix))
 			{
-				taskRow.Cells[4].SetErrorColor();
+				taskRow.Cells[4].SetWarningColor();
 				taskRow.Cells[4].ToolTipText = Messages.TaskIsNotAssigned();
 			}
 
