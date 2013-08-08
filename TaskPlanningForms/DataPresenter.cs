@@ -158,17 +158,26 @@ namespace TaskPlanningForms
 			dgv.Rows.Add(new DataGridViewRow());
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
 
-			FillLeadTaskStarttingCells(
+			bool shouldCheckEstimate = FillLeadTaskStarttingCells(
 				leadTask,
 				leadTaskRow,
 				data);
 
 			if (leadTask.State == WorkItemState.Proposed)
-				return AddDatesProposed(leadTask, leadTaskRow, m_indShift, "O");
-			return AddDatesActive(leadTask, leadTaskRow, m_indShift, "X");
+				return AddDatesProposed(
+					leadTask,
+					leadTaskRow,
+					m_indShift,
+					"O",
+					shouldCheckEstimate);
+			return AddDatesActive(
+				leadTask,
+				leadTaskRow,
+				m_indShift,
+				"X");
 		}
 
-		private void FillLeadTaskStarttingCells(
+		private bool FillLeadTaskStarttingCells(
 			WorkItem leadTask,
 			DataGridViewRow leadTaskRow,
 			DataContainer data)
@@ -178,17 +187,21 @@ namespace TaskPlanningForms
 			leadTaskRow.Cells[0].ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
 
 			leadTaskRow.Cells[1].Value = leadTask.Id;
+
+			bool result = true;
 			string visionAgreementState = leadTask.VisionAgreementState();
 			string hlaAgeementState = leadTask.HlaAgreementState();
 			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
 			{
 				leadTaskRow.Cells[1].SetErrorColor();
 				leadTaskRow.Cells[1].ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
+				result = false;
 			}
 			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
 			{
 				leadTaskRow.Cells[1].SetErrorColor();
 				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
+				result = false;
 			}
 			else if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
 			{
@@ -223,6 +236,8 @@ namespace TaskPlanningForms
 			}
 
 			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
+
+			return result;
 		}
 
 		private int AddTaskRow(
@@ -272,8 +287,17 @@ namespace TaskPlanningForms
 
 			string userMark = assignedTo.Substring(0, 3);
 			int nextInd = task.State == WorkItemState.Proposed
-				? AddDatesProposed(task, taskRow, maxNextInd, userMark)
-				: AddDatesActive(task, taskRow, maxNextInd, userMark);
+				? AddDatesProposed(
+					task,
+					taskRow,
+					maxNextInd,
+					userMark,
+					true)
+				: AddDatesActive(
+					task,
+					taskRow,
+					maxNextInd,
+					userMark);
 
 			SetVacations(taskRow, userMark);
 
@@ -433,13 +457,17 @@ namespace TaskPlanningForms
 			WorkItem task,
 			DataGridViewRow taskRow,
 			int startInd,
-			string userMark)
+			string userMark,
+			bool shouldCheckEstimate)
 		{
 			double? estimate = task.Estimate();
 			if (estimate == null)
 			{
-				taskRow.Cells[m_indShift - 1].SetErrorColor();
-				taskRow.Cells[m_indShift - 1].ToolTipText = Messages.NoEstimate();
+				if (shouldCheckEstimate)
+				{
+					taskRow.Cells[m_indShift - 1].SetErrorColor();
+					taskRow.Cells[m_indShift - 1].ToolTipText = Messages.NoEstimate();
+				}
 				return m_indShift;
 			}
 
