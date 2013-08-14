@@ -118,7 +118,10 @@ namespace TaskPlanningForms
 			iterations.Sort();
 			var validIterations = new List<string>();
 			if (m_config.IterationPaths != null && m_config.IterationPaths.Count > 0)
+			{
 				validIterations = m_config.IterationPaths.Where(iterations.Contains).ToList();
+				validIterations.Sort();
+			}
 
 			iterationsComboBox.Invoke(new Action(() =>
 				{
@@ -316,7 +319,17 @@ namespace TaskPlanningForms
 			string iterationPath = iterationsComboBox.Text;
 			if (iterationPathListBox.Items.Contains(iterationPath))
 				return;
-			iterationPathListBox.Items.Add(iterationPath);
+			int ind = 0;
+			for (; ind < iterationPathListBox.Items.Count; ind++)
+			{
+				if (string.Compare(iterationPathListBox.Items[ind].ToString(), iterationPath, StringComparison.Ordinal) <= 0)
+					continue;
+				iterationPathListBox.Items.Insert(ind, iterationPath);
+				break;
+			}
+			if (ind == iterationPathListBox.Items.Count)
+				iterationPathListBox.Items.Add(iterationPath);
+			
 			loadDataButton.Enabled = true;
 			iterationPathRemoveButton.Enabled = true;
 		}
