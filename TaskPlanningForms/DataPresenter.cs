@@ -191,27 +191,27 @@ namespace TaskPlanningForms
 			bool result = true;
 			string visionAgreementState = leadTask.VisionAgreementState();
 			string hlaAgeementState = leadTask.HlaAgreementState();
+			leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
 			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
 			{
 				leadTaskRow.Cells[1].SetErrorColor();
-				leadTaskRow.Cells[1].ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
+				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.BadVisionAgreemntState(visionAgreementState);
 				result = false;
 			}
 			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
 			{
 				leadTaskRow.Cells[1].SetErrorColor();
-				leadTaskRow.Cells[1].ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
+				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.BadHlaAgreemntState(hlaAgeementState);
 				result = false;
 			}
 			else if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
 			{
 				leadTaskRow.Cells[1].SetWarningColor();
-				leadTaskRow.Cells[1].ToolTipText = Messages.LTHasNoChildren();
+				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
 			}
 			else
 			{
 				leadTaskRow.Cells[1].SetColorByState(leadTask);
-				leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
 			}
 
 			leadTaskRow.Cells[2].Value = leadTask.Title;
