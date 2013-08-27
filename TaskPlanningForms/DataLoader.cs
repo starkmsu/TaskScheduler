@@ -134,8 +134,8 @@ namespace TaskPlanningForms
 			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
 				AppendTasks(result, wiqlAccessor);
-				CleanDict(result.LeadTaskChildrenDict, result.WiDict, false, wiqlAccessor);
-				CleanDict(result.BlockersDict, result.WiDict, true, wiqlAccessor);
+				CleanDict(result.LeadTaskChildrenDict, result.WiDict, false, false, wiqlAccessor);
+				CleanDict(result.BlockersDict, result.WiDict, true, true, wiqlAccessor);
 			}
 
 			InitExternalBlockers(result);
@@ -187,6 +187,7 @@ namespace TaskPlanningForms
 			Dictionary<int, List<int>> dict,
 			Dictionary<int, WorkItem> wiDict,
 			bool deleteEmpty,
+			bool ignoreResolvedLinkedfWorkItems,
 			TfsWiqlAccessor wiqlAccessor)
 		{
 			var notFoundIdsDict = new Dictionary<int, List<List<int>>>(dict.Keys.Count);
@@ -219,7 +220,8 @@ namespace TaskPlanningForms
 				for (int i = 0; i < workItems.Count; i++)
 				{
 					WorkItem workItem = workItems[i];
-					if (workItem.State != WorkItemState.Closed)
+					if (workItem.State != WorkItemState.Closed ||
+						ignoreResolvedLinkedfWorkItems && workItem.State != WorkItemState.Resolved)
 						continue;
 					foreach (List<int> ids in notFoundIdsDict[workItem.Id])
 					{

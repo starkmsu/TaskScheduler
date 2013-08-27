@@ -25,7 +25,8 @@ namespace TaskPlanningForms
 					Name = dateText,
 					HeaderText = dateText,
 					Width = 40,
-					Resizable = DataGridViewTriState.False
+					Resizable = DataGridViewTriState.False,
+					SortMode = DataGridViewColumnSortMode.NotSortable
 				};
 				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
 					column.HeaderCell.Style.BackColor = column.DefaultCellStyle.BackColor = CellsPalette.WeekEnd;
