@@ -282,9 +282,10 @@ namespace TaskPlanningForms
 			{
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
-					MessageBox.Show(exc.Message, Resources.LeadTasksParsinigError);
+					MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsinigError);
 					loadDataButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
+					refreshButton.Enabled = true;
 				}));
 			}
 		}
