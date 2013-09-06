@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
+using WorkItemType = TfsUtils.Const.WorkItemType;
 
 namespace TaskPlanningForms
 {
@@ -402,26 +403,29 @@ namespace TaskPlanningForms
 		}
 
 		private int AddDatesActive(
-			WorkItem task,
-			DataGridViewRow taskRow,
+			WorkItem workItem,
+			DataGridViewRow row,
 			int startInd,
 			string userMark)
 		{
-			var taskStart = task.StartDate();
-			var taskFinish = task.FinishDate();
+			var taskStart = workItem.StartDate();
+			var taskFinish = workItem.FinishDate();
 			if (taskFinish == null)
 				return m_indShift;
 
 			if (taskFinish.Value.Date < DateTime.Now.Date)
 			{
-				taskRow.Cells[m_indShift - 1].Value = taskFinish.Value.ToString("dd.MM");
-				taskRow.Cells[m_indShift - 1].SetErrorColor();
-				taskRow.Cells[m_indShift - 1].ToolTipText = Messages.ExpiredFd();
+				row.Cells[m_indShift - 1].Value = taskFinish.Value.ToString("dd.MM");
+				if (workItem.Type.Name == WorkItemType.LeadTask)
+					row.Cells[m_indShift - 1].SetErrorColor();
+				else
+					row.Cells[m_indShift - 1].SetWarningColor();
+				row.Cells[m_indShift - 1].ToolTipText = Messages.ExpiredFd();
 
-				double? remaining = task.Remaining();
+				double? remaining = workItem.Remaining();
 				if (remaining.HasValue)
 					return AddDates(
-						taskRow,
+						row,
 						remaining.Value,
 						startInd,
 						userMark);
@@ -430,7 +434,7 @@ namespace TaskPlanningForms
 			{
 				var indStart = (int)taskStart.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
 				if (indStart < 0)
-					taskRow.Cells[m_indShift - 1].Value = taskStart.Value.ToString("dd.MM");
+					row.Cells[m_indShift - 1].Value = taskStart.Value.ToString("dd.MM");
 				indStart = Math.Min(Math.Max(0, indStart) + m_indShift, m_maxInd);
 
 				var indFinish = (int)taskFinish.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
@@ -443,10 +447,10 @@ namespace TaskPlanningForms
 						continue;
 					if (IsVacation(date, userMark))
 					{
-						taskRow.Cells[i].Style.BackColor = CellsPalette.WeekEnd;
+						row.Cells[i].Style.BackColor = CellsPalette.WeekEnd;
 						continue;
 					}
-					taskRow.Cells[i].Value = userMark;
+					row.Cells[i].Value = userMark;
 				}
 				return indFinish + 1;
 			}
