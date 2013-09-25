@@ -59,7 +59,7 @@
 			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.BlockedBy = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
@@ -336,7 +336,7 @@
             this.Priority,
             this.LeadTask,
             this.Task,
-            this.BlockedBy,
+            this.Blockers,
             this.AssignedTo,
             this.Past});
 			this.scheduleDataGridView.EnableHeadersVisualStyles = false;
@@ -434,15 +434,15 @@
 			this.Task.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Task.Width = 200;
 			// 
-			// BlockedBy
+			// Blockers
 			// 
-			this.BlockedBy.Frozen = true;
-			this.BlockedBy.HeaderText = "BlockedBy";
-			this.BlockedBy.Name = "BlockedBy";
-			this.BlockedBy.ReadOnly = true;
-			this.BlockedBy.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.BlockedBy.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.BlockedBy.Width = 60;
+			this.Blockers.Frozen = true;
+			this.Blockers.HeaderText = "Blockers";
+			this.Blockers.Name = "Blockers";
+			this.Blockers.ReadOnly = true;
+			this.Blockers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Blockers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Blockers.Width = 60;
 			// 
 			// AssignedTo
 			// 
@@ -518,7 +518,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
-		private System.Windows.Forms.DataGridViewTextBoxColumn BlockedBy;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 	}

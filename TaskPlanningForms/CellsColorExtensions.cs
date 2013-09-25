@@ -26,25 +26,6 @@ namespace TaskPlanningForms
 			}
 		}
 
-		internal static void SetColorByDiscipline(this DataGridViewCell cell, WorkItem workItem)
-		{
-			switch (workItem.Discipline())
-			{
-				case WorlItemDiscipline.Development:
-					cell.Style.BackColor = CellsPalette.DisciplineDevelopment;
-					break;
-				case WorlItemDiscipline.AutoTesting:
-					cell.Style.BackColor = CellsPalette.DisciplineAutoTesting;
-					break;
-				case WorlItemDiscipline.ProductTesting:
-					cell.Style.BackColor = CellsPalette.DisciplineProductTesting;
-					break;
-				case WorlItemDiscipline.Architecture:
-					cell.Style.BackColor = CellsPalette.DisciplineArchitecture;
-					break;
-			}
-		}
-
 		internal static void SetErrorColor(this DataGridViewCell cell)
 		{
 			cell.Style.BackColor = CellsPalette.Error;

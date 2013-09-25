@@ -216,7 +216,7 @@ namespace TaskPlanningForms
 			}
 
 			leadTaskRow.Cells[2].Value = leadTask.Title;
-			leadTaskRow.Cells[2].SetColorByState(leadTask);
+			leadTaskRow.Cells[2].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
 
 			if (data.BlockersDict.ContainsKey(leadTask.Id))
 			{
@@ -234,6 +234,14 @@ namespace TaskPlanningForms
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
 					leadTaskRow.Cells[3].ToolTipText = blockerIdsStr;
 				}
+			}
+			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
+			{
+				if (!string.IsNullOrEmpty(leadTaskRow.Cells[3].ToolTipText))
+					leadTaskRow.Cells[3].ToolTipText += Environment.NewLine;
+				else
+					leadTaskRow.Cells[3].Value = leadTask.BlockingReason();
+				leadTaskRow.Cells[3].ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
 			}
 
 			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
@@ -360,14 +368,14 @@ namespace TaskPlanningForms
 			taskRow.Cells[0].SetColorByState(task);
 			taskRow.Cells[0].ToolTipText = task.State;
 
-			taskRow.Cells[2].Value = task.Id;
+			taskRow.Cells[2].Value = task.Id + " " + task.Title;
 			taskRow.Cells[2].ToolTipText =
 				task.Discipline() + " "
 				+ task.Title + " "
 				+ (task.State == WorkItemState.Active
 					? "Remaining " + task.Remaining().ToString()
 					: "Estimate " + task.Estimate().ToString());
-			taskRow.Cells[2].SetColorByDiscipline(task);
+			taskRow.Cells[2].Style.BackColor = taskRow.Cells[0].Style.BackColor;
 
 			if (blockerIds != null)
 			{
@@ -389,6 +397,14 @@ namespace TaskPlanningForms
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
 					taskRow.Cells[3].ToolTipText = blockerIdsStr;
 				}
+			}
+			if (!string.IsNullOrEmpty(task.BlockingReason()))
+			{
+				if (!string.IsNullOrEmpty(taskRow.Cells[3].ToolTipText))
+					taskRow.Cells[3].ToolTipText += Environment.NewLine;
+				else
+					taskRow.Cells[3].Value = task.BlockingReason();
+				taskRow.Cells[3].ToolTipText += "Blocking Reason: " + task.BlockingReason();
 			}
 
 			string assignedTo = task.AssignedTo();
@@ -424,21 +440,24 @@ namespace TaskPlanningForms
 
 				double? remaining = workItem.Remaining();
 				if (remaining.HasValue)
+				{
+					var length = (int)Math.Ceiling(remaining.Value / 8 / m_focusFactor);
 					return AddDates(
 						row,
-						remaining.Value,
 						startInd,
+						length,
 						userMark);
+				}
 			}
 			else if (taskStart.HasValue)
 			{
 				var indStart = (int)taskStart.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
 				if (indStart < 0)
 					row.Cells[m_indShift - 1].Value = taskStart.Value.ToString("dd.MM");
-				indStart = Math.Min(Math.Max(0, indStart) + m_indShift, m_maxInd);
+				indStart = Math.Min(Math.Max(0, indStart), m_maxInd) + m_indShift;
 
 				var indFinish = (int)taskFinish.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
-				indFinish = Math.Min(Math.Max(0, indFinish) + m_indShift, m_maxInd);
+				indFinish = Math.Min(Math.Max(0, indFinish), m_maxInd) + m_indShift;
 				DateTime today = DateTime.Now.Date;
 				for (int i = indStart; i <= indFinish; i++)
 				{
@@ -475,22 +494,38 @@ namespace TaskPlanningForms
 				return m_indShift;
 			}
 
+			var length = (int)Math.Ceiling(estimate.Value / 8 / m_focusFactor);
+
+			if (task.FinishDate() != null)
+			{
+				int finishShift = length - 1;
+				DateTime startDate = task.FinishDate().Value.Date;
+				DateTime today = DateTime.Now.Date;
+				while (finishShift > 0 && startDate >= today)
+				{
+					startDate = startDate.AddDays(-1);
+					if (!IsHoliday(startDate))
+						--finishShift;
+				}
+				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
+				startInd = Math.Max(startInd, startShift + m_indShift);
+			}
+
 			return AddDates(
 				taskRow,
-				estimate.Value,
 				startInd,
+				length,
 				userMark);
 		}
 
 		private int AddDates(
 			DataGridViewRow row,
-			double duration,
 			int startInd,
+			int length,
 			string userMark)
 		{
 			if (startInd - m_indShift > m_maxInd)
 				return m_indShift + m_maxInd + 1;
-			var length = (int)Math.Ceiling(duration / 8 / m_focusFactor);
 			int ind = 0;
 			while (length > 0)
 			{

@@ -16,14 +16,6 @@ namespace TaskPlanningForms
 
 		internal static Color StateDevCompleted = Color.Green;
 
-		internal static Color DisciplineDevelopment = Color.Cyan;
-
-		internal static Color DisciplineAutoTesting = Color.HotPink;
-
-		internal static Color DisciplineProductTesting = Color.Moccasin;
-
-		internal static Color DisciplineArchitecture = Color.Gold;
-
 		internal static Color Holiday = Color.LightGray;
 
 		internal static Color WeekEnd = Color.Gray;
