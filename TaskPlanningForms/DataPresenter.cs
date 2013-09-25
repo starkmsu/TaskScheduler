@@ -188,63 +188,62 @@ namespace TaskPlanningForms
 			leadTaskRow.Cells[0].ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
 
 			leadTaskRow.Cells[1].Value = leadTask.Id;
-
-			bool result = true;
-			string visionAgreementState = leadTask.VisionAgreementState();
-			string hlaAgeementState = leadTask.HlaAgreementState();
 			leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
-			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
-			{
-				leadTaskRow.Cells[1].SetErrorColor();
-				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.BadVisionAgreemntState(visionAgreementState);
-				result = false;
-			}
-			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
-			{
-				leadTaskRow.Cells[1].SetErrorColor();
-				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.BadHlaAgreemntState(hlaAgeementState);
-				result = false;
-			}
-			else if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
+			leadTaskRow.Cells[1].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
+			if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
 			{
 				leadTaskRow.Cells[1].SetWarningColor();
 				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
 			}
-			else
+
+			bool result = true;
+			string visionAgreementState = leadTask.VisionAgreementState();
+			string hlaAgeementState = leadTask.HlaAgreementState();
+			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
 			{
-				leadTaskRow.Cells[1].SetColorByState(leadTask);
+				leadTaskRow.Cells[2].Value = visionAgreementState;
+				leadTaskRow.Cells[2].SetErrorColor();
+				leadTaskRow.Cells[2].ToolTipText += Environment.NewLine + Messages.BadVisionAgreemntState(visionAgreementState);
+				result = false;
+			}
+			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
+			{
+				leadTaskRow.Cells[2].Value = hlaAgeementState;
+				leadTaskRow.Cells[2].SetErrorColor();
+				leadTaskRow.Cells[2].ToolTipText += Environment.NewLine + Messages.BadHlaAgreemntState(hlaAgeementState);
+				result = false;
 			}
 
-			leadTaskRow.Cells[2].Value = leadTask.Title;
-			leadTaskRow.Cells[2].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
+			leadTaskRow.Cells[3].Value = leadTask.Title;
+			leadTaskRow.Cells[3].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
 
 			if (data.BlockersDict.ContainsKey(leadTask.Id))
 			{
 				List<int> blockerIds = data.BlockersDict[leadTask.Id];
 				string blockerIdsStr = string.Join(",", blockerIds);
-				leadTaskRow.Cells[3].Value = blockerIdsStr;
+				leadTaskRow.Cells[4].Value = blockerIdsStr;
 				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.Contains);
 				if (nonChildBlockerId > 0)
 				{
-					leadTaskRow.Cells[3].SetErrorColor();
-					leadTaskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
+					leadTaskRow.Cells[4].SetErrorColor();
+					leadTaskRow.Cells[4].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 				else
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					leadTaskRow.Cells[3].ToolTipText = blockerIdsStr;
+					leadTaskRow.Cells[4].ToolTipText = blockerIdsStr;
 				}
 			}
 			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
 			{
-				if (!string.IsNullOrEmpty(leadTaskRow.Cells[3].ToolTipText))
-					leadTaskRow.Cells[3].ToolTipText += Environment.NewLine;
+				if (!string.IsNullOrEmpty(leadTaskRow.Cells[4].ToolTipText))
+					leadTaskRow.Cells[4].ToolTipText += Environment.NewLine;
 				else
-					leadTaskRow.Cells[3].Value = leadTask.BlockingReason();
-				leadTaskRow.Cells[3].ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
+					leadTaskRow.Cells[4].Value = leadTask.BlockingReason();
+				leadTaskRow.Cells[4].ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
 			}
 
-			leadTaskRow.Cells[4].Value = leadTask.AssignedTo();
+			leadTaskRow.Cells[5].Value = leadTask.AssignedTo();
 
 			return result;
 		}
@@ -368,51 +367,51 @@ namespace TaskPlanningForms
 			taskRow.Cells[0].SetColorByState(task);
 			taskRow.Cells[0].ToolTipText = task.State;
 
-			taskRow.Cells[2].Value = task.Id + " " + task.Title;
-			taskRow.Cells[2].ToolTipText =
+			taskRow.Cells[3].Value = task.Id + " " + task.Title;
+			taskRow.Cells[3].ToolTipText =
 				task.Discipline() + " "
 				+ task.Title + " "
 				+ (task.State == WorkItemState.Active
 					? "Remaining " + task.Remaining().ToString()
 					: "Estimate " + task.Estimate().ToString());
-			taskRow.Cells[2].Style.BackColor = taskRow.Cells[0].Style.BackColor;
+			taskRow.Cells[3].Style.BackColor = taskRow.Cells[0].Style.BackColor;
 
 			if (blockerIds != null)
 			{
 				string blockerIdsStr = string.Join(",", blockerIds);
-				taskRow.Cells[3].Value = blockerIdsStr;
+				taskRow.Cells[4].Value = blockerIdsStr;
 				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.Contains);
 				if (nonChildBlockerId > 0)
 				{
-					taskRow.Cells[3].SetErrorColor();
-					taskRow.Cells[3].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
+					taskRow.Cells[4].SetErrorColor();
+					taskRow.Cells[4].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 				else if (task.State == WorkItemState.Active)
 				{
-					taskRow.Cells[3].SetErrorColor();
-					taskRow.Cells[3].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
+					taskRow.Cells[4].SetErrorColor();
+					taskRow.Cells[4].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
 				}
 				else
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					taskRow.Cells[3].ToolTipText = blockerIdsStr;
+					taskRow.Cells[4].ToolTipText = blockerIdsStr;
 				}
 			}
 			if (!string.IsNullOrEmpty(task.BlockingReason()))
 			{
-				if (!string.IsNullOrEmpty(taskRow.Cells[3].ToolTipText))
-					taskRow.Cells[3].ToolTipText += Environment.NewLine;
+				if (!string.IsNullOrEmpty(taskRow.Cells[4].ToolTipText))
+					taskRow.Cells[4].ToolTipText += Environment.NewLine;
 				else
-					taskRow.Cells[3].Value = task.BlockingReason();
-				taskRow.Cells[3].ToolTipText += "Blocking Reason: " + task.BlockingReason();
+					taskRow.Cells[4].Value = task.BlockingReason();
+				taskRow.Cells[4].ToolTipText += "Blocking Reason: " + task.BlockingReason();
 			}
 
 			string assignedTo = task.AssignedTo();
-			taskRow.Cells[4].Value = assignedTo;
+			taskRow.Cells[5].Value = assignedTo;
 			if (assignedTo.StartsWith(m_groupPrefix))
 			{
-				taskRow.Cells[4].SetWarningColor();
-				taskRow.Cells[4].ToolTipText = Messages.TaskIsNotAssigned();
+				taskRow.Cells[5].SetWarningColor();
+				taskRow.Cells[5].ToolTipText = Messages.TaskIsNotAssigned();
 			}
 
 			return assignedTo;

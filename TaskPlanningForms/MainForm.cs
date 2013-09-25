@@ -201,6 +201,7 @@ namespace TaskPlanningForms
 						usersLabel.Enabled = true;
 						loadDataButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
+						refreshButton.Enabled = true;
 						mainTabControl.SelectTab(dataTabPage);
 					}));
 			}

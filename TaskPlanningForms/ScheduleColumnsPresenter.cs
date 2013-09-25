@@ -5,7 +5,7 @@ namespace TaskPlanningForms
 {
 	internal class ScheduleColumnsPresenter
 	{
-		private const int m_indShift = 6;
+		private const int m_indShift = 7;
 
 		internal int FirstDataColumnIndex { get { return m_indShift; } }
 

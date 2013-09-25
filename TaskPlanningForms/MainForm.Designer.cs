@@ -58,6 +58,7 @@
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -295,6 +296,7 @@
 			// 
 			// refreshButton
 			// 
+			this.refreshButton.Enabled = false;
 			this.refreshButton.Location = new System.Drawing.Point(8, 4);
 			this.refreshButton.Name = "refreshButton";
 			this.refreshButton.Size = new System.Drawing.Size(75, 23);
@@ -335,6 +337,7 @@
 			this.scheduleDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Priority,
             this.LeadTask,
+            this.Docs,
             this.Task,
             this.Blockers,
             this.AssignedTo,
@@ -424,6 +427,16 @@
 			this.LeadTask.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			this.LeadTask.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.LeadTask.Width = 60;
+			// 
+			// Docs
+			// 
+			this.Docs.Frozen = true;
+			this.Docs.HeaderText = "Docs";
+			this.Docs.Name = "Docs";
+			this.Docs.ReadOnly = true;
+			this.Docs.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Docs.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Docs.Width = 50;
 			// 
 			// Task
 			// 
@@ -517,6 +530,7 @@
 		private System.Windows.Forms.ComboBox usersVacationsComboBox;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
