@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -14,19 +15,20 @@ namespace TaskPlanningForms
 		private const double m_focusFactor = 0.5f;
 		
 		private readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
-		private const int m_leadTaskIdInd = 1;
-		private const int m_assignedToInd = 4;
 		private const string m_groupPrefix = "g ";
-		private readonly int m_indShift;
+		private const string m_blockersPrefix = "-->";
+		private const int m_leadTaskIdInd = 1;
+		private const int m_docsInd = 2;
+		private const int m_titleInd = 3;
+		private const int m_blockersInd = 4;
+		private const int m_assignedToInd = 5;
+		private const int m_indShift = 7;
 
 		private List<DateTime> m_holidays;
 
 		private Dictionary<string, List<DateTime>> m_vacations = new Dictionary<string, List<DateTime>>(0);
 
-		internal DataPresenter(int indShift)
-		{
-			m_indShift = indShift;
-		}
+		internal int FirstDataColumnIndex { get { return m_indShift; } }
 
 		internal void SetHolidays(List<DateTime> holidays)
 		{
@@ -87,7 +89,8 @@ namespace TaskPlanningForms
 					int lasttChildRowInd = dgv.Rows.Count - 1;
 					for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
 					{
-						if (!dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Proposed))
+						if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active)
+							|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved))
 						{
 							dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
 							dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
@@ -140,14 +143,39 @@ namespace TaskPlanningForms
 
 		internal void FilterDataByLTMode(DataGridView dgv, bool ltOnly)
 		{
-			bool visible = true;
+			bool blockersVisibleInLTMode = true;
+			bool blockersVisibleInAllMode = false;
 			for (int i = 0; i < dgv.Rows.Count; i++)
 			{
 				var row = dgv.Rows[i];
-				if (row.Cells[m_leadTaskIdInd].Value != null)
-					visible = row.Visible;
+				var marker = row.Cells[m_leadTaskIdInd].Value;
+				if (marker == null)
+				{
+					blockersVisibleInLTMode = false;
+					row.Visible = !ltOnly;
+				}
+				else if (marker.ToString() != m_blockersPrefix)
+				{
+					blockersVisibleInLTMode = true;
+				}
 				else
-					row.Visible = visible && !ltOnly;
+				{
+					if (row.Visible)
+						blockersVisibleInAllMode = true;
+					row.Visible = ltOnly ? row.Visible && blockersVisibleInLTMode : blockersVisibleInAllMode;
+				}
+			}
+		}
+
+		internal void ExpandBlockers(DataGridView dgv, bool expandBlockers)
+		{
+			for (int i = 0; i < dgv.Rows.Count; i++)
+			{
+				var row = dgv.Rows[i];
+				object marker = row.Cells[m_leadTaskIdInd].Value;
+				if (marker == null || marker.ToString() != m_blockersPrefix)
+					continue;
+				row.Visible = expandBlockers && dgv.Rows[i-1].Visible;
 			}
 		}
 
@@ -159,7 +187,7 @@ namespace TaskPlanningForms
 			dgv.Rows.Add(new DataGridViewRow());
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
 
-			bool shouldCheckEstimate = FillLeadTaskStarttingCells(
+			bool shouldCheckEstimate = FillLeadTaskStartingCells(
 				leadTask,
 				leadTaskRow,
 				data);
@@ -178,74 +206,114 @@ namespace TaskPlanningForms
 				"X");
 		}
 
-		private bool FillLeadTaskStarttingCells(
+		private bool FillLeadTaskStartingCells(
 			WorkItem leadTask,
 			DataGridViewRow leadTaskRow,
 			DataContainer data)
 		{
-			leadTaskRow.Cells[0].Value = leadTask.Priority();
-			leadTaskRow.Cells[0].SetColorByState(leadTask);
-			leadTaskRow.Cells[0].ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
+			var priorityCell = leadTaskRow.Cells[0];
+			priorityCell.Value = leadTask.Priority();
+			priorityCell.SetColorByState(leadTask);
+			priorityCell.ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
 
-			leadTaskRow.Cells[1].Value = leadTask.Id;
-			leadTaskRow.Cells[1].ToolTipText = leadTask.IterationPath;
-			leadTaskRow.Cells[1].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
+			var idCell = leadTaskRow.Cells[m_leadTaskIdInd];
+			idCell.Value = leadTask.Id;
+			idCell.ToolTipText = leadTask.IterationPath;
+			idCell.Style.BackColor = priorityCell.Style.BackColor;
 			if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
 			{
-				leadTaskRow.Cells[1].SetWarningColor();
-				leadTaskRow.Cells[1].ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
+				idCell.SetWarningColor();
+				idCell.ToolTipText = Environment.NewLine + Messages.LTHasNoChildren();
 			}
 
+			var docsCell = leadTaskRow.Cells[m_docsInd];
 			bool result = true;
 			string visionAgreementState = leadTask.VisionAgreementState();
 			string hlaAgeementState = leadTask.HlaAgreementState();
 			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
 			{
-				leadTaskRow.Cells[2].Value = visionAgreementState;
-				leadTaskRow.Cells[2].SetErrorColor();
-				leadTaskRow.Cells[2].ToolTipText += Environment.NewLine + Messages.BadVisionAgreemntState(visionAgreementState);
+				docsCell.Value = visionAgreementState;
+				docsCell.SetErrorColor();
+				docsCell.ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
 				result = false;
 			}
 			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
 			{
-				leadTaskRow.Cells[2].Value = hlaAgeementState;
-				leadTaskRow.Cells[2].SetErrorColor();
-				leadTaskRow.Cells[2].ToolTipText += Environment.NewLine + Messages.BadHlaAgreemntState(hlaAgeementState);
+				docsCell.Value = hlaAgeementState;
+				docsCell.SetErrorColor();
+				docsCell.ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
 				result = false;
 			}
+			else
+			{
+				docsCell.Style.BackColor = priorityCell.Style.BackColor;
+			}
 
-			leadTaskRow.Cells[3].Value = leadTask.Title;
-			leadTaskRow.Cells[3].Style.BackColor = leadTaskRow.Cells[0].Style.BackColor;
+			var titleCell = leadTaskRow.Cells[m_titleInd];
+			titleCell.Value = leadTask.Title;
+			titleCell.Style.Font = new Font(
+				titleCell.Style.Font
+					?? titleCell.OwningColumn.DefaultCellStyle.Font
+					?? titleCell.OwningColumn.DataGridView.ColumnHeadersDefaultCellStyle.Font,
+				FontStyle.Underline);
+			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
+			var blockersCell = leadTaskRow.Cells[m_blockersInd];
 			if (data.BlockersDict.ContainsKey(leadTask.Id))
 			{
 				List<int> blockerIds = data.BlockersDict[leadTask.Id];
 				string blockerIdsStr = string.Join(",", blockerIds);
-				leadTaskRow.Cells[4].Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.Contains);
+				blockersCell.Value = blockerIdsStr;
+				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
 				if (nonChildBlockerId > 0)
 				{
-					leadTaskRow.Cells[4].SetErrorColor();
-					leadTaskRow.Cells[4].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
+					blockersCell.SetErrorColor();
+					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 				else
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					leadTaskRow.Cells[4].ToolTipText = blockerIdsStr;
+					blockersCell.ToolTipText = blockerIdsStr;
+				}
+				var dgv = leadTaskRow.DataGridView;
+				foreach (int blockerId in blockerIds)
+				{
+					AddBlockerRow(
+						dgv,
+						data,
+						blockerId);
 				}
 			}
 			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
 			{
 				if (!string.IsNullOrEmpty(leadTaskRow.Cells[4].ToolTipText))
-					leadTaskRow.Cells[4].ToolTipText += Environment.NewLine;
+					blockersCell.ToolTipText += Environment.NewLine;
 				else
-					leadTaskRow.Cells[4].Value = leadTask.BlockingReason();
-				leadTaskRow.Cells[4].ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
+					blockersCell.Value = leadTask.BlockingReason();
+				blockersCell.ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
 			}
 
-			leadTaskRow.Cells[5].Value = leadTask.AssignedTo();
+			leadTaskRow.Cells[m_assignedToInd].Value = leadTask.AssignedTo();
 
 			return result;
+		}
+
+		private void AddBlockerRow(
+			DataGridView dgv,
+			DataContainer data,
+			int blockerId)
+		{
+			dgv.Rows.Add(new DataGridViewRow());
+			var blockerRow = dgv.Rows[dgv.Rows.Count - 1];
+			blockerRow.Cells[m_leadTaskIdInd].Value = m_blockersPrefix;
+			WorkItem blocker = data.NonChildBlockers.ContainsKey(blockerId)
+				? data.NonChildBlockers[blockerId]
+				: data.WiDict[blockerId];
+			blockerRow.Cells[m_docsInd].Value = blocker.Type.Name;
+			blockerRow.Cells[m_titleInd].Value = blockerId + " " + blocker.Title;
+			blockerRow.Cells[m_blockersInd].Value = blocker.State;
+			blockerRow.Cells[m_assignedToInd].Value = blocker.AssignedTo();
+			blockerRow.Visible = false;
 		}
 
 		private int AddTaskRow(
@@ -363,55 +431,67 @@ namespace TaskPlanningForms
 			DataContainer data,
 			List<int> blockerIds)
 		{
-			taskRow.Cells[0].Value = task.Priority();
-			taskRow.Cells[0].SetColorByState(task);
-			taskRow.Cells[0].ToolTipText = task.State;
+			var priorityCell = taskRow.Cells[0];
+			priorityCell.Value = task.Priority();
+			priorityCell.SetColorByState(task);
+			priorityCell.ToolTipText = task.State;
 
-			taskRow.Cells[3].Value = task.Id + " " + task.Title;
-			taskRow.Cells[3].ToolTipText =
-				task.Discipline() + " "
+			var titleCell = taskRow.Cells[m_titleInd];
+			titleCell.Value = task.Id + " " + task.Title;
+			titleCell.ToolTipText =
+				task.Discipline() + " " 
 				+ task.Title + " "
 				+ (task.State == WorkItemState.Active
 					? "Remaining " + task.Remaining().ToString()
 					: "Estimate " + task.Estimate().ToString());
-			taskRow.Cells[3].Style.BackColor = taskRow.Cells[0].Style.BackColor;
+			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
+			var blockersCell = taskRow.Cells[m_blockersInd];
 			if (blockerIds != null)
 			{
 				string blockerIdsStr = string.Join(",", blockerIds);
-				taskRow.Cells[4].Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.Contains);
+				blockersCell.Value = blockerIdsStr;
+				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
 				if (nonChildBlockerId > 0)
 				{
-					taskRow.Cells[4].SetErrorColor();
-					taskRow.Cells[4].ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
+					blockersCell.SetErrorColor();
+					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
 				}
 				else if (task.State == WorkItemState.Active)
 				{
-					taskRow.Cells[4].SetErrorColor();
-					taskRow.Cells[4].ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
+					blockersCell.SetErrorColor();
+					blockersCell.ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
 				}
 				else
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					taskRow.Cells[4].ToolTipText = blockerIdsStr;
+					blockersCell.ToolTipText = blockerIdsStr;
+				}
+				var dgv = taskRow.DataGridView;
+				foreach (int blockerId in blockerIds)
+				{
+					AddBlockerRow(
+						dgv,
+						data,
+						blockerId);
 				}
 			}
 			if (!string.IsNullOrEmpty(task.BlockingReason()))
 			{
-				if (!string.IsNullOrEmpty(taskRow.Cells[4].ToolTipText))
-					taskRow.Cells[4].ToolTipText += Environment.NewLine;
+				if (!string.IsNullOrEmpty(blockersCell.ToolTipText))
+					blockersCell.ToolTipText += Environment.NewLine;
 				else
-					taskRow.Cells[4].Value = task.BlockingReason();
-				taskRow.Cells[4].ToolTipText += "Blocking Reason: " + task.BlockingReason();
+					blockersCell.Value = task.BlockingReason();
+				blockersCell.ToolTipText += "Blocking Reason: " + task.BlockingReason();
 			}
 
+			var assignedCell = taskRow.Cells[m_assignedToInd];
 			string assignedTo = task.AssignedTo();
-			taskRow.Cells[5].Value = assignedTo;
+			assignedCell.Value = assignedTo;
 			if (assignedTo.StartsWith(m_groupPrefix))
 			{
-				taskRow.Cells[5].SetWarningColor();
-				taskRow.Cells[5].ToolTipText = Messages.TaskIsNotAssigned();
+				assignedCell.SetWarningColor();
+				assignedCell.ToolTipText = Messages.TaskIsNotAssigned();
 			}
 
 			return assignedTo;

@@ -12,9 +12,9 @@ namespace TaskPlanningForms
 	{
 		private readonly Config m_config;
 
-		private readonly DataLoader m_dataLoader = new DataLoader();
-		private readonly ScheduleColumnsPresenter m_columnsPresenter = new ScheduleColumnsPresenter();
-		private readonly DataPresenter m_dataPresenter;
+		private static readonly DataLoader s_dataLoader = new DataLoader();
+		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
+		private static readonly ScheduleColumnsPresenter s_columnsPresenter = new ScheduleColumnsPresenter(s_dataPresenter.FirstDataColumnIndex);
 
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
@@ -30,12 +30,10 @@ namespace TaskPlanningForms
 
 			m_config = ConfigManager.LoadConfig();
 
-			m_columnsPresenter.InitColumns(scheduleDataGridView);
-
-			m_dataPresenter = new DataPresenter(m_columnsPresenter.FirstDataColumnIndex);
+			s_columnsPresenter.InitColumns(scheduleDataGridView);
 
 			m_holidays = m_config.Holidays;
-			m_dataPresenter.SetHolidays(m_holidays);
+			s_dataPresenter.SetHolidays(m_holidays);
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
 			if (m_config.AreaPaths != null && m_config.AreaPaths.Count > 0)
@@ -53,7 +51,7 @@ namespace TaskPlanningForms
 				var vacationsUsers = m_config.Vacations.Select(v => v.User).ToList();
 				vacationsUsers.Sort();
 				usersVacationsComboBox.DataSource = vacationsUsers;
-				m_dataPresenter.SetVacations(m_config.Vacations);
+				s_dataPresenter.SetVacations(m_config.Vacations);
 			}
 		}
 
@@ -67,7 +65,7 @@ namespace TaskPlanningForms
 				++ind;
 				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
 					continue;
-				var column = scheduleDataGridView.Columns[m_columnsPresenter.FirstDataColumnIndex + ind];
+				var column = scheduleDataGridView.Columns[s_dataPresenter.FirstDataColumnIndex + ind];
 				var color = m_holidays.Contains(i)
 					? CellsPalette.Holiday
 					: scheduleDataGridView.Columns[1].HeaderCell.Style.BackColor;
@@ -93,7 +91,7 @@ namespace TaskPlanningForms
 			try
 			{
 				m_lastAreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
-				m_leadTasks = m_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, m_lastAreaPaths, subAreaPathsCheckBox.Checked);
+				m_leadTasks = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, m_lastAreaPaths, subAreaPathsCheckBox.Checked);
 			}
 			catch (Exception e)
 			{
@@ -187,11 +185,11 @@ namespace TaskPlanningForms
 			m_lastWithSubAreas = subAreaPathsCheckBox.Checked;
 			try
 			{
-				var data = m_dataLoader.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
+				var data = s_dataLoader.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
+						var users = s_dataPresenter.PresentData(data, scheduleDataGridView);
 						usersVacationsComboBox.DataSource = users;
 						vacationsButton.Enabled = users.Count > 0;
 						var users2 = new List<string>(users);
@@ -219,7 +217,7 @@ namespace TaskPlanningForms
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
 			string user = usersFilterСomboBox.SelectedItem.ToString();
-			m_dataPresenter.FilterDataByUser(scheduleDataGridView, user);
+			s_dataPresenter.FilterDataByUser(scheduleDataGridView, user);
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -242,7 +240,7 @@ namespace TaskPlanningForms
 				}));
 			try
 			{
-				var leadTasksCollection = m_dataLoader.GetLeadTasks(
+				var leadTasksCollection = s_dataLoader.GetLeadTasks(
 					m_lastTfsUrl,
 					m_lastAreaPaths.Cast<object>().ToList(),
 					m_lastWithSubAreas,
@@ -252,14 +250,14 @@ namespace TaskPlanningForms
 				{
 					leadTasks.Add(leadTasksCollection[i]);
 				}
-				var data = m_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				var data = s_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
-					bool isDateChanged = scheduleDataGridView.Columns[m_columnsPresenter.FirstDataColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
+					bool isDateChanged = scheduleDataGridView.Columns[s_dataPresenter.FirstDataColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
-						m_columnsPresenter.InitColumns(scheduleDataGridView);
-					var users = m_dataPresenter.PresentData(data, scheduleDataGridView);
+						s_columnsPresenter.InitColumns(scheduleDataGridView);
+					var users = s_dataPresenter.PresentData(data, scheduleDataGridView);
 					usersVacationsComboBox.DataSource = users;
 					vacationsButton.Enabled = users.Count > 0;
 					var users2 = new List<string>(users);
@@ -269,7 +267,7 @@ namespace TaskPlanningForms
 					if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
 					{
 						usersFilterСomboBox.SelectedItem = currentUser;
-						m_dataPresenter.FilterDataByUser(scheduleDataGridView, currentUser);
+						s_dataPresenter.FilterDataByUser(scheduleDataGridView, currentUser);
 					}
 
 					usersFilterСomboBox.Enabled = true;
@@ -303,7 +301,7 @@ namespace TaskPlanningForms
 			m_holidays = holidaysForm.Holidays;
 
 			m_config.Holidays = m_holidays;
-			m_dataPresenter.SetHolidays(m_holidays);
+			s_dataPresenter.SetHolidays(m_holidays);
 			UpdateHolidays();
 		}
 
@@ -358,13 +356,13 @@ namespace TaskPlanningForms
 		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool withDevCompleted = devCmpletedCheckBox.Checked;
-			m_dataPresenter.FilterDataByDevCompleted(scheduleDataGridView, withDevCompleted);
+			s_dataPresenter.FilterDataByDevCompleted(scheduleDataGridView, withDevCompleted);
 		}
 
 		private void LtOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool ltOnly = ltOnlyCheckBox.Checked;
-			m_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnly);
+			s_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnly);
 		}
 
 		private void VacationsButtonClick(object sender, EventArgs e)
@@ -377,7 +375,13 @@ namespace TaskPlanningForms
 				m_config.Vacations.Remove(userVacations);
 			if (holidaysForm.Holidays.Count > 0)
 				m_config.Vacations.Add(new VacationData { User = user, VacationDays = holidaysForm.Holidays });
-			m_dataPresenter.SetVacations(m_config.Vacations);
+			s_dataPresenter.SetVacations(m_config.Vacations);
+		}
+
+		private void ShowBlockersCheckBoxCheckedChanged(object sender, EventArgs e)
+		{
+			bool expandBlockers = expandBlockersCheckBox.Checked;
+			s_dataPresenter.ExpandBlockers(scheduleDataGridView, expandBlockers);
 		}
 	}
 }

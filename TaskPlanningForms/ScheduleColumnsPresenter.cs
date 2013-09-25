@@ -5,9 +5,12 @@ namespace TaskPlanningForms
 {
 	internal class ScheduleColumnsPresenter
 	{
-		private const int m_indShift = 7;
+		private readonly int m_indShift;
 
-		internal int FirstDataColumnIndex { get { return m_indShift; } }
+		internal ScheduleColumnsPresenter(int indShift)
+		{
+			m_indShift = indShift;
+		}
 
 		internal void InitColumns(DataGridView dgv)
 		{

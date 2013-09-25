@@ -11,6 +11,6 @@ namespace TaskPlanningForms
 
 		internal Dictionary<int, List<int>> BlockersDict;
 
-		internal HashSet<int> NonChildBlockers;
+		internal Dictionary<int, WorkItem> NonChildBlockers;
 	}
 }

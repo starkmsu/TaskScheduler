@@ -126,7 +126,7 @@ namespace TaskPlanningForms
 				WiDict = new Dictionary<int, WorkItem>(),
 				BlockersDict = new Dictionary<int, List<int>>(),
 				LeadTaskChildrenDict = new Dictionary<int, List<int>>(),
-				NonChildBlockers = new HashSet<int>()
+				NonChildBlockers = new Dictionary<int, WorkItem>()
 			};
 
 			AppendLeadTasks(result, leadTasks);
@@ -136,9 +136,8 @@ namespace TaskPlanningForms
 				AppendTasks(result, wiqlAccessor);
 				CleanDict(result.LeadTaskChildrenDict, result.WiDict, false, true, wiqlAccessor);
 				CleanDict(result.BlockersDict, result.WiDict, true, false, wiqlAccessor);
+				InitExternalBlockers(result, wiqlAccessor);
 			}
-
-			InitExternalBlockers(result);
 
 			return result;
 		}
@@ -236,14 +235,22 @@ namespace TaskPlanningForms
 			}
 		}
 
-		private void InitExternalBlockers(DataContainer dataContainer)
+		private void InitExternalBlockers(DataContainer dataContainer, TfsWiqlAccessor wiqlAccessor)
 		{
 			foreach (var pair in dataContainer.BlockersDict)
 			{
 				foreach (int blockerId in pair.Value.Where(i => !dataContainer.WiDict.ContainsKey(i)))
 				{
-					dataContainer.NonChildBlockers.Add(blockerId);
+					if (dataContainer.NonChildBlockers.ContainsKey(blockerId))
+						continue;
+					dataContainer.NonChildBlockers.Add(blockerId, null);
 				}
+			}
+			var workItems = wiqlAccessor.QueryWorkItemsByIds(dataContainer.NonChildBlockers.Keys.ToList());
+			for (int i = 0; i < workItems.Count; i++)
+			{
+				WorkItem workItem = workItems[i];
+				dataContainer.NonChildBlockers[workItem.Id] = workItem;
 			}
 		}
 	}
