@@ -237,6 +237,9 @@ namespace TaskPlanningForms
 
 		private void InitExternalBlockers(DataContainer dataContainer, TfsWiqlAccessor wiqlAccessor)
 		{
+			if (dataContainer.BlockersDict.Count == 0)
+				return;
+
 			foreach (var pair in dataContainer.BlockersDict)
 			{
 				foreach (int blockerId in pair.Value.Where(i => !dataContainer.WiDict.ContainsKey(i)))

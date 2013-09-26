@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="IterationsChanged" xml:space="preserve">
+    <value>Iterations changed</value>
+  </data>
   <data name="LeadTasksFetchingError" xml:space="preserve">
     <value>LeadTasks fetching error</value>
   </data>
-  <data name="LeadTasksParsinigError" xml:space="preserve">
-    <value>LeadTasks parsinig error</value>
+  <data name="LeadTasksParsingError" xml:space="preserve">
+    <value>LeadTasks parsing error</value>
   </data>
 </root>

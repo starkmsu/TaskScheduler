@@ -11,8 +11,6 @@ namespace TaskPlanningForms
 {
 	public partial class MainForm : Form
 	{
-		private const string s_iterationsChangedText = "Iterations changed.";
-
 		private readonly Config m_config;
 
 		private static readonly DataLoader s_dataLoader = new DataLoader();
@@ -130,7 +128,7 @@ namespace TaskPlanningForms
 				{
 					iterationsComboBox.BackColor = iterationsColor;
 					if (iterationsColor == Color.Yellow)
-						iterationsToolTip.SetToolTip(iterationsComboBox, s_iterationsChangedText);
+						iterationsToolTip.SetToolTip(iterationsComboBox, Resources.IterationsChanged);
 					else
 						iterationsToolTip.RemoveAll();
 				}));
@@ -225,11 +223,11 @@ namespace TaskPlanningForms
 						mainTabControl.SelectTab(dataTabPage);
 					}));
 			}
-			catch (Exception e)
+			catch (Exception exc)
 			{
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						MessageBox.Show(e.Message, Resources.LeadTasksParsinigError);
+						MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
 						loadDataButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
@@ -303,7 +301,7 @@ namespace TaskPlanningForms
 			{
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
-					MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsinigError);
+					MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
 					loadDataButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					refreshButton.Enabled = true;

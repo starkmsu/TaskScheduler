@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskPlanningForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 using WorkItemType = TfsUtils.Const.WorkItemType;
@@ -59,43 +60,55 @@ namespace TaskPlanningForms
 				int ltRowInd = dgv.Rows.Count - 1;
 
 				var childrenTasks = leadTaskChildren.Value
+					.Where(i => data.WiDict.ContainsKey(i))
 					.Select(i => data.WiDict[i])
 					.OrderBy(i => i.Priority())
 					.ToList();
 
-				if (childrenTasks.Count == 0)
-					continue;
-
-				int lastTaskInd = childrenTasks
-					.Select(task =>
-						AddTaskRow(
-							dgv,
-							task,
-							childrenTasks,
-							data,
-							alreadyAdded,
-							tasksByUser))
-					.Max();
-				for (int i = nextLtInd; i < lastTaskInd; i++)
+				if (childrenTasks.Count > 0)
 				{
-					DateTime date = today.AddDays(i - m_indShift);
-					if (IsHoliday(date))
-						continue;
-					dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
-					dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
-				}
-				if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed))
-				{
-					int lasttChildRowInd = dgv.Rows.Count - 1;
-					for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
+					int lastTaskInd = childrenTasks
+						.Select(task =>
+							AddTaskRow(
+								dgv,
+								task,
+								childrenTasks,
+								data,
+								alreadyAdded,
+								tasksByUser))
+						.Max();
+					for (int i = nextLtInd; i < lastTaskInd; i++)
 					{
-						if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active)
-							|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved))
+						DateTime date = today.AddDays(i - m_indShift);
+						if (IsHoliday(date))
+							continue;
+						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
+						dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
+					}
+					if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed))
+					{
+						int lasttChildRowInd = dgv.Rows.Count - 1;
+						for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
 						{
-							dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
-							dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
+							if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active)
+								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved))
+							{
+								dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
+								dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
+							}
 						}
 					}
+				}
+
+				var notAccessableChildren = leadTaskChildren.Value
+					.Where(i => !data.WiDict.ContainsKey(i))
+					.ToList();
+				foreach (int notAccessableChildId in notAccessableChildren)
+				{
+					dgv.Rows.Add(new DataGridViewRow());
+					var taskRow = dgv.Rows[dgv.Rows.Count - 1];
+					taskRow.Cells[m_titleInd].Value = notAccessableChildId;
+					taskRow.Cells[m_assignedToInd].Value = Resources.AccessDenied;
 				}
 			}
 

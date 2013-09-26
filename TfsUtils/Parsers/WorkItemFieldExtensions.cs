@@ -17,7 +17,10 @@ namespace TfsUtils.Parsers
 
 		public static int Priority(this WorkItem workItem)
 		{
-			return (int)workItem["Priority"];
+			object priority = workItem.Fields.Contains("Priority")
+				? workItem["Priority"]
+				: workItem["Backlog Priority"];
+			return (int)priority;
 		}
 
 		public static DateTime? StartDate(this WorkItem workItem)
