@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,6 +11,8 @@ namespace TaskPlanningForms
 {
 	public partial class MainForm : Form
 	{
+		private const string s_iterationsChangedText = "Iterations changed.";
+
 		private readonly Config m_config;
 
 		private static readonly DataLoader s_dataLoader = new DataLoader();
@@ -114,6 +117,25 @@ namespace TaskPlanningForms
 				iterations.Add(iteration);
 			}
 			iterations.Sort();
+
+			var iterationsColor = Color.White;
+			if (m_config.AllIterationPaths != null
+				&& m_config.AllIterationPaths.Count > 0
+				&& (iterations.Count != m_config.AllIterationPaths.Count
+					|| m_config.AllIterationPaths.Any(i => !iterations.Contains(i))))
+			{
+				iterationsColor = Color.Yellow;
+			}
+			iterationsComboBox.Invoke(new Action(() =>
+				{
+					iterationsComboBox.BackColor = iterationsColor;
+					if (iterationsColor == Color.Yellow)
+						iterationsToolTip.SetToolTip(iterationsComboBox, s_iterationsChangedText);
+					else
+						iterationsToolTip.RemoveAll();
+				}));
+			m_config.AllIterationPaths = iterations;
+
 			var validIterations = new List<string>();
 			if (m_config.IterationPaths != null && m_config.IterationPaths.Count > 0)
 			{

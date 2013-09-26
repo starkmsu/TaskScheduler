@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.mainTabControl = new System.Windows.Forms.TabControl();
 			this.mainTabPage = new System.Windows.Forms.TabPage();
 			this.iterationPathGroupBox = new System.Windows.Forms.GroupBox();
@@ -64,6 +65,7 @@
 			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
+			this.iterationsToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.iterationPathGroupBox.SuspendLayout();
@@ -549,6 +551,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox expandBlockersCheckBox;
+		private System.Windows.Forms.ToolTip iterationsToolTip;
 	}
 }
 

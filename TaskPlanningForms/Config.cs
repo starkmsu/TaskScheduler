@@ -12,6 +12,8 @@ namespace TaskPlanningForms
 
 		public List<string> IterationPaths { get; set; }
 
+		public List<string> AllIterationPaths { get; set; }
+
 		public List<DateTime> Holidays { get; set; }
 
 		public List<VacationData> Vacations { get; set; }
