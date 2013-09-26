@@ -6,14 +6,28 @@ namespace TaskPlanningForms
 {
 	internal class ConfigManager
 	{
-		private const string s_configFIleName = "config.cfg";
+		private const string s_oldConfigFileName = "config.cfg";
+		private const string s_configExtension = "cfg";
 
 		internal static Config LoadConfig()
 		{
-			if (!File.Exists(s_configFIleName))
+			string userAppDaraPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			string appName = AppDomain.CurrentDomain.FriendlyName;
+			while (appName.Contains("."))
+			{
+				appName = Path.GetFileNameWithoutExtension(appName);
+			}
+			appName += "." + s_configExtension;
+			string path = Path.Combine(userAppDaraPath, appName);
+
+			// search in user folder
+			if (!File.Exists(path))
+				path = s_oldConfigFileName;
+			// search in local folder
+			if (!File.Exists(path))
 				return new Config();
 
-			using (var fs = new FileStream(s_configFIleName, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
+			using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
 			{
 				try
 				{
@@ -29,7 +43,16 @@ namespace TaskPlanningForms
 
 		internal static void SaveConfig(Config config)
 		{
-			using (var fs = new FileStream(s_configFIleName, FileMode.Create, FileAccess.Write, FileShare.Write))
+			string userAppDaraPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			string appName = AppDomain.CurrentDomain.FriendlyName;
+			while (appName.Contains("."))
+			{
+				appName = Path.GetFileNameWithoutExtension(appName);
+			}
+			appName += "." + s_configExtension;
+			string path = Path.Combine(userAppDaraPath, appName);
+
+			using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write))
 			{
 				try
 				{
