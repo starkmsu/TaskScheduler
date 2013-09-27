@@ -249,6 +249,10 @@ namespace TaskPlanningForms
 					dataContainer.NonChildBlockers.Add(blockerId, null);
 				}
 			}
+
+			if (dataContainer.NonChildBlockers.Keys.Count == 0)
+				return;
+
 			var workItems = wiqlAccessor.QueryWorkItemsByIds(dataContainer.NonChildBlockers.Keys.ToList());
 			for (int i = 0; i < workItems.Count; i++)
 			{
