@@ -13,6 +13,7 @@ namespace TaskPlanningForms
 			switch (workItem.State)
 			{
 				case WorkItemState.Proposed:
+				case WorkItemState.ToDo:
 					cell.Style.BackColor = CellsPalette.StateProposed;
 					break;
 				case WorkItemState.Active:
@@ -21,6 +22,7 @@ namespace TaskPlanningForms
 						: CellsPalette.StateActive;
 					break;
 				case WorkItemState.Resolved:
+				case WorkItemState.Done:
 					cell.Style.BackColor = CellsPalette.StateResolved;
 					break;
 			}
@@ -38,11 +40,11 @@ namespace TaskPlanningForms
 
 		internal static bool IsColorForState(this DataGridViewCell cell, string state)
 		{
-			if (state == WorkItemState.Proposed)
+			if (state == WorkItemState.Proposed || state == WorkItemState.ToDo)
 				return cell.Style.BackColor == CellsPalette.StateProposed;
 			if (state == WorkItemState.Active)
 				return cell.Style.BackColor == CellsPalette.StateActive;
-			if (state == WorkItemState.Resolved)
+			if (state == WorkItemState.Resolved || state == WorkItemState.Done)
 				return cell.Style.BackColor == CellsPalette.StateResolved;
 			if (state == WorkItemState.DevCompleted)
 				return cell.Style.BackColor == CellsPalette.StateDevCompleted;

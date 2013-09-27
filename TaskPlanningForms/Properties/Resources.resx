@@ -129,4 +129,7 @@
   <data name="LeadTasksParsingError" xml:space="preserve">
     <value>LeadTasks parsing error</value>
   </data>
+  <data name="Nobody" xml:space="preserve">
+    <value>Nobody</value>
+  </data>
 </root>

@@ -95,5 +95,14 @@ namespace TaskPlanningForms.Properties {
                 return ResourceManager.GetString("LeadTasksParsingError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nobody.
+        /// </summary>
+        internal static string Nobody {
+            get {
+                return ResourceManager.GetString("Nobody", resourceCulture);
+            }
+        }
     }
 }

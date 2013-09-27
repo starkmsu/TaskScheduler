@@ -62,7 +62,7 @@ namespace TaskPlanningForms
 				var childrenTasks = leadTaskChildren.Value
 					.Where(i => data.WiDict.ContainsKey(i))
 					.Select(i => data.WiDict[i])
-					.OrderBy(i => i.Priority())
+					.OrderBy(i => i.Priority() ?? 999)
 					.ToList();
 
 				if (childrenTasks.Count > 0)
@@ -85,13 +85,15 @@ namespace TaskPlanningForms
 						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
 						dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
 					}
-					if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed))
+					if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed)
+						|| dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.ToDo))
 					{
 						int lasttChildRowInd = dgv.Rows.Count - 1;
 						for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
 						{
 							if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active)
-								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved))
+								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved)
+								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Done))
 							{
 								dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
 								dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
@@ -205,7 +207,7 @@ namespace TaskPlanningForms
 				leadTaskRow,
 				data);
 
-			if (leadTask.State == WorkItemState.Proposed)
+			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
 				return AddDatesProposed(
 					leadTask,
 					leadTaskRow,
@@ -361,7 +363,7 @@ namespace TaskPlanningForms
 				data,
 				blockerIds);
 
-			if (task.State == WorkItemState.Resolved)
+			if (task.State == WorkItemState.Resolved || task.State == WorkItemState.Done)
 			{
 				alreadyAdded.Add(task.Id, m_indShift);
 				return m_indShift;
@@ -374,8 +376,8 @@ namespace TaskPlanningForms
 			if (nextInds.Count > 0)
 				maxNextInd = nextInds.Max();
 
-			string userMark = assignedTo.Substring(0, 3);
-			int nextInd = task.State == WorkItemState.Proposed
+			string userMark = assignedTo.Length > 0 ? assignedTo.Substring(0, 3) : Resources.Nobody;
+			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? AddDatesProposed(
 					task,
 					taskRow,
@@ -500,7 +502,7 @@ namespace TaskPlanningForms
 
 			var assignedCell = taskRow.Cells[m_assignedToInd];
 			string assignedTo = task.AssignedTo();
-			assignedCell.Value = assignedTo;
+			assignedCell.Value = assignedTo.Length > 0 ? assignedTo : Resources.Nobody;
 			if (assignedTo.StartsWith(m_groupPrefix))
 			{
 				assignedCell.SetWarningColor();
