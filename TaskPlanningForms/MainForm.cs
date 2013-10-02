@@ -79,6 +79,8 @@ namespace TaskPlanningForms
 			holidaysButton.Enabled = false;
 			subAreaPathsCheckBox.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
+			refreshButton.Enabled = false;
+			refreshButton.BackColor = Color.Transparent;
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
 			m_config.AreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
@@ -116,18 +118,14 @@ namespace TaskPlanningForms
 			}
 			iterations.Sort();
 
-			var iterationsColor = Color.White;
-			if (m_config.AllIterationPaths != null
+			bool newIterationsAppeared = m_config.AllIterationPaths != null
 				&& m_config.AllIterationPaths.Count > 0
 				&& (iterations.Count != m_config.AllIterationPaths.Count
-					|| m_config.AllIterationPaths.Any(i => !iterations.Contains(i))))
-			{
-				iterationsColor = Color.Yellow;
-			}
+					|| iterations.Any(i => !m_config.AllIterationPaths.Contains(i)));
 			iterationsComboBox.Invoke(new Action(() =>
 				{
-					iterationsComboBox.BackColor = iterationsColor;
-					if (iterationsColor == Color.Yellow)
+					iterationsComboBox.BackColor = newIterationsAppeared ? Color.Yellow : Color.White;
+					if (newIterationsAppeared)
 						iterationsToolTip.SetToolTip(iterationsComboBox, Resources.IterationsChanged);
 					else
 						iterationsToolTip.RemoveAll();
@@ -181,6 +179,8 @@ namespace TaskPlanningForms
 			usersFilterСomboBox.Enabled = false;
 			mainTabControl.SelectTab(mainTabPage);
 			scheduleDataGridView.Rows.Clear();
+			refreshButton.Enabled = false;
+			refreshButton.BackColor = Color.Transparent;
 
 			ThreadPool.QueueUserWorkItem(x => LoadAndPresentData());
 		}
@@ -262,13 +262,19 @@ namespace TaskPlanningForms
 			{
 				var leadTasksCollection = s_dataLoader.GetLeadTasks(
 					m_lastTfsUrl,
-					m_lastAreaPaths.Cast<object>().ToList(),
-					m_lastWithSubAreas,
-					m_lastIterationPaths.Cast<object>().ToList());
+					m_lastAreaPaths,
+					m_lastWithSubAreas);
+
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
+				bool newIterationsAppeared = false;
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
-					leadTasks.Add(leadTasksCollection[i]);
+					WorkItem leadTask = leadTasksCollection[i];
+					if (!newIterationsAppeared && !m_config.AllIterationPaths.Contains(leadTask.IterationPath))
+						newIterationsAppeared = true;
+					if (!m_lastIterationPaths.Contains(leadTask.IterationPath))
+						continue;
+					leadTasks.Add(leadTask);
 				}
 				var data = s_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
@@ -295,6 +301,13 @@ namespace TaskPlanningForms
 					loadDataButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					refreshButton.Enabled = true;
+					refreshButton.BackColor = Color.Yellow;
+					iterationsToolTip.SetToolTip(refreshButton, Resources.IterationsChanged);
+
+					if (ltOnlyCheckBox.Checked)
+						s_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnlyCheckBox.Checked);
+					if (expandBlockersCheckBox.Checked)
+						s_dataPresenter.ExpandBlockers(scheduleDataGridView, expandBlockersCheckBox.Checked);
 				}));
 			}
 			catch (Exception exc)

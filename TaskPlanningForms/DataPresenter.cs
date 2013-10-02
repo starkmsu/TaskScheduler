@@ -238,7 +238,7 @@ namespace TaskPlanningForms
 			if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
 			{
 				idCell.SetWarningColor();
-				idCell.ToolTipText = Environment.NewLine + Messages.LTHasNoChildren();
+				idCell.ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
 			}
 
 			var docsCell = leadTaskRow.Cells[m_docsInd];
