@@ -120,8 +120,8 @@
   <data name="AccessDenied" xml:space="preserve">
     <value>Access denied</value>
   </data>
-  <data name="IterationsChanged" xml:space="preserve">
-    <value>Iterations changed</value>
+  <data name="NewIterations" xml:space="preserve">
+    <value>New iterations:</value>
   </data>
   <data name="LeadTasksFetchingError" xml:space="preserve">
     <value>LeadTasks fetching error</value>

@@ -118,15 +118,16 @@ namespace TaskPlanningForms
 			}
 			iterations.Sort();
 
-			bool newIterationsAppeared = m_config.AllIterationPaths != null
-				&& m_config.AllIterationPaths.Count > 0
-				&& (iterations.Count != m_config.AllIterationPaths.Count
-					|| iterations.Any(i => !m_config.AllIterationPaths.Contains(i)));
+			var newIterations = new List<string>(iterations.Count);
+			if (m_config.AllIterationPaths != null && m_config.AllIterationPaths.Count > 0)
+				newIterations.AddRange(iterations.Where(i => !m_config.AllIterationPaths.Contains(i)));
 			iterationsComboBox.Invoke(new Action(() =>
 				{
-					iterationsComboBox.BackColor = newIterationsAppeared ? Color.Yellow : Color.White;
-					if (newIterationsAppeared)
-						iterationsToolTip.SetToolTip(iterationsComboBox, Resources.IterationsChanged);
+					iterationsComboBox.BackColor = newIterations.Count > 0 ? Color.Yellow : Color.White;
+					if (newIterations.Count > 0)
+						iterationsToolTip.SetToolTip(
+							iterationsComboBox,
+							Resources.NewIterations + Environment.NewLine + string.Join(Environment.NewLine, newIterations));
 					else
 						iterationsToolTip.RemoveAll();
 				}));
@@ -266,12 +267,13 @@ namespace TaskPlanningForms
 					m_lastWithSubAreas);
 
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-				bool newIterationsAppeared = false;
+				var newIterations = new List<string>(m_lastIterationPaths.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
 					WorkItem leadTask = leadTasksCollection[i];
-					if (!newIterationsAppeared && !m_config.AllIterationPaths.Contains(leadTask.IterationPath))
-						newIterationsAppeared = true;
+					if (!m_config.AllIterationPaths.Contains(leadTask.IterationPath)
+						&& !newIterations.Contains(leadTask.IterationPath))
+						newIterations.Add(leadTask.IterationPath);
 					if (!m_lastIterationPaths.Contains(leadTask.IterationPath))
 						continue;
 					leadTasks.Add(leadTask);
@@ -301,8 +303,12 @@ namespace TaskPlanningForms
 					loadDataButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					refreshButton.Enabled = true;
-					refreshButton.BackColor = Color.Yellow;
-					iterationsToolTip.SetToolTip(refreshButton, Resources.IterationsChanged);
+					if (newIterations.Count > 0)
+					{
+						refreshButton.BackColor = Color.Yellow;
+						iterationsToolTip.SetToolTip(refreshButton,
+							Resources.NewIterations + Environment.NewLine + string.Join(Environment.NewLine, newIterations));
+					}
 
 					if (ltOnlyCheckBox.Checked)
 						s_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnlyCheckBox.Checked);

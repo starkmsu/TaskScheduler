@@ -70,15 +70,6 @@ namespace TaskPlanningForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Iterations changed.
-        /// </summary>
-        internal static string IterationsChanged {
-            get {
-                return ResourceManager.GetString("IterationsChanged", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to LeadTasks fetching error.
         /// </summary>
         internal static string LeadTasksFetchingError {
@@ -93,6 +84,15 @@ namespace TaskPlanningForms.Properties {
         internal static string LeadTasksParsingError {
             get {
                 return ResourceManager.GetString("LeadTasksParsingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New iterations:.
+        /// </summary>
+        internal static string NewIterations {
+            get {
+                return ResourceManager.GetString("NewIterations", resourceCulture);
             }
         }
         
