@@ -14,6 +14,7 @@ namespace TaskPlanningForms
 		private readonly Config m_config;
 
 		private static readonly DataLoader s_dataLoader = new DataLoader();
+		private static readonly DataProcessor s_dataProcessor = new DataProcessor();
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
 		private static readonly ScheduleColumnsPresenter s_columnsPresenter = new ScheduleColumnsPresenter(s_dataPresenter.FirstDataColumnIndex);
 
@@ -206,7 +207,7 @@ namespace TaskPlanningForms
 			m_lastWithSubAreas = subAreaPathsCheckBox.Checked;
 			try
 			{
-				var data = s_dataLoader.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
+				var data = s_dataProcessor.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
@@ -278,7 +279,7 @@ namespace TaskPlanningForms
 						continue;
 					leadTasks.Add(leadTask);
 				}
-				var data = s_dataLoader.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				var data = s_dataProcessor.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
