@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -16,20 +15,10 @@ namespace TaskPlanningForms
 		private const double m_focusFactor = 0.5f;
 		
 		private readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
-		private const string m_groupPrefix = "g ";
-		private const string m_blockersPrefix = "-->";
-		private const int m_leadTaskIdInd = 1;
-		private const int m_docsInd = 2;
-		private const int m_titleInd = 3;
-		private const int m_blockersInd = 4;
-		private const int m_assignedToInd = 5;
-		private const int m_indShift = 7;
 
 		private List<DateTime> m_holidays;
 
 		private Dictionary<string, List<DateTime>> m_vacations = new Dictionary<string, List<DateTime>>(0);
-
-		internal int FirstDataColumnIndex { get { return m_indShift; } }
 
 		internal void SetHolidays(List<DateTime> holidays)
 		{
@@ -45,13 +34,17 @@ namespace TaskPlanningForms
 			}
 		}
 
-		internal ViewFiltersApplier PresentData(DataContainer data, DataGridView dgv)
+		internal ViewFiltersApplier PresentData(
+			DataContainer data,
+			ViewColumnsIndexes viewColumnsIndexes,
+			DataGridView dgv)
 		{
 			var alreadyAdded = new Dictionary<int, int>();
 			var tasksByUser = new Dictionary<string, int>();
 
 			DateTime today = DateTime.Now.Date;
-			var resultBuilder = new ViewFiltersBuilder(dgv);
+			var resultBuilder = new ViewFiltersBuilder(dgv, viewColumnsIndexes);
+			var workItemInfoFiller = new WorkItemInfoFiller(dgv, viewColumnsIndexes);
 
 			foreach (var leadTaskChildren in data.LeadTaskChildrenDict)
 			{
@@ -60,6 +53,8 @@ namespace TaskPlanningForms
 				int nextLtInd = AddLeadTaskRow(
 					dgv,
 					resultBuilder,
+					workItemInfoFiller,
+					viewColumnsIndexes,
 					leadTask,
 					data);
 				int ltRowInd = dgv.Rows.Count - 1;
@@ -77,6 +72,8 @@ namespace TaskPlanningForms
 							AddTaskRow(
 								dgv,
 								resultBuilder,
+								workItemInfoFiller,
+								viewColumnsIndexes,
 								task,
 								childrenTasks,
 								data,
@@ -85,7 +82,7 @@ namespace TaskPlanningForms
 						.Max();
 					for (int i = nextLtInd; i < lastTaskInd; i++)
 					{
-						DateTime date = today.AddDays(i - m_indShift);
+						DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
 						if (IsHoliday(date))
 							continue;
 						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
@@ -115,9 +112,8 @@ namespace TaskPlanningForms
 				{
 					dgv.Rows.Add(new DataGridViewRow());
 					var taskRow = dgv.Rows[dgv.Rows.Count - 1];
+					workItemInfoFiller.FillNotAccessibleTaskInfo(viewColumnsIndexes, taskRow, notAccessableChildId);
 					resultBuilder.MarkTaskRow(taskRow);
-					taskRow.Cells[m_titleInd].Value = notAccessableChildId;
-					taskRow.Cells[m_assignedToInd].Value = Resources.AccessDenied;
 				}
 			}
 
@@ -127,152 +123,74 @@ namespace TaskPlanningForms
 		private int AddLeadTaskRow(
 			DataGridView dgv,
 			ViewFiltersBuilder viewFiltersBuilder,
+			WorkItemInfoFiller workItemInfoFiller,
+			ViewColumnsIndexes viewColumnsIndexes,
 			WorkItem leadTask,
 			DataContainer data)
 		{
 			dgv.Rows.Add(new DataGridViewRow());
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
 
-			bool shouldCheckEstimate = FillLeadTaskStartingCells(
+			List<int> blockersIds = data.BlockersDict.ContainsKey(leadTask.Id)
+				? data.BlockersDict[leadTask.Id]
+				: null;
+			bool shouldCheckEstimate = workItemInfoFiller.FillLeadTaskInfo(
 				viewFiltersBuilder,
 				leadTask,
 				leadTaskRow,
-				data);
+				data,
+				blockersIds);
 
 			viewFiltersBuilder.MarkLeadTaskRow(leadTaskRow);
 
-			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
-				return AddDatesProposed(
-					leadTask,
-					leadTaskRow,
-					m_indShift,
-					"O",
-					shouldCheckEstimate);
-			return AddDatesActive(
-				leadTask,
-				leadTaskRow,
-				m_indShift,
-				"X");
-		}
-
-		private bool FillLeadTaskStartingCells(
-			ViewFiltersBuilder viewFiltersBuilder,
-			WorkItem leadTask,
-			DataGridViewRow leadTaskRow,
-			DataContainer data)
-		{
-			var priorityCell = leadTaskRow.Cells[0];
-			priorityCell.Value = leadTask.Priority();
-			priorityCell.SetColorByState(leadTask);
-			priorityCell.ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
-
-			var idCell = leadTaskRow.Cells[m_leadTaskIdInd];
-			idCell.Value = leadTask.Id;
-			idCell.ToolTipText = leadTask.IterationPath;
-			idCell.Style.BackColor = priorityCell.Style.BackColor;
-			if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
-			{
-				idCell.SetWarningColor();
-				idCell.ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
-			}
-
-			var docsCell = leadTaskRow.Cells[m_docsInd];
-			bool result = true;
-			string visionAgreementState = leadTask.VisionAgreementState();
-			string hlaAgeementState = leadTask.HlaAgreementState();
-			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
-			{
-				docsCell.Value = visionAgreementState;
-				docsCell.SetErrorColor();
-				docsCell.ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
-				result = false;
-			}
-			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
-			{
-				docsCell.Value = hlaAgeementState;
-				docsCell.SetErrorColor();
-				docsCell.ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
-				result = false;
-			}
-			else
-			{
-				docsCell.Style.BackColor = priorityCell.Style.BackColor;
-			}
-
-			var titleCell = leadTaskRow.Cells[m_titleInd];
-			titleCell.Value = leadTask.Title;
-			titleCell.Style.Font = new Font(
-				titleCell.Style.Font
-					?? titleCell.OwningColumn.DefaultCellStyle.Font
-					?? titleCell.OwningColumn.DataGridView.ColumnHeadersDefaultCellStyle.Font,
-				FontStyle.Underline);
-			titleCell.Style.BackColor = priorityCell.Style.BackColor;
-
-			var blockersCell = leadTaskRow.Cells[m_blockersInd];
-			if (data.BlockersDict.ContainsKey(leadTask.Id))
-			{
-				List<int> blockerIds = data.BlockersDict[leadTask.Id];
-				string blockerIdsStr = string.Join(",", blockerIds);
-				blockersCell.Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
-				if (nonChildBlockerId > 0)
-				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
-				}
-				else
-				{
-					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					blockersCell.ToolTipText = blockerIdsStr;
-				}
-				var dgv = leadTaskRow.DataGridView;
-				foreach (int blockerId in blockerIds)
+			if (blockersIds != null)
+				foreach (int blockerId in blockersIds)
 				{
 					AddBlockerRow(
 						dgv,
 						viewFiltersBuilder,
+						workItemInfoFiller,
 						data,
 						blockerId);
 				}
-			}
-			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
-			{
-				if (!string.IsNullOrEmpty(leadTaskRow.Cells[4].ToolTipText))
-					blockersCell.ToolTipText += Environment.NewLine;
-				else
-					blockersCell.Value = leadTask.BlockingReason();
-				blockersCell.ToolTipText += "Blocking Reason: " + leadTask.BlockingReason();
-			}
 
-			leadTaskRow.Cells[m_assignedToInd].Value = leadTask.AssignedTo();
-
-			return result;
+			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
+				return AddDatesProposed(
+					viewColumnsIndexes,
+					leadTask,
+					leadTaskRow,
+					viewColumnsIndexes.FirstDateColumnIndex,
+					"O",
+					shouldCheckEstimate);
+			return AddDatesActive(
+				viewColumnsIndexes,
+				leadTask,
+				leadTaskRow,
+				viewColumnsIndexes.FirstDateColumnIndex,
+				"X");
 		}
 
 		private void AddBlockerRow(
 			DataGridView dgv,
 			ViewFiltersBuilder viewFiltersBuilder,
+			WorkItemInfoFiller workItemInfoFiller,
 			DataContainer data,
 			int blockerId)
 		{
 			dgv.Rows.Add(new DataGridViewRow());
 			var blockerRow = dgv.Rows[dgv.Rows.Count - 1];
-			blockerRow.Cells[m_leadTaskIdInd].Value = m_blockersPrefix;
 			WorkItem blocker = data.NonChildBlockers.ContainsKey(blockerId)
 				? data.NonChildBlockers[blockerId]
 				: data.WiDict[blockerId];
-			blockerRow.Cells[m_docsInd].Value = blocker.Type.Name;
-			blockerRow.Cells[m_titleInd].Value = blockerId + " " + blocker.Title;
-			blockerRow.Cells[m_blockersInd].Value = blocker.State;
-			blockerRow.Cells[m_assignedToInd].Value = blocker.AssignedTo();
-			blockerRow.Visible = false;
-
+			workItemInfoFiller.FillBlockerInfo(blockerRow, blocker);
 			viewFiltersBuilder.MarkBlockerRow(blockerRow);
 		}
 
 		private int AddTaskRow(
 			DataGridView dgv,
 			ViewFiltersBuilder viewFiltersBuilder,
+			WorkItemInfoFiller workItemInfoFiller,
+			ViewColumnsIndexes viewColumnsIndexes,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
 			DataContainer data,
@@ -280,13 +198,15 @@ namespace TaskPlanningForms
 			Dictionary<string, int> tasksByUser)
 		{
 			if (alreadyAdded.ContainsKey(task.Id))
-				return m_indShift;
+				return viewColumnsIndexes.FirstDateColumnIndex;
 
 			var nextInds = new List<int>();
 
 			List<int> blockerIds = ProcessBlockers(
 				dgv,
 				viewFiltersBuilder,
+				workItemInfoFiller,
+				viewColumnsIndexes,
 				data,
 				task,
 				childrenTasks,
@@ -297,7 +217,7 @@ namespace TaskPlanningForms
 			dgv.Rows.Add(new DataGridViewRow());
 			var taskRow = dgv.Rows[dgv.Rows.Count - 1];
 
-			string assignedTo = FillTaskStartingCells(
+			string assignedTo = workItemInfoFiller.FillTaskInfo(
 				viewFiltersBuilder,
 				task,
 				taskRow,
@@ -306,34 +226,47 @@ namespace TaskPlanningForms
 
 			viewFiltersBuilder.MarkTaskRow(taskRow);
 
+			if (blockerIds != null)
+				foreach (int blockerId in blockerIds)
+				{
+					AddBlockerRow(
+						dgv,
+						viewFiltersBuilder,
+						workItemInfoFiller,
+						data,
+						blockerId);
+				}
+
 			if (task.State == WorkItemState.Resolved || task.State == WorkItemState.Done)
 			{
-				alreadyAdded.Add(task.Id, m_indShift);
-				return m_indShift;
+				alreadyAdded.Add(task.Id, viewColumnsIndexes.FirstDateColumnIndex);
+				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
-			if (!assignedTo.StartsWith(m_groupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
+			if (!assignedTo.StartsWith(workItemInfoFiller.GroupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
 				nextInds.Add(tasksByUser[assignedTo]);
 
-			int maxNextInd = m_indShift;
+			int maxNextInd = viewColumnsIndexes.FirstDateColumnIndex;
 			if (nextInds.Count > 0)
 				maxNextInd = nextInds.Max();
 
 			string userMark = assignedTo.Length > 0 ? assignedTo.Substring(0, 3) : Resources.Nobody;
 			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? AddDatesProposed(
+				viewColumnsIndexes,
 					task,
 					taskRow,
 					maxNextInd,
 					userMark,
 					true)
 				: AddDatesActive(
+				viewColumnsIndexes,
 					task,
 					taskRow,
 					maxNextInd,
 					userMark);
 
-			SetVacations(taskRow, userMark);
+			SetVacations(viewColumnsIndexes, taskRow, userMark);
 
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;
@@ -343,6 +276,8 @@ namespace TaskPlanningForms
 		private List<int> ProcessBlockers(
 			DataGridView dgv,
 			ViewFiltersBuilder viewFiltersBuilder,
+			WorkItemInfoFiller workItemInfoFiller,
+			ViewColumnsIndexes viewColumnsIndexes,
 			DataContainer data,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
@@ -373,6 +308,8 @@ namespace TaskPlanningForms
 					int blockerNextInd = AddTaskRow(
 						dgv,
 						viewFiltersBuilder,
+						workItemInfoFiller,
+						viewColumnsIndexes,
 						blockerSiblingTask,
 						childrenTasks,
 						data,
@@ -385,81 +322,8 @@ namespace TaskPlanningForms
 			return blockerIds;
 		}
 
-		private string FillTaskStartingCells(
-			ViewFiltersBuilder viewFiltersBuilder,
-			WorkItem task,
-			DataGridViewRow taskRow,
-			DataContainer data,
-			List<int> blockerIds)
-		{
-			var priorityCell = taskRow.Cells[0];
-			priorityCell.Value = task.Priority();
-			priorityCell.SetColorByState(task);
-			priorityCell.ToolTipText = task.State;
-
-			var titleCell = taskRow.Cells[m_titleInd];
-			titleCell.Value = task.Id + " " + task.Title;
-			titleCell.ToolTipText =
-				task.Discipline() + " " 
-				+ task.Title + " "
-				+ (task.State == WorkItemState.Active
-					? "Remaining " + task.Remaining().ToString()
-					: "Estimate " + task.Estimate().ToString());
-			titleCell.Style.BackColor = priorityCell.Style.BackColor;
-
-			var blockersCell = taskRow.Cells[m_blockersInd];
-			if (blockerIds != null)
-			{
-				string blockerIdsStr = string.Join(",", blockerIds);
-				blockersCell.Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
-				if (nonChildBlockerId > 0)
-				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
-				}
-				else if (task.State == WorkItemState.Active)
-				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
-				}
-				else
-				{
-					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
-					blockersCell.ToolTipText = blockerIdsStr;
-				}
-				var dgv = taskRow.DataGridView;
-				foreach (int blockerId in blockerIds)
-				{
-					AddBlockerRow(
-						dgv,
-						viewFiltersBuilder,
-						data,
-						blockerId);
-				}
-			}
-			if (!string.IsNullOrEmpty(task.BlockingReason()))
-			{
-				if (!string.IsNullOrEmpty(blockersCell.ToolTipText))
-					blockersCell.ToolTipText += Environment.NewLine;
-				else
-					blockersCell.Value = task.BlockingReason();
-				blockersCell.ToolTipText += "Blocking Reason: " + task.BlockingReason();
-			}
-
-			var assignedCell = taskRow.Cells[m_assignedToInd];
-			string assignedTo = task.AssignedTo();
-			assignedCell.Value = assignedTo.Length > 0 ? assignedTo : Resources.Nobody;
-			if (assignedTo.StartsWith(m_groupPrefix))
-			{
-				assignedCell.SetWarningColor();
-				assignedCell.ToolTipText = Messages.TaskIsNotAssigned();
-			}
-
-			return assignedTo;
-		}
-
 		private int AddDatesActive(
+			ViewColumnsIndexes viewColumnsIndexes,
 			WorkItem workItem,
 			DataGridViewRow row,
 			int startInd,
@@ -468,22 +332,23 @@ namespace TaskPlanningForms
 			var taskStart = workItem.StartDate();
 			var taskFinish = workItem.FinishDate();
 			if (taskFinish == null)
-				return m_indShift;
+				return viewColumnsIndexes.FirstDateColumnIndex;
 
 			if (taskFinish.Value.Date < DateTime.Now.Date)
 			{
-				row.Cells[m_indShift - 1].Value = taskFinish.Value.ToString("dd.MM");
+				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskFinish.Value.ToString("dd.MM");
 				if (workItem.Type.Name == WorkItemType.LeadTask)
-					row.Cells[m_indShift - 1].SetErrorColor();
+					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetErrorColor();
 				else
-					row.Cells[m_indShift - 1].SetWarningColor();
-				row.Cells[m_indShift - 1].ToolTipText = Messages.ExpiredFd();
+					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetWarningColor();
+				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = Messages.ExpiredFd();
 
 				double? remaining = workItem.Remaining();
 				if (remaining.HasValue)
 				{
 					var length = (int)Math.Ceiling(remaining.Value / 8 / m_focusFactor);
 					return AddDates(
+						viewColumnsIndexes,
 						row,
 						startInd,
 						length,
@@ -494,15 +359,15 @@ namespace TaskPlanningForms
 			{
 				var indStart = (int)taskStart.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
 				if (indStart < 0)
-					row.Cells[m_indShift - 1].Value = taskStart.Value.ToString("dd.MM");
-				indStart = Math.Min(Math.Max(0, indStart), m_maxInd) + m_indShift;
+					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskStart.Value.ToString("dd.MM");
+				indStart = Math.Min(Math.Max(0, indStart), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
 				var indFinish = (int)taskFinish.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
-				indFinish = Math.Min(Math.Max(0, indFinish), m_maxInd) + m_indShift;
+				indFinish = Math.Min(Math.Max(0, indFinish), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 				DateTime today = DateTime.Now.Date;
 				for (int i = indStart; i <= indFinish; i++)
 				{
-					DateTime date = today.AddDays(i - m_indShift);
+					DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
 					if (IsHoliday(date))
 						continue;
 					if (IsVacation(date, userMark))
@@ -514,10 +379,11 @@ namespace TaskPlanningForms
 				}
 				return indFinish + 1;
 			}
-			return m_indShift;
+			return viewColumnsIndexes.FirstDateColumnIndex;
 		}
 
 		private int AddDatesProposed(
+			ViewColumnsIndexes viewColumnsIndexes,
 			WorkItem task,
 			DataGridViewRow taskRow,
 			int startInd,
@@ -529,10 +395,10 @@ namespace TaskPlanningForms
 			{
 				if (shouldCheckEstimate)
 				{
-					taskRow.Cells[m_indShift - 1].SetErrorColor();
-					taskRow.Cells[m_indShift - 1].ToolTipText = Messages.NoEstimate();
+					taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetErrorColor();
+					taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = Messages.NoEstimate();
 				}
-				return m_indShift;
+				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
 			var length = (int)Math.Ceiling(estimate.Value / 8 / m_focusFactor);
@@ -549,10 +415,11 @@ namespace TaskPlanningForms
 						--finishShift;
 				}
 				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
-				startInd = Math.Max(startInd, startShift + m_indShift);
+				startInd = Math.Max(startInd, startShift + viewColumnsIndexes.FirstDateColumnIndex);
 			}
 
 			return AddDates(
+				viewColumnsIndexes,
 				taskRow,
 				startInd,
 				length,
@@ -560,24 +427,25 @@ namespace TaskPlanningForms
 		}
 
 		private int AddDates(
+			ViewColumnsIndexes viewColumnsIndexes,
 			DataGridViewRow row,
 			int startInd,
 			int length,
 			string userMark)
 		{
-			if (startInd - m_indShift > m_maxInd)
-				return m_indShift + m_maxInd + 1;
+			if (startInd - viewColumnsIndexes.FirstDateColumnIndex > m_maxInd)
+				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 			int ind = 0;
 			while (length > 0)
 			{
-				var date = DateTime.Now.AddDays(startInd - m_indShift + ind);
+				var date = DateTime.Now.AddDays(startInd - viewColumnsIndexes.FirstDateColumnIndex + ind);
 				if (IsHoliday(date))
 				{
 					++ind;
 					continue;
 				}
-				if (startInd - m_indShift + ind > m_maxInd)
-					return m_indShift + m_maxInd + 1;
+				if (startInd - viewColumnsIndexes.FirstDateColumnIndex + ind > m_maxInd)
+					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var cell = row.Cells[startInd + ind];
 				if (IsVacation(date, userMark))
 				{
@@ -595,7 +463,10 @@ namespace TaskPlanningForms
 			return startInd + ind;
 		}
 
-		private void SetVacations(DataGridViewRow row, string user)
+		private void SetVacations(
+			ViewColumnsIndexes viewColumnsIndexes,
+			DataGridViewRow row,
+			string user)
 		{
 			if (!m_vacations.ContainsKey(user) || m_vacations[user].Count == 0)
 				return;
@@ -606,7 +477,7 @@ namespace TaskPlanningForms
 				return;
 			if (start > vacationsDays[vacationsDays.Count-1])
 				return;
-			int ind = m_indShift;
+			int ind = viewColumnsIndexes.FirstDateColumnIndex;
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
 				if (vacationsDays.Any(d => d == i))

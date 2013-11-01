@@ -8,9 +8,7 @@ namespace TaskPlanningForms
 	internal class ViewFiltersBuilder
 	{
 		private readonly DataGridView m_dataGridView;
-
-		private const int m_assignedToInd = 5;
-		private const int m_priorityInd = 0;
+		private readonly ViewColumnsIndexes m_viewColumnsIndexes;
 
 		private readonly List<int> m_leadTasksRowsIndexes = new List<int>();
 		private readonly List<int> m_leadTasksWithDevCompletedRowsIndexes = new List<int>();
@@ -23,9 +21,10 @@ namespace TaskPlanningForms
 		private int m_currentLeadTaskRowIndex;
 		private int m_currentRowIndex;
 
-		internal ViewFiltersBuilder(DataGridView dataGridView)
+		internal ViewFiltersBuilder(DataGridView dataGridView, ViewColumnsIndexes viewColumnsIndexes)
 		{
 			m_dataGridView = dataGridView;
+			m_viewColumnsIndexes = viewColumnsIndexes;
 		}
 
 		internal void MarkLeadTaskRow(DataGridViewRow row)
@@ -33,7 +32,7 @@ namespace TaskPlanningForms
 			m_currentRowIndex = m_dataGridView.Rows.IndexOf(row);
 			m_currentLeadTaskRowIndex = m_currentRowIndex;
 			m_leadTasksRowsIndexes.Add(m_currentLeadTaskRowIndex);
-			bool isDevCompleted = row.Cells[m_priorityInd].IsColorForState(WorkItemState.DevCompleted);
+			bool isDevCompleted = row.Cells[m_viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.DevCompleted);
 			if (isDevCompleted)
 				m_leadTasksWithDevCompletedRowsIndexes.Add(m_currentLeadTaskRowIndex);
 		}
@@ -53,7 +52,7 @@ namespace TaskPlanningForms
 			}
 			leadTaskChildrenIndexes.Add(m_currentRowIndex);
 			m_taskToLeadTaskIndexesDict[m_currentRowIndex] = m_currentLeadTaskRowIndex;
-			string user = row.Cells[m_assignedToInd].Value.ToString();
+			string user = row.Cells[m_viewColumnsIndexes.AssignedToColumnIndex].Value.ToString();
 			if (user == Resources.AccessDenied)
 				return;
 

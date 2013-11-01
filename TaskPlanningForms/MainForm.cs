@@ -16,7 +16,9 @@ namespace TaskPlanningForms
 		private static readonly DataLoader s_dataLoader = new DataLoader();
 		private static readonly DataProcessor s_dataProcessor = new DataProcessor();
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
-		private static readonly ScheduleColumnsPresenter s_columnsPresenter = new ScheduleColumnsPresenter(s_dataPresenter.FirstDataColumnIndex);
+
+		private static ViewColumnsIndexes s_viewColumnsIndexes;
+		private static ScheduleColumnsPresenter s_columnsPresenter;
 
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
@@ -34,6 +36,8 @@ namespace TaskPlanningForms
 
 			m_config = ConfigManager.LoadConfig();
 
+			s_viewColumnsIndexes = new ViewColumnsIndexes(scheduleDataGridView);
+			s_columnsPresenter = new ScheduleColumnsPresenter(s_viewColumnsIndexes.FirstDateColumnIndex);
 			s_columnsPresenter.InitColumns(scheduleDataGridView);
 
 			m_holidays = m_config.Holidays;
@@ -69,7 +73,7 @@ namespace TaskPlanningForms
 				++ind;
 				if (i.DayOfWeek == DayOfWeek.Sunday || i.DayOfWeek == DayOfWeek.Saturday)
 					continue;
-				var column = scheduleDataGridView.Columns[s_dataPresenter.FirstDataColumnIndex + ind];
+				var column = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex + ind];
 				var color = m_holidays.Contains(i)
 					? CellsPalette.Holiday
 					: scheduleDataGridView.Columns[1].HeaderCell.Style.BackColor;
@@ -213,7 +217,7 @@ namespace TaskPlanningForms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						_viewFiltersApplier = s_dataPresenter.PresentData(data, scheduleDataGridView);
+						_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
 						usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
 						vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
 						var users2 = new List<string>(_viewFiltersApplier.Users);
@@ -285,10 +289,10 @@ namespace TaskPlanningForms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
-					bool isDateChanged = scheduleDataGridView.Columns[s_dataPresenter.FirstDataColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
+					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
 						s_columnsPresenter.InitColumns(scheduleDataGridView);
-					_viewFiltersApplier = s_dataPresenter.PresentData(data, scheduleDataGridView);
+					_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
 					usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
 					vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
 					var users2 = new List<string>(_viewFiltersApplier.Users);
