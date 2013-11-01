@@ -27,7 +27,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>44</ApplicationRevision>
+    <ApplicationRevision>45</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -105,6 +105,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScheduleColumnsPresenter.cs" />
     <Compile Include="VacationData.cs" />
+    <Compile Include="ViewFiltersApplier.cs" />
+    <Compile Include="ViewFiltersBuilder.cs" />
     <EmbeddedResource Include="HolidaysForm.resx">
       <DependentUpon>HolidaysForm.cs</DependentUpon>
     </EmbeddedResource>

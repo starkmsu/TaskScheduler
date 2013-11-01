@@ -45,18 +45,23 @@ namespace TaskPlanningForms
 			}
 		}
 
-		internal List<string> PresentData(DataContainer data, DataGridView dgv)
+		internal ViewFiltersApplier PresentData(DataContainer data, DataGridView dgv)
 		{
 			var alreadyAdded = new Dictionary<int, int>();
 			var tasksByUser = new Dictionary<string, int>();
 
 			DateTime today = DateTime.Now.Date;
+			var resultBuilder = new ViewFiltersBuilder(dgv);
 
 			foreach (var leadTaskChildren in data.LeadTaskChildrenDict)
 			{
 				var leadTask = data.WiDict[leadTaskChildren.Key];
 
-				int nextLtInd = AddLeadTaskRow(dgv, leadTask, data);
+				int nextLtInd = AddLeadTaskRow(
+					dgv,
+					resultBuilder,
+					leadTask,
+					data);
 				int ltRowInd = dgv.Rows.Count - 1;
 
 				var childrenTasks = leadTaskChildren.Value
@@ -71,6 +76,7 @@ namespace TaskPlanningForms
 						.Select(task =>
 							AddTaskRow(
 								dgv,
+								resultBuilder,
 								task,
 								childrenTasks,
 								data,
@@ -109,93 +115,18 @@ namespace TaskPlanningForms
 				{
 					dgv.Rows.Add(new DataGridViewRow());
 					var taskRow = dgv.Rows[dgv.Rows.Count - 1];
+					resultBuilder.MarkTaskRow(taskRow);
 					taskRow.Cells[m_titleInd].Value = notAccessableChildId;
 					taskRow.Cells[m_assignedToInd].Value = Resources.AccessDenied;
 				}
 			}
 
-			List<string> users = tasksByUser.Keys.ToList();
-			users.Sort();
-
-			return users;
-		}
-
-		internal void FilterDataByUser(DataGridView dgv, string user)
-		{
-			int prevLeadTaskRow = -1;
-			bool hasUserTasks = false;
-			for (int i = 0; i < dgv.Rows.Count; i++)
-			{
-				var row = dgv.Rows[i];
-				if (row.Cells[m_leadTaskIdInd].Value != null)
-				{
-					if (prevLeadTaskRow >= 0)
-						dgv.Rows[prevLeadTaskRow].Visible = user == string.Empty || hasUserTasks;
-					hasUserTasks = false;
-					prevLeadTaskRow = i;
-					continue;
-				}
-				bool visible = user == string.Empty || row.Cells[m_assignedToInd].Value.ToString() == user;
-				if (visible)
-					hasUserTasks = true;
-				row.Visible = visible;
-			}
-			if (prevLeadTaskRow >= 0)
-				dgv.Rows[prevLeadTaskRow].Visible = hasUserTasks;
-		}
-
-		internal void FilterDataByDevCompleted(DataGridView dgv, bool withDevCompleted)
-		{
-			bool visible = true;
-			for (int i = 0; i < dgv.Rows.Count; i++)
-			{
-				var row = dgv.Rows[i];
-				if (row.Cells[m_leadTaskIdInd].Value != null)
-					visible = withDevCompleted || !row.Cells[0].IsColorForState(WorkItemState.DevCompleted);
-				row.Visible = visible;
-			}
-		}
-
-		internal void FilterDataByLTMode(DataGridView dgv, bool ltOnly)
-		{
-			bool blockersVisibleInLTMode = true;
-			bool blockersVisibleInAllMode = false;
-			for (int i = 0; i < dgv.Rows.Count; i++)
-			{
-				var row = dgv.Rows[i];
-				var marker = row.Cells[m_leadTaskIdInd].Value;
-				if (marker == null)
-				{
-					blockersVisibleInLTMode = false;
-					row.Visible = !ltOnly;
-				}
-				else if (marker.ToString() != m_blockersPrefix)
-				{
-					blockersVisibleInLTMode = true;
-				}
-				else
-				{
-					if (row.Visible)
-						blockersVisibleInAllMode = true;
-					row.Visible = ltOnly ? row.Visible && blockersVisibleInLTMode : blockersVisibleInAllMode;
-				}
-			}
-		}
-
-		internal void ExpandBlockers(DataGridView dgv, bool expandBlockers)
-		{
-			for (int i = 0; i < dgv.Rows.Count; i++)
-			{
-				var row = dgv.Rows[i];
-				object marker = row.Cells[m_leadTaskIdInd].Value;
-				if (marker == null || marker.ToString() != m_blockersPrefix)
-					continue;
-				row.Visible = expandBlockers && dgv.Rows[i-1].Visible;
-			}
+			return resultBuilder.Build();
 		}
 
 		private int AddLeadTaskRow(
 			DataGridView dgv,
+			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem leadTask,
 			DataContainer data)
 		{
@@ -203,9 +134,12 @@ namespace TaskPlanningForms
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
 
 			bool shouldCheckEstimate = FillLeadTaskStartingCells(
+				viewFiltersBuilder,
 				leadTask,
 				leadTaskRow,
 				data);
+
+			viewFiltersBuilder.MarkLeadTaskRow(leadTaskRow);
 
 			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
 				return AddDatesProposed(
@@ -222,6 +156,7 @@ namespace TaskPlanningForms
 		}
 
 		private bool FillLeadTaskStartingCells(
+			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem leadTask,
 			DataGridViewRow leadTaskRow,
 			DataContainer data)
@@ -295,6 +230,7 @@ namespace TaskPlanningForms
 				{
 					AddBlockerRow(
 						dgv,
+						viewFiltersBuilder,
 						data,
 						blockerId);
 				}
@@ -315,6 +251,7 @@ namespace TaskPlanningForms
 
 		private void AddBlockerRow(
 			DataGridView dgv,
+			ViewFiltersBuilder viewFiltersBuilder,
 			DataContainer data,
 			int blockerId)
 		{
@@ -329,10 +266,13 @@ namespace TaskPlanningForms
 			blockerRow.Cells[m_blockersInd].Value = blocker.State;
 			blockerRow.Cells[m_assignedToInd].Value = blocker.AssignedTo();
 			blockerRow.Visible = false;
+
+			viewFiltersBuilder.MarkBlockerRow(blockerRow);
 		}
 
 		private int AddTaskRow(
 			DataGridView dgv,
+			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
 			DataContainer data,
@@ -346,6 +286,7 @@ namespace TaskPlanningForms
 
 			List<int> blockerIds = ProcessBlockers(
 				dgv,
+				viewFiltersBuilder,
 				data,
 				task,
 				childrenTasks,
@@ -354,14 +295,16 @@ namespace TaskPlanningForms
 				tasksByUser);
 
 			dgv.Rows.Add(new DataGridViewRow());
-			
 			var taskRow = dgv.Rows[dgv.Rows.Count - 1];
 
 			string assignedTo = FillTaskStartingCells(
+				viewFiltersBuilder,
 				task,
 				taskRow,
 				data,
 				blockerIds);
+
+			viewFiltersBuilder.MarkTaskRow(taskRow);
 
 			if (task.State == WorkItemState.Resolved || task.State == WorkItemState.Done)
 			{
@@ -399,6 +342,7 @@ namespace TaskPlanningForms
 
 		private List<int> ProcessBlockers(
 			DataGridView dgv,
+			ViewFiltersBuilder viewFiltersBuilder,
 			DataContainer data,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
@@ -428,6 +372,7 @@ namespace TaskPlanningForms
 				{
 					int blockerNextInd = AddTaskRow(
 						dgv,
+						viewFiltersBuilder,
 						blockerSiblingTask,
 						childrenTasks,
 						data,
@@ -441,6 +386,7 @@ namespace TaskPlanningForms
 		}
 
 		private string FillTaskStartingCells(
+			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
 			DataGridViewRow taskRow,
 			DataContainer data,
@@ -487,6 +433,7 @@ namespace TaskPlanningForms
 				{
 					AddBlockerRow(
 						dgv,
+						viewFiltersBuilder,
 						data,
 						blockerId);
 				}

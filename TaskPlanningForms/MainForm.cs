@@ -26,6 +26,8 @@ namespace TaskPlanningForms
 		private List<string> m_lastIterationPaths;
 		private bool m_lastWithSubAreas;
 
+		private ViewFiltersApplier _viewFiltersApplier;
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -211,10 +213,10 @@ namespace TaskPlanningForms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						var users = s_dataPresenter.PresentData(data, scheduleDataGridView);
-						usersVacationsComboBox.DataSource = users;
-						vacationsButton.Enabled = users.Count > 0;
-						var users2 = new List<string>(users);
+						_viewFiltersApplier = s_dataPresenter.PresentData(data, scheduleDataGridView);
+						usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
+						vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
+						var users2 = new List<string>(_viewFiltersApplier.Users);
 						users2.Insert(0, string.Empty);
 						usersFilterСomboBox.DataSource = users2;
 						usersFilterСomboBox.Enabled = true;
@@ -239,7 +241,7 @@ namespace TaskPlanningForms
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
 			string user = usersFilterСomboBox.SelectedItem.ToString();
-			s_dataPresenter.FilterDataByUser(scheduleDataGridView, user);
+			_viewFiltersApplier.FilterDataByUser(user);
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -286,17 +288,17 @@ namespace TaskPlanningForms
 					bool isDateChanged = scheduleDataGridView.Columns[s_dataPresenter.FirstDataColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
 						s_columnsPresenter.InitColumns(scheduleDataGridView);
-					var users = s_dataPresenter.PresentData(data, scheduleDataGridView);
-					usersVacationsComboBox.DataSource = users;
-					vacationsButton.Enabled = users.Count > 0;
-					var users2 = new List<string>(users);
+					_viewFiltersApplier = s_dataPresenter.PresentData(data, scheduleDataGridView);
+					usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
+					vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
+					var users2 = new List<string>(_viewFiltersApplier.Users);
 					users2.Insert(0, string.Empty);
 					usersFilterСomboBox.DataSource = users2;
 
-					if (!string.IsNullOrEmpty(currentUser) && users.Contains(currentUser))
+					if (!string.IsNullOrEmpty(currentUser) && _viewFiltersApplier.Users.Contains(currentUser))
 					{
 						usersFilterСomboBox.SelectedItem = currentUser;
-						s_dataPresenter.FilterDataByUser(scheduleDataGridView, currentUser);
+						_viewFiltersApplier.FilterDataByUser(currentUser);
 					}
 
 					usersFilterСomboBox.Enabled = true;
@@ -312,9 +314,9 @@ namespace TaskPlanningForms
 					}
 
 					if (ltOnlyCheckBox.Checked)
-						s_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnlyCheckBox.Checked);
+						_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnlyCheckBox.Checked);
 					if (expandBlockersCheckBox.Checked)
-						s_dataPresenter.ExpandBlockers(scheduleDataGridView, expandBlockersCheckBox.Checked);
+						_viewFiltersApplier.ExpandBlockers(expandBlockersCheckBox.Checked);
 				}));
 			}
 			catch (Exception exc)
@@ -396,13 +398,13 @@ namespace TaskPlanningForms
 		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool withDevCompleted = devCmpletedCheckBox.Checked;
-			s_dataPresenter.FilterDataByDevCompleted(scheduleDataGridView, withDevCompleted);
+			_viewFiltersApplier.FilterDataByDevCompleted(withDevCompleted);
 		}
 
 		private void LtOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool ltOnly = ltOnlyCheckBox.Checked;
-			s_dataPresenter.FilterDataByLTMode(scheduleDataGridView, ltOnly);
+			_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnly);
 		}
 
 		private void VacationsButtonClick(object sender, EventArgs e)
@@ -421,7 +423,7 @@ namespace TaskPlanningForms
 		private void ShowBlockersCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool expandBlockers = expandBlockersCheckBox.Checked;
-			s_dataPresenter.ExpandBlockers(scheduleDataGridView, expandBlockers);
+			_viewFiltersApplier.ExpandBlockers(expandBlockers);
 		}
 	}
 }
