@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TaskPlanningForms.Properties;
+using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 using WorkItemType = TfsUtils.Const.WorkItemType;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class DataPresenter
 	{

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TaskPlanningForms.Properties;
+using TaskSchedulerForms.Properties;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	public partial class MainForm : Form
 	{
@@ -28,6 +28,8 @@ namespace TaskPlanningForms
 		private List<string> m_lastIterationPaths;
 		private bool m_lastWithSubAreas;
 
+		private bool m_isAreaFirstMode = true;
+
 		private ViewFiltersApplier _viewFiltersApplier;
 
 		public MainForm()
@@ -46,10 +48,10 @@ namespace TaskPlanningForms
 			tfsUrlTextBox.Text = m_config.TfsUrl;
 			if (m_config.AreaPaths != null && m_config.AreaPaths.Count > 0)
 			{
-				areaPathTextBox.Text = m_config.AreaPaths[0];
-				m_config.AreaPaths.ForEach(i => areaPathListBox.Items.Add(i));
+				firstTextBox.Text = m_config.AreaPaths[0];
+				m_config.AreaPaths.ForEach(i => firstListBox.Items.Add(i));
 			}
-			subAreaPathsCheckBox.Checked = m_config.WithSubAreaPaths;
+			subTreesCheckBox.Checked = m_config.WithSubAreaPaths;
 
 			UpdateHolidays();
 
@@ -84,14 +86,17 @@ namespace TaskPlanningForms
 		private void LoadLeadTasksButtonClick(object sender, EventArgs e)
 		{
 			holidaysButton.Enabled = false;
-			subAreaPathsCheckBox.Enabled = false;
+			subTreesCheckBox.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
 			refreshButton.Enabled = false;
 			refreshButton.BackColor = Color.Transparent;
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
-			m_config.AreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
-			m_config.WithSubAreaPaths = subAreaPathsCheckBox.Checked;
+			m_config.WithSubAreaPaths = subTreesCheckBox.Checked;
+			if (m_isAreaFirstMode)
+				m_config.AreaPaths = firstListBox.Items.Cast<string>().ToList();
+			else
+				m_config.IterationPaths = firstListBox.Items.Cast<string>().ToList();
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
@@ -100,89 +105,125 @@ namespace TaskPlanningForms
 		{
 			try
 			{
-				m_lastAreaPaths = areaPathListBox.Items.Cast<object>().Cast<string>().ToList();
-				m_leadTasks = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, m_lastAreaPaths, subAreaPathsCheckBox.Checked);
+				if (m_isAreaFirstMode)
+				{
+					m_lastAreaPaths = firstListBox.Items.Cast<string>().ToList();
+					m_leadTasks = s_dataLoader.GetLeadTasksByAreas(
+						tfsUrlTextBox.Text,
+						m_lastAreaPaths,
+						subTreesCheckBox.Checked);
+				}
+				else
+				{
+					m_lastIterationPaths = firstListBox.Items.Cast<string>().ToList();
+					m_leadTasks = s_dataLoader.GetLeadTasksByIterations(
+						tfsUrlTextBox.Text,
+						m_lastIterationPaths,
+						subTreesCheckBox.Checked);
+				}
 			}
 			catch (Exception e)
 			{
-				iterationsComboBox.Invoke(new Action(() =>
+				secondComboBox.Invoke(new Action(() =>
 					{
 						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
 						holidaysButton.Enabled = true;
-						subAreaPathsCheckBox.Enabled = true;
+						subTreesCheckBox.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
 				return;
 			}
 
-			var iterations = new List<string>();
-			for (int i = 0; i < m_leadTasks.Count; i++)
-			{
-				string iteration = m_leadTasks[i].IterationPath;
-				if (iterations.Contains(iteration))
-					continue;
-				iterations.Add(iteration);
-			}
-			iterations.Sort();
-
-			var newIterations = new List<string>(iterations.Count);
-			if (m_config.AllIterationPaths != null && m_config.AllIterationPaths.Count > 0)
-				newIterations.AddRange(iterations.Where(i => !m_config.AllIterationPaths.Contains(i)));
-			iterationsComboBox.Invoke(new Action(() =>
-				{
-					iterationsComboBox.BackColor = newIterations.Count > 0 ? Color.Yellow : Color.White;
-					if (newIterations.Count > 0)
-						iterationsToolTip.SetToolTip(
-							iterationsComboBox,
-							Resources.NewIterations + Environment.NewLine + string.Join(Environment.NewLine, newIterations));
-					else
-						iterationsToolTip.RemoveAll();
-				}));
-			m_config.AllIterationPaths = iterations;
-
-			var validIterations = new List<string>();
-			if (m_config.IterationPaths != null && m_config.IterationPaths.Count > 0)
-			{
-				validIterations = m_config.IterationPaths.Where(iterations.Contains).ToList();
-				validIterations.Sort();
-			}
-
-			iterationsComboBox.Invoke(new Action(() =>
-				{
-					iterationsComboBox.DataSource = iterations;
-					iterationsComboBox.Enabled = true;
-					iterationPathAddButton.Enabled = iterations.Count > 0;
-
-					for (int i = 0; i < iterationPathListBox.Items.Count; i++)
-					{
-						var iteration = iterationPathListBox.Items[i];
-						if (iterations.Contains(iteration.ToString()))
-							continue;
-						iterationPathListBox.Items.RemoveAt(i);
-						--i;
-					}
-
-					validIterations.ForEach(i =>
-						{
-							if (!iterationPathListBox.Items.Contains(i))
-								iterationPathListBox.Items.Add(i);
-						});
-
-					subAreaPathsCheckBox.Enabled = true;
-					loadLeadTasksButton.Enabled = true;
-					loadDataButton.Enabled = iterationPathListBox.Items.Count > 0;
-					if (iterationPathListBox.Items.Count > 0)
-					{
-						iterationPathAddButton.Enabled = true;
-						iterationPathRemoveButton.Enabled = true;
-					}
-				}));
+			FillSecondList();
 		}
 
-		private void LoadDataButtonClick(object sender, EventArgs e)
+		private void FillSecondList()
+		{
+			var secondList = new List<string>();
+			for (int i = 0; i < m_leadTasks.Count; i++)
+			{
+				string second = m_isAreaFirstMode ? m_leadTasks[i].IterationPath : m_leadTasks[i].AreaPath;
+				if (secondList.Contains(second))
+					continue;
+				secondList.Add(second);
+			}
+			secondList.Sort();
+
+			var newSecond = new List<string>(secondList.Count);
+			if (m_isAreaFirstMode)
+			{
+				if (m_config.AllIterationPaths != null && m_config.AllIterationPaths.Count > 0)
+					newSecond.AddRange(secondList.Where(i => !m_config.AllIterationPaths.Contains(i)));
+			}
+			else
+			{
+				if (m_config.AllAreaPaths != null && m_config.AllAreaPaths.Count > 0)
+					newSecond.AddRange(secondList.Where(i => !m_config.AllAreaPaths.Contains(i)));
+			}
+
+			secondComboBox.Invoke(new Action(() =>
+			{
+				secondComboBox.BackColor = newSecond.Count > 0 ? Color.Yellow : Color.White;
+				if (newSecond.Count > 0)
+					secondToolTip.SetToolTip(
+						secondComboBox,
+						Resources.NewItems + Environment.NewLine + string.Join(Environment.NewLine, newSecond));
+				else
+					secondToolTip.RemoveAll();
+			}));
+
+			if (m_isAreaFirstMode)
+				m_config.AllIterationPaths = secondList;
+			else
+				m_config.AllAreaPaths = secondList;
+
+			var validSecond = new List<string>();
+			if (m_isAreaFirstMode
+				&& m_config.IterationPaths != null
+				&& m_config.IterationPaths.Count > 0)
+				validSecond = m_config.IterationPaths.Where(secondList.Contains).ToList();
+			else if (!m_isAreaFirstMode
+				&& m_config.AreaPaths != null
+				&& m_config.AreaPaths.Count > 0)
+				validSecond = m_config.AreaPaths.Where(secondList.Contains).ToList();
+			validSecond.Sort();
+
+			secondComboBox.Invoke(new Action(() =>
+			{
+				secondComboBox.DataSource = secondList;
+				secondComboBox.Enabled = true;
+				secondAddButton.Enabled = secondList.Count > 0;
+
+				for (int i = 0; i < secondListBox.Items.Count; i++)
+				{
+					var second = secondListBox.Items[i];
+					if (secondList.Contains(second.ToString()))
+						continue;
+					secondListBox.Items.RemoveAt(i);
+					--i;
+				}
+
+				validSecond.ForEach(i =>
+				{
+					if (!secondListBox.Items.Contains(i))
+						secondListBox.Items.Add(i);
+				});
+
+				subTreesCheckBox.Enabled = true;
+				loadLeadTasksButton.Enabled = true;
+				makeScheduleButton.Enabled = secondListBox.Items.Count > 0;
+				if (secondListBox.Items.Count > 0)
+				{
+					secondAddButton.Enabled = true;
+					secondRemoveButton.Enabled = true;
+				}
+			}));
+		}
+
+		private void MakeScheduleButtonClick(object sender, EventArgs e)
 		{
 			loadLeadTasksButton.Enabled = false;
-			loadDataButton.Enabled = false;
+			makeScheduleButton.Enabled = false;
 			usersLabel.Enabled = false;
 			usersFilterСomboBox.Enabled = false;
 			mainTabControl.SelectTab(mainTabPage);
@@ -190,27 +231,40 @@ namespace TaskPlanningForms
 			refreshButton.Enabled = false;
 			refreshButton.BackColor = Color.Transparent;
 
-			ThreadPool.QueueUserWorkItem(x => LoadAndPresentData());
+			ThreadPool.QueueUserWorkItem(x => ProcessData());
 		}
 
-		private void LoadAndPresentData()
+		private void ProcessData()
 		{
-			List<string> iterationPaths = null;
-			iterationsComboBox.Invoke(
-				new Action(() => iterationPaths = iterationPathListBox.Items.Cast<object>().Cast<string>().ToList()));
-			m_config.IterationPaths = iterationPaths;
+			List<string> firstList = null;
+			List<string> secondList = null;
+			secondComboBox.Invoke(new Action(() =>
+				{
+					firstList = firstListBox.Items.Cast<string>().ToList();
+					secondList = secondListBox.Items.Cast<string>().ToList();
+				}));
+			if (m_isAreaFirstMode)
+				m_config.IterationPaths = secondList;
+			else
+				m_config.AreaPaths = secondList;
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
 				var leadTask = m_leadTasks[i];
-				if (!iterationPaths.Contains(leadTask.IterationPath))
+				if (!firstList.Contains(m_isAreaFirstMode ? leadTask.AreaPath : leadTask.IterationPath)
+					||!secondList.Contains(m_isAreaFirstMode ? leadTask.IterationPath : leadTask.AreaPath))
 					continue;
 				leadTasks.Add(leadTask);
 			}
+
 			m_lastTfsUrl = tfsUrlTextBox.Text;
-			m_lastIterationPaths = iterationPaths;
-			m_lastWithSubAreas = subAreaPathsCheckBox.Checked;
+			m_lastWithSubAreas = subTreesCheckBox.Checked;
+			if (m_isAreaFirstMode)
+				m_lastIterationPaths = secondList;
+			else
+				m_lastAreaPaths = secondList;
+
 			try
 			{
 				var data = s_dataProcessor.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
@@ -225,7 +279,7 @@ namespace TaskPlanningForms
 						usersFilterСomboBox.DataSource = users2;
 						usersFilterСomboBox.Enabled = true;
 						usersLabel.Enabled = true;
-						loadDataButton.Enabled = true;
+						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 						refreshButton.Enabled = true;
 						mainTabControl.SelectTab(dataTabPage);
@@ -236,7 +290,7 @@ namespace TaskPlanningForms
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
 						MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
-						loadDataButton.Enabled = true;
+						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
 			}
@@ -261,28 +315,46 @@ namespace TaskPlanningForms
 					currentUser = usersFilterСomboBox.SelectedItem.ToString();
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
-					loadDataButton.Enabled = false;
+					makeScheduleButton.Enabled = false;
 					usersLabel.Enabled = false;
 					usersFilterСomboBox.Enabled = false;
 					scheduleDataGridView.Rows.Clear();
 				}));
 			try
 			{
-				var leadTasksCollection = s_dataLoader.GetLeadTasks(
-					m_lastTfsUrl,
-					m_lastAreaPaths,
-					m_lastWithSubAreas);
+				WorkItemCollection leadTasksCollection;
+				if (m_isAreaFirstMode)
+					leadTasksCollection = s_dataLoader.GetLeadTasksByAreas(
+						m_lastTfsUrl,
+						m_lastAreaPaths,
+						m_lastWithSubAreas);
+				else
+					leadTasksCollection = s_dataLoader.GetLeadTasksByIterations(
+						m_lastTfsUrl,
+						m_lastIterationPaths,
+						m_lastWithSubAreas);
 
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-				var newIterations = new List<string>(m_lastIterationPaths.Count);
+				var newSecond = new List<string>(m_isAreaFirstMode ? m_lastIterationPaths.Count : m_lastAreaPaths.Count);
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
 					WorkItem leadTask = leadTasksCollection[i];
-					if (!m_config.AllIterationPaths.Contains(leadTask.IterationPath)
-						&& !newIterations.Contains(leadTask.IterationPath))
-						newIterations.Add(leadTask.IterationPath);
-					if (!m_lastIterationPaths.Contains(leadTask.IterationPath))
-						continue;
+					if (m_isAreaFirstMode)
+					{
+						if (!m_config.AllIterationPaths.Contains(leadTask.IterationPath)
+							&& !newSecond.Contains(leadTask.IterationPath))
+								newSecond.Add(leadTask.IterationPath);
+						if (!m_lastIterationPaths.Contains(leadTask.IterationPath))
+							continue;
+					}
+					else
+					{
+						if (!m_config.AllAreaPaths.Contains(leadTask.AreaPath)
+							&& !newSecond.Contains(leadTask.AreaPath))
+							newSecond.Add(leadTask.AreaPath);
+						if (!m_lastAreaPaths.Contains(leadTask.AreaPath))
+							continue;
+					}
 					leadTasks.Add(leadTask);
 				}
 				var data = s_dataProcessor.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
@@ -307,14 +379,14 @@ namespace TaskPlanningForms
 
 					usersFilterСomboBox.Enabled = true;
 					usersLabel.Enabled = true;
-					loadDataButton.Enabled = true;
+					makeScheduleButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					refreshButton.Enabled = true;
-					if (newIterations.Count > 0)
+					if (newSecond.Count > 0)
 					{
 						refreshButton.BackColor = Color.Yellow;
-						iterationsToolTip.SetToolTip(refreshButton,
-							Resources.NewIterations + Environment.NewLine + string.Join(Environment.NewLine, newIterations));
+						secondToolTip.SetToolTip(refreshButton,
+							Resources.NewItems + Environment.NewLine + string.Join(Environment.NewLine, newSecond));
 					}
 
 					if (ltOnlyCheckBox.Checked)
@@ -328,7 +400,7 @@ namespace TaskPlanningForms
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
 					MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
-					loadDataButton.Enabled = true;
+					makeScheduleButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					refreshButton.Enabled = true;
 				}));
@@ -351,52 +423,54 @@ namespace TaskPlanningForms
 			UpdateHolidays();
 		}
 
-		private void AreaPathAddButtonClick(object sender, EventArgs e)
+		private void FirstAddButtonClick(object sender, EventArgs e)
 		{
-			string areaPath = areaPathTextBox.Text;
-			if (areaPathListBox.Items.Contains(areaPath))
+			string first = firstTextBox.Text;
+			if (firstListBox.Items.Contains(first))
 				return;
-			areaPathListBox.Items.Add(areaPath);
+			firstListBox.Items.Add(first);
 			loadLeadTasksButton.Enabled = true;
-			areaPathRemoveButton.Enabled = true;
+			firstRemoveButton.Enabled = true;
+			makeScheduleButton.Enabled = false;
 		}
 
-		private void AreaPathRemoveButtonClick(object sender, EventArgs e)
+		private void FirstRemoveButtonClick(object sender, EventArgs e)
 		{
-			areaPathListBox.Items.Remove(areaPathListBox.SelectedItem);
-			if (areaPathListBox.Items.Count > 0)
+			firstListBox.Items.Remove(firstListBox.SelectedItem);
+			if (firstListBox.Items.Count > 0)
 				return;
 			loadLeadTasksButton.Enabled = false;
-			areaPathRemoveButton.Enabled = false;
+			firstRemoveButton.Enabled = false;
+			makeScheduleButton.Enabled = false;
 		}
 
-		private void IterationPathAddButtonClick(object sender, EventArgs e)
+		private void SecondAddButtonClick(object sender, EventArgs e)
 		{
-			string iterationPath = iterationsComboBox.Text;
-			if (iterationPathListBox.Items.Contains(iterationPath))
+			string second = secondComboBox.Text;
+			if (secondListBox.Items.Contains(second))
 				return;
 			int ind = 0;
-			for (; ind < iterationPathListBox.Items.Count; ind++)
+			for (; ind < secondListBox.Items.Count; ind++)
 			{
-				if (string.Compare(iterationPathListBox.Items[ind].ToString(), iterationPath, StringComparison.Ordinal) <= 0)
+				if (string.Compare(secondListBox.Items[ind].ToString(), second, StringComparison.Ordinal) <= 0)
 					continue;
-				iterationPathListBox.Items.Insert(ind, iterationPath);
+				secondListBox.Items.Insert(ind, second);
 				break;
 			}
-			if (ind == iterationPathListBox.Items.Count)
-				iterationPathListBox.Items.Add(iterationPath);
+			if (ind == secondListBox.Items.Count)
+				secondListBox.Items.Add(second);
 			
-			loadDataButton.Enabled = true;
-			iterationPathRemoveButton.Enabled = true;
+			makeScheduleButton.Enabled = true;
+			secondRemoveButton.Enabled = true;
 		}
 
-		private void IterationPathRemoveButtonClick(object sender, EventArgs e)
+		private void SecondRemoveButtonClick(object sender, EventArgs e)
 		{
-			iterationPathListBox.Items.Remove(iterationPathListBox.SelectedItem);
-			if (iterationPathListBox.Items.Count > 0)
+			secondListBox.Items.Remove(secondListBox.SelectedItem);
+			if (secondListBox.Items.Count > 0)
 				return;
-			loadDataButton.Enabled = false;
-			iterationPathRemoveButton.Enabled = false;
+			makeScheduleButton.Enabled = false;
+			secondRemoveButton.Enabled = false;
 		}
 
 		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
@@ -428,6 +502,25 @@ namespace TaskPlanningForms
 		{
 			bool expandBlockers = expandBlockersCheckBox.Checked;
 			_viewFiltersApplier.ExpandBlockers(expandBlockers);
+		}
+
+		private void ExchangeButtonClick(object sender, EventArgs e)
+		{
+			m_isAreaFirstMode = !m_isAreaFirstMode;
+			string tmp = firstGroupBox.Text;
+			firstGroupBox.Text = secondGroupBox.Text;
+			secondGroupBox.Text = tmp;
+			var itemsCopy = new object[firstListBox.Items.Count];
+			firstTextBox.Text = secondListBox.Items.Count > 0
+				? secondListBox.Items[0].ToString()
+				: string.Empty;
+			firstListBox.Items.CopyTo(itemsCopy, 0);
+			firstListBox.Items.Clear();
+			firstListBox.Items.AddRange(secondListBox.Items);
+			secondListBox.Items.Clear();
+			secondListBox.Items.AddRange(itemsCopy);
+			secondComboBox.Text = string.Empty;
+			secondComboBox.DataSource = itemsCopy;
 		}
 	}
 }

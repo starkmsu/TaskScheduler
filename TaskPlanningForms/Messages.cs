@@ -1,4 +1,4 @@
-﻿namespace TaskPlanningForms
+﻿namespace TaskSchedulerForms
 {
 	internal class Messages
 	{

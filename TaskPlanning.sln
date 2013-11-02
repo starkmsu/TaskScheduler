@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TfsUtils", "TfsUtils\TfsUtils.csproj", "{B08E4844-C25F-4B26-B940-929570989328}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskPlanningForms", "TaskPlanningForms\TaskPlanningForms.csproj", "{E59690DC-8776-4ECF-9B7E-6D239B942842}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskSchedulerForms", "TaskPlanningForms\TaskSchedulerForms.csproj", "{E59690DC-8776-4ECF-9B7E-6D239B942842}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

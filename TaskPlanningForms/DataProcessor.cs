@@ -7,7 +7,7 @@ using TfsUtils.Parsers;
 using WorkItemLinkType = TfsUtils.Const.WorkItemLinkType;
 using WorkItemType = TfsUtils.Const.WorkItemType;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class DataProcessor
 	{

@@ -8,8 +8,8 @@
     <ProjectGuid>{E59690DC-8776-4ECF-9B7E-6D239B942842}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TaskPlanningForms</RootNamespace>
-    <AssemblyName>TaskPlanningForms</AssemblyName>
+    <RootNamespace>TaskSchedulerForms</RootNamespace>
+    <AssemblyName>TaskSchedulerForms</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -163,6 +163,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Exchange.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

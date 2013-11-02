@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class ViewFiltersApplier
 	{

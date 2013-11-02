@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml.Serialization;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class ConfigManager
 	{

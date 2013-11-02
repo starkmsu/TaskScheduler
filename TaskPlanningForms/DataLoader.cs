@@ -4,14 +4,42 @@ using System.Text;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TfsUtils.Accessors;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class DataLoader
 	{
-		internal WorkItemCollection GetLeadTasks(
+		internal WorkItemCollection GetLeadTasksByAreas(
 			string tfsUrl,
-			List<string> areaPaths,
-			bool withSubAreaPaths)
+			List<string> areas,
+			bool withSubTrees)
+		{
+			return GetLeadTasks(
+				tfsUrl,
+				areas,
+				withSubTrees,
+				"System.AreaPath",
+				"areaPath");
+		}
+
+		internal WorkItemCollection GetLeadTasksByIterations(
+			string tfsUrl,
+			List<string> iterations,
+			bool withSubTrees)
+		{
+			return GetLeadTasks(
+				tfsUrl,
+				iterations,
+				withSubTrees,
+				"System.IterationPath",
+				"iteration");
+		}
+
+		private WorkItemCollection GetLeadTasks(
+			string tfsUrl,
+			List<string> data,
+			bool withSubTrees,
+			string systemFieldName,
+			string fieldAlias)
 		{
 			var paramValues = new Dictionary<string, object>
 			{
@@ -31,23 +59,23 @@ namespace TaskPlanningForms
 			strBuilder.Append(" AND [System.WorkItemType] IN (@wiType)");
 			strBuilder.Append(" AND [System.State] IN (@wiState)");
 			strBuilder.Append(" AND [Microsoft.VSTS.Common.Discipline] IN (@discipline)");
-			if (withSubAreaPaths)
+			if (withSubTrees)
 			{
 				strBuilder.Append(" AND (");
-				for (int i = 0; i < areaPaths.Count; i++)
+				for (int i = 0; i < data.Count; i++)
 				{
-					string areaPathParam = "areaPath" + i;
+					string dataParam = fieldAlias + i;
 					if (i > 0)
 						strBuilder.Append(" OR ");
-					strBuilder.Append("[System.AreaPath] UNDER @" + areaPathParam);
-					paramValues.Add(areaPathParam, areaPaths[i]);
+					strBuilder.Append("[" + systemFieldName + "] UNDER @" + dataParam);
+					paramValues.Add(dataParam, data[i]);
 				}
 				strBuilder.Append(")");
 			}
 			else
 			{
-				strBuilder.Append(" AND [System.AreaPath] IN (@areaPath)");
-				complexParamValues.Add("areaPath", areaPaths.Cast<object>().ToList());
+				strBuilder.Append(" AND [" + systemFieldName + "] IN (@" + fieldAlias + ")");
+				complexParamValues.Add(fieldAlias, data.Cast<object>().ToList());
 			}
 			strBuilder.Append(" ORDER BY [Priority]");
 

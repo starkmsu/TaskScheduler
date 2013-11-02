@@ -1,4 +1,4 @@
-﻿namespace TaskPlanningForms
+﻿namespace TaskSchedulerForms
 {
 	partial class HolidaysForm
 	{

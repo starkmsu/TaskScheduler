@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	[Serializable]
 	public class Config
@@ -13,6 +13,8 @@ namespace TaskPlanningForms
 		public List<string> IterationPaths { get; set; }
 
 		public List<string> AllIterationPaths { get; set; }
+
+		public List<string> AllAreaPaths { get; set; }
 
 		public List<DateTime> Holidays { get; set; }
 

@@ -4,11 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TaskPlanningForms.Properties;
+using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class WorkItemInfoFiller
 	{

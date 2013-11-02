@@ -4,7 +4,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal static class CellsColorExtensions
 	{

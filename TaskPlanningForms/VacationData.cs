@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	[Serializable]
 	public class VacationData

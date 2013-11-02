@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
-using TaskPlanningForms.Properties;
+using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 
-namespace TaskPlanningForms
+namespace TaskSchedulerForms
 {
 	internal class ViewFiltersBuilder
 	{
