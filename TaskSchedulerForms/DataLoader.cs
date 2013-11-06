@@ -8,35 +8,23 @@ namespace TaskSchedulerForms
 {
 	internal class DataLoader
 	{
-		internal WorkItemCollection GetLeadTasksByAreas(
+		internal WorkItemCollection GetLeadTasks(
 			string tfsUrl,
-			List<string> areas,
+			bool byArea,
+			List<string> values,
 			bool withSubTrees)
 		{
 			return GetLeadTasks(
 				tfsUrl,
-				areas,
+				values,
 				withSubTrees,
-				"System.AreaPath",
-				"areaPath");
-		}
-
-		internal WorkItemCollection GetLeadTasksByIterations(
-			string tfsUrl,
-			List<string> iterations,
-			bool withSubTrees)
-		{
-			return GetLeadTasks(
-				tfsUrl,
-				iterations,
-				withSubTrees,
-				"System.IterationPath",
-				"iteration");
+				byArea ? "System.AreaPath" : "System.IterationPath",
+				byArea ? "areaPath" : "iteration");
 		}
 
 		private WorkItemCollection GetLeadTasks(
 			string tfsUrl,
-			List<string> data,
+			List<string> values,
 			bool withSubTrees,
 			string systemFieldName,
 			string fieldAlias)
@@ -62,20 +50,20 @@ namespace TaskSchedulerForms
 			if (withSubTrees)
 			{
 				strBuilder.Append(" AND (");
-				for (int i = 0; i < data.Count; i++)
+				for (int i = 0; i < values.Count; i++)
 				{
 					string dataParam = fieldAlias + i;
 					if (i > 0)
 						strBuilder.Append(" OR ");
 					strBuilder.Append("[" + systemFieldName + "] UNDER @" + dataParam);
-					paramValues.Add(dataParam, data[i]);
+					paramValues.Add(dataParam, values[i]);
 				}
 				strBuilder.Append(")");
 			}
 			else
 			{
 				strBuilder.Append(" AND [" + systemFieldName + "] IN (@" + fieldAlias + ")");
-				complexParamValues.Add(fieldAlias, data.Cast<object>().ToList());
+				complexParamValues.Add(fieldAlias, values.Cast<object>().ToList());
 			}
 			strBuilder.Append(" ORDER BY [Priority]");
 

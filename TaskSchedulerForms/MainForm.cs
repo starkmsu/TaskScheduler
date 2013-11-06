@@ -16,6 +16,7 @@ namespace TaskSchedulerForms
 		private static readonly DataLoader s_dataLoader = new DataLoader();
 		private static readonly DataProcessor s_dataProcessor = new DataProcessor();
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
+		private static readonly StateContainer s_stateContainer = new StateContainer();
 
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
 		private static ScheduleColumnsPresenter s_columnsPresenter;
@@ -23,14 +24,7 @@ namespace TaskSchedulerForms
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
 
-		private string m_lastTfsUrl;
-		private List<string> m_lastAreaPaths;
-		private List<string> m_lastIterationPaths;
-		private bool m_lastWithSubAreas;
-
-		private bool m_isAreaFirstMode = true;
-
-		private ViewFiltersApplier _viewFiltersApplier;
+		private ViewFiltersApplier m_viewFiltersApplier;
 
 		public MainForm()
 		{
@@ -93,10 +87,7 @@ namespace TaskSchedulerForms
 
 			m_config.TfsUrl = tfsUrlTextBox.Text;
 			m_config.WithSubAreaPaths = subTreesCheckBox.Checked;
-			if (m_isAreaFirstMode)
-				m_config.AreaPaths = firstListBox.Items.Cast<string>().ToList();
-			else
-				m_config.IterationPaths = firstListBox.Items.Cast<string>().ToList();
+			s_stateContainer.SaveChosenFirstToConfig(m_config, firstListBox.Items.Cast<string>().ToList());
 
 			ThreadPool.QueueUserWorkItem(LoadLeadTasks);
 		}
@@ -105,22 +96,12 @@ namespace TaskSchedulerForms
 		{
 			try
 			{
-				if (m_isAreaFirstMode)
-				{
-					m_lastAreaPaths = firstListBox.Items.Cast<string>().ToList();
-					m_leadTasks = s_dataLoader.GetLeadTasksByAreas(
-						tfsUrlTextBox.Text,
-						m_lastAreaPaths,
-						subTreesCheckBox.Checked);
-				}
-				else
-				{
-					m_lastIterationPaths = firstListBox.Items.Cast<string>().ToList();
-					m_leadTasks = s_dataLoader.GetLeadTasksByIterations(
-						tfsUrlTextBox.Text,
-						m_lastIterationPaths,
-						subTreesCheckBox.Checked);
-				}
+				s_stateContainer.SaveChosenFirstToState(firstListBox.Items.Cast<string>().ToList());
+				m_leadTasks = s_dataLoader.GetLeadTasks(
+					tfsUrlTextBox.Text,
+					s_stateContainer.IsAreaFirstMode,
+					s_stateContainer.GetFirstList(),
+					subTreesCheckBox.Checked);
 			}
 			catch (Exception e)
 			{
@@ -142,7 +123,7 @@ namespace TaskSchedulerForms
 			var secondList = new List<string>();
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
-				string second = m_isAreaFirstMode ? m_leadTasks[i].IterationPath : m_leadTasks[i].AreaPath;
+				string second = s_stateContainer.GetParamForSecond(m_leadTasks[i]);
 				if (secondList.Contains(second))
 					continue;
 				secondList.Add(second);
@@ -150,16 +131,9 @@ namespace TaskSchedulerForms
 			secondList.Sort();
 
 			var newSecond = new List<string>(secondList.Count);
-			if (m_isAreaFirstMode)
-			{
-				if (m_config.AllIterationPaths != null && m_config.AllIterationPaths.Count > 0)
-					newSecond.AddRange(secondList.Where(i => !m_config.AllIterationPaths.Contains(i)));
-			}
-			else
-			{
-				if (m_config.AllAreaPaths != null && m_config.AllAreaPaths.Count > 0)
-					newSecond.AddRange(secondList.Where(i => !m_config.AllAreaPaths.Contains(i)));
-			}
+			var oldSecond = s_stateContainer.IsAreaFirstMode ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+			if (oldSecond != null && oldSecond.Count > 0)
+				newSecond.AddRange(secondList.Where(i => !oldSecond.Contains(i)));
 
 			secondComboBox.Invoke(new Action(() =>
 			{
@@ -172,20 +146,12 @@ namespace TaskSchedulerForms
 					secondToolTip.RemoveAll();
 			}));
 
-			if (m_isAreaFirstMode)
-				m_config.AllIterationPaths = secondList;
-			else
-				m_config.AllAreaPaths = secondList;
+			s_stateContainer.SaveAllSecondToConfig(m_config, secondList);
 
 			var validSecond = new List<string>();
-			if (m_isAreaFirstMode
-				&& m_config.IterationPaths != null
-				&& m_config.IterationPaths.Count > 0)
-				validSecond = m_config.IterationPaths.Where(secondList.Contains).ToList();
-			else if (!m_isAreaFirstMode
-				&& m_config.AreaPaths != null
-				&& m_config.AreaPaths.Count > 0)
-				validSecond = m_config.AreaPaths.Where(secondList.Contains).ToList();
+			var configSecond = s_stateContainer.IsAreaFirstMode ? m_config.IterationPaths : m_config.AreaPaths;
+			if (configSecond != null && configSecond.Count > 0)
+				validSecond = configSecond.Where(secondList.Contains).ToList();
 			validSecond.Sort();
 
 			secondComboBox.Invoke(new Action(() =>
@@ -236,6 +202,9 @@ namespace TaskSchedulerForms
 
 		private void ProcessData()
 		{
+			s_stateContainer.LastTfsUrl = tfsUrlTextBox.Text;
+			s_stateContainer.LastWithSubTree = subTreesCheckBox.Checked;
+
 			List<string> firstList = null;
 			List<string> secondList = null;
 			secondComboBox.Invoke(new Action(() =>
@@ -243,38 +212,29 @@ namespace TaskSchedulerForms
 					firstList = firstListBox.Items.Cast<string>().ToList();
 					secondList = secondListBox.Items.Cast<string>().ToList();
 				}));
-			if (m_isAreaFirstMode)
-				m_config.IterationPaths = secondList;
-			else
-				m_config.AreaPaths = secondList;
+			s_stateContainer.SaveChosenSecondToConfig(m_config, secondList);
+			s_stateContainer.SaveChosenSecondToState(secondList);
 
 			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
 			for (int i = 0; i < m_leadTasks.Count; i++)
 			{
 				var leadTask = m_leadTasks[i];
-				if (!firstList.Contains(m_isAreaFirstMode ? leadTask.AreaPath : leadTask.IterationPath)
-					||!secondList.Contains(m_isAreaFirstMode ? leadTask.IterationPath : leadTask.AreaPath))
+				if (!firstList.Contains(s_stateContainer.GetParamForFirst(leadTask))
+					|| !secondList.Contains(s_stateContainer.GetParamForSecond(leadTask)))
 					continue;
 				leadTasks.Add(leadTask);
 			}
 
-			m_lastTfsUrl = tfsUrlTextBox.Text;
-			m_lastWithSubAreas = subTreesCheckBox.Checked;
-			if (m_isAreaFirstMode)
-				m_lastIterationPaths = secondList;
-			else
-				m_lastAreaPaths = secondList;
-
 			try
 			{
-				var data = s_dataProcessor.ProcessLeadTasks(m_lastTfsUrl, leadTasks);
+				var data = s_dataProcessor.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
-						usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
-						vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
-						var users2 = new List<string>(_viewFiltersApplier.Users);
+						m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
+						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
+						vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
+						var users2 = new List<string>(m_viewFiltersApplier.Users);
 						users2.Insert(0, string.Empty);
 						usersFilterСomboBox.DataSource = users2;
 						usersFilterСomboBox.Enabled = true;
@@ -299,7 +259,7 @@ namespace TaskSchedulerForms
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
 			string user = usersFilterСomboBox.SelectedItem.ToString();
-			_viewFiltersApplier.FilterDataByUser(user);
+			m_viewFiltersApplier.FilterDataByUser(user);
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -322,39 +282,24 @@ namespace TaskSchedulerForms
 				}));
 			try
 			{
-				WorkItemCollection leadTasksCollection;
-				if (m_isAreaFirstMode)
-					leadTasksCollection = s_dataLoader.GetLeadTasksByAreas(
-						m_lastTfsUrl,
-						m_lastAreaPaths,
-						m_lastWithSubAreas);
-				else
-					leadTasksCollection = s_dataLoader.GetLeadTasksByIterations(
-						m_lastTfsUrl,
-						m_lastIterationPaths,
-						m_lastWithSubAreas);
+				WorkItemCollection leadTasksCollection = s_dataLoader.GetLeadTasks(
+					s_stateContainer.LastTfsUrl,
+					s_stateContainer.IsAreaFirstMode,
+					s_stateContainer.GetFirstList(),
+					s_stateContainer.LastWithSubTree);
 
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-				var newSecond = new List<string>(m_isAreaFirstMode ? m_lastIterationPaths.Count : m_lastAreaPaths.Count);
+				var oldSecond = s_stateContainer.IsAreaFirstMode ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+				var newSecond = new List<string>();
 				for (int i = 0; i < leadTasksCollection.Count; i++)
 				{
 					WorkItem leadTask = leadTasksCollection[i];
-					if (m_isAreaFirstMode)
-					{
-						if (!m_config.AllIterationPaths.Contains(leadTask.IterationPath)
-							&& !newSecond.Contains(leadTask.IterationPath))
-								newSecond.Add(leadTask.IterationPath);
-						if (!m_lastIterationPaths.Contains(leadTask.IterationPath))
-							continue;
-					}
-					else
-					{
-						if (!m_config.AllAreaPaths.Contains(leadTask.AreaPath)
-							&& !newSecond.Contains(leadTask.AreaPath))
-							newSecond.Add(leadTask.AreaPath);
-						if (!m_lastAreaPaths.Contains(leadTask.AreaPath))
-							continue;
-					}
+					string second = s_stateContainer.GetParamForSecond(leadTask);
+					if (!oldSecond.Contains(second)
+						&& !newSecond.Contains(second))
+						newSecond.Add(second);
+					if (!s_stateContainer.IsSecondFromStateContains(second))
+						continue;
 					leadTasks.Add(leadTask);
 				}
 				var data = s_dataProcessor.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
@@ -364,17 +309,17 @@ namespace TaskSchedulerForms
 					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
 						s_columnsPresenter.InitColumns(scheduleDataGridView);
-					_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
-					usersVacationsComboBox.DataSource = _viewFiltersApplier.Users;
-					vacationsButton.Enabled = _viewFiltersApplier.Users.Count > 0;
-					var users2 = new List<string>(_viewFiltersApplier.Users);
+					m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
+					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
+					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
+					var users2 = new List<string>(m_viewFiltersApplier.Users);
 					users2.Insert(0, string.Empty);
 					usersFilterСomboBox.DataSource = users2;
 
-					if (!string.IsNullOrEmpty(currentUser) && _viewFiltersApplier.Users.Contains(currentUser))
+					if (!string.IsNullOrEmpty(currentUser) && m_viewFiltersApplier.Users.Contains(currentUser))
 					{
 						usersFilterСomboBox.SelectedItem = currentUser;
-						_viewFiltersApplier.FilterDataByUser(currentUser);
+						m_viewFiltersApplier.FilterDataByUser(currentUser);
 					}
 
 					usersFilterСomboBox.Enabled = true;
@@ -390,9 +335,9 @@ namespace TaskSchedulerForms
 					}
 
 					if (ltOnlyCheckBox.Checked)
-						_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnlyCheckBox.Checked);
+						m_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnlyCheckBox.Checked);
 					if (expandBlockersCheckBox.Checked)
-						_viewFiltersApplier.ExpandBlockers(expandBlockersCheckBox.Checked);
+						m_viewFiltersApplier.ExpandBlockers(expandBlockersCheckBox.Checked);
 				}));
 			}
 			catch (Exception exc)
@@ -476,13 +421,13 @@ namespace TaskSchedulerForms
 		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool withDevCompleted = devCmpletedCheckBox.Checked;
-			_viewFiltersApplier.FilterDataByDevCompleted(withDevCompleted);
+			m_viewFiltersApplier.FilterDataByDevCompleted(withDevCompleted);
 		}
 
 		private void LtOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool ltOnly = ltOnlyCheckBox.Checked;
-			_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnly);
+			m_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnly);
 		}
 
 		private void VacationsButtonClick(object sender, EventArgs e)
@@ -501,12 +446,12 @@ namespace TaskSchedulerForms
 		private void ShowBlockersCheckBoxCheckedChanged(object sender, EventArgs e)
 		{
 			bool expandBlockers = expandBlockersCheckBox.Checked;
-			_viewFiltersApplier.ExpandBlockers(expandBlockers);
+			m_viewFiltersApplier.ExpandBlockers(expandBlockers);
 		}
 
 		private void ExchangeButtonClick(object sender, EventArgs e)
 		{
-			m_isAreaFirstMode = !m_isAreaFirstMode;
+			s_stateContainer.IsAreaFirstMode = !s_stateContainer.IsAreaFirstMode;
 			string tmp = firstGroupBox.Text;
 			firstGroupBox.Text = secondGroupBox.Text;
 			secondGroupBox.Text = tmp;
