@@ -31,20 +31,25 @@
 			this.components = new System.ComponentModel.Container();
 			this.mainTabControl = new System.Windows.Forms.TabControl();
 			this.mainTabPage = new System.Windows.Forms.TabPage();
-			this.exchangeButton = new System.Windows.Forms.Button();
-			this.subTreesCheckBox = new System.Windows.Forms.CheckBox();
-			this.secondGroupBox = new System.Windows.Forms.GroupBox();
-			this.secondRemoveButton = new System.Windows.Forms.Button();
-			this.secondListBox = new System.Windows.Forms.ListBox();
-			this.secondAddButton = new System.Windows.Forms.Button();
-			this.secondComboBox = new System.Windows.Forms.ComboBox();
+			this.orLabel = new System.Windows.Forms.Label();
+			this.makeScheduleButton = new System.Windows.Forms.Button();
+			this.ParamsGroupBox = new System.Windows.Forms.GroupBox();
+			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.firstGroupBox = new System.Windows.Forms.GroupBox();
 			this.firstRemoveButton = new System.Windows.Forms.Button();
 			this.firstAddButton = new System.Windows.Forms.Button();
 			this.firstListBox = new System.Windows.Forms.ListBox();
 			this.firstTextBox = new System.Windows.Forms.TextBox();
-			this.loadLeadTasksButton = new System.Windows.Forms.Button();
-			this.makeScheduleButton = new System.Windows.Forms.Button();
+			this.secondGroupBox = new System.Windows.Forms.GroupBox();
+			this.secondRemoveButton = new System.Windows.Forms.Button();
+			this.secondListBox = new System.Windows.Forms.ListBox();
+			this.secondAddButton = new System.Windows.Forms.Button();
+			this.secondComboBox = new System.Windows.Forms.ComboBox();
+			this.subTreesCheckBox = new System.Windows.Forms.CheckBox();
+			this.exchangeButton = new System.Windows.Forms.Button();
+			this.queryGroupBox = new System.Windows.Forms.GroupBox();
+			this.queryLabel = new System.Windows.Forms.Label();
+			this.queryTextBox = new System.Windows.Forms.TextBox();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
 			this.expandBlockersCheckBox = new System.Windows.Forms.CheckBox();
 			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
@@ -69,8 +74,10 @@
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
-			this.secondGroupBox.SuspendLayout();
+			this.ParamsGroupBox.SuspendLayout();
 			this.firstGroupBox.SuspendLayout();
+			this.secondGroupBox.SuspendLayout();
+			this.queryGroupBox.SuspendLayout();
 			this.dataTabPage.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).BeginInit();
 			this.settingsPage.SuspendLayout();
@@ -85,51 +92,131 @@
 			this.mainTabControl.Location = new System.Drawing.Point(0, 0);
 			this.mainTabControl.Name = "mainTabControl";
 			this.mainTabControl.SelectedIndex = 0;
-			this.mainTabControl.Size = new System.Drawing.Size(601, 505);
+			this.mainTabControl.Size = new System.Drawing.Size(582, 528);
 			this.mainTabControl.TabIndex = 0;
 			// 
 			// mainTabPage
 			// 
-			this.mainTabPage.Controls.Add(this.exchangeButton);
-			this.mainTabPage.Controls.Add(this.subTreesCheckBox);
-			this.mainTabPage.Controls.Add(this.secondGroupBox);
-			this.mainTabPage.Controls.Add(this.firstGroupBox);
-			this.mainTabPage.Controls.Add(this.loadLeadTasksButton);
+			this.mainTabPage.Controls.Add(this.orLabel);
 			this.mainTabPage.Controls.Add(this.makeScheduleButton);
+			this.mainTabPage.Controls.Add(this.ParamsGroupBox);
+			this.mainTabPage.Controls.Add(this.queryGroupBox);
 			this.mainTabPage.Location = new System.Drawing.Point(4, 22);
 			this.mainTabPage.Name = "mainTabPage";
 			this.mainTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.mainTabPage.Size = new System.Drawing.Size(593, 479);
+			this.mainTabPage.Size = new System.Drawing.Size(574, 502);
 			this.mainTabPage.TabIndex = 1;
 			this.mainTabPage.Text = "Main";
 			this.mainTabPage.UseVisualStyleBackColor = true;
 			// 
-			// exchangeButton
+			// orLabel
 			// 
-			this.exchangeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.exchangeButton.Image = global::TaskSchedulerForms.Properties.Resources.Exchange;
-			this.exchangeButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.exchangeButton.Location = new System.Drawing.Point(504, 186);
-			this.exchangeButton.Name = "exchangeButton";
-			this.exchangeButton.Size = new System.Drawing.Size(75, 23);
-			this.exchangeButton.TabIndex = 17;
-			this.exchangeButton.Text = "Exchange";
-			this.exchangeButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.exchangeButton.UseVisualStyleBackColor = true;
-			this.exchangeButton.Click += new System.EventHandler(this.ExchangeButtonClick);
+			this.orLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.orLabel.AutoSize = true;
+			this.orLabel.BackColor = System.Drawing.Color.Transparent;
+			this.orLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.orLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.orLabel.Location = new System.Drawing.Point(266, 416);
+			this.orLabel.Name = "orLabel";
+			this.orLabel.Size = new System.Drawing.Size(35, 22);
+			this.orLabel.TabIndex = 19;
+			this.orLabel.Text = "OR";
 			// 
-			// subTreesCheckBox
+			// makeScheduleButton
 			// 
-			this.subTreesCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.subTreesCheckBox.AutoSize = true;
-			this.subTreesCheckBox.Checked = true;
-			this.subTreesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.subTreesCheckBox.Location = new System.Drawing.Point(342, 190);
-			this.subTreesCheckBox.Name = "subTreesCheckBox";
-			this.subTreesCheckBox.Size = new System.Drawing.Size(92, 17);
-			this.subTreesCheckBox.TabIndex = 16;
-			this.subTreesCheckBox.Text = "with subTrees";
-			this.subTreesCheckBox.UseVisualStyleBackColor = true;
+			this.makeScheduleButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.makeScheduleButton.Enabled = false;
+			this.makeScheduleButton.Location = new System.Drawing.Point(230, 475);
+			this.makeScheduleButton.Name = "makeScheduleButton";
+			this.makeScheduleButton.Size = new System.Drawing.Size(107, 23);
+			this.makeScheduleButton.TabIndex = 4;
+			this.makeScheduleButton.Text = "Make Schedule";
+			this.makeScheduleButton.UseVisualStyleBackColor = true;
+			this.makeScheduleButton.Click += new System.EventHandler(this.MakeScheduleButtonClick);
+			// 
+			// ParamsGroupBox
+			// 
+			this.ParamsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.ParamsGroupBox.Controls.Add(this.loadLeadTasksButton);
+			this.ParamsGroupBox.Controls.Add(this.firstGroupBox);
+			this.ParamsGroupBox.Controls.Add(this.secondGroupBox);
+			this.ParamsGroupBox.Controls.Add(this.subTreesCheckBox);
+			this.ParamsGroupBox.Controls.Add(this.exchangeButton);
+			this.ParamsGroupBox.Location = new System.Drawing.Point(3, 1);
+			this.ParamsGroupBox.Name = "ParamsGroupBox";
+			this.ParamsGroupBox.Size = new System.Drawing.Size(568, 410);
+			this.ParamsGroupBox.TabIndex = 18;
+			this.ParamsGroupBox.TabStop = false;
+			// 
+			// loadLeadTasksButton
+			// 
+			this.loadLeadTasksButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.loadLeadTasksButton.Location = new System.Drawing.Point(230, 177);
+			this.loadLeadTasksButton.Name = "loadLeadTasksButton";
+			this.loadLeadTasksButton.Size = new System.Drawing.Size(107, 23);
+			this.loadLeadTasksButton.TabIndex = 5;
+			this.loadLeadTasksButton.Text = "Load LeadTasks";
+			this.loadLeadTasksButton.UseVisualStyleBackColor = true;
+			this.loadLeadTasksButton.Click += new System.EventHandler(this.LoadLeadTasksButtonClick);
+			// 
+			// firstGroupBox
+			// 
+			this.firstGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstGroupBox.Controls.Add(this.firstRemoveButton);
+			this.firstGroupBox.Controls.Add(this.firstAddButton);
+			this.firstGroupBox.Controls.Add(this.firstListBox);
+			this.firstGroupBox.Controls.Add(this.firstTextBox);
+			this.firstGroupBox.Location = new System.Drawing.Point(6, 10);
+			this.firstGroupBox.Name = "firstGroupBox";
+			this.firstGroupBox.Size = new System.Drawing.Size(555, 162);
+			this.firstGroupBox.TabIndex = 14;
+			this.firstGroupBox.TabStop = false;
+			this.firstGroupBox.Text = "Area";
+			// 
+			// firstRemoveButton
+			// 
+			this.firstRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstRemoveButton.Location = new System.Drawing.Point(474, 16);
+			this.firstRemoveButton.Name = "firstRemoveButton";
+			this.firstRemoveButton.Size = new System.Drawing.Size(75, 23);
+			this.firstRemoveButton.TabIndex = 8;
+			this.firstRemoveButton.Text = "Remove";
+			this.firstRemoveButton.UseVisualStyleBackColor = true;
+			this.firstRemoveButton.Click += new System.EventHandler(this.FirstRemoveButtonClick);
+			// 
+			// firstAddButton
+			// 
+			this.firstAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstAddButton.Location = new System.Drawing.Point(406, 16);
+			this.firstAddButton.Name = "firstAddButton";
+			this.firstAddButton.Size = new System.Drawing.Size(62, 23);
+			this.firstAddButton.TabIndex = 7;
+			this.firstAddButton.Text = "Add";
+			this.firstAddButton.UseVisualStyleBackColor = true;
+			this.firstAddButton.Click += new System.EventHandler(this.FirstAddButtonClick);
+			// 
+			// firstListBox
+			// 
+			this.firstListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstListBox.FormattingEnabled = true;
+			this.firstListBox.Location = new System.Drawing.Point(6, 44);
+			this.firstListBox.Name = "firstListBox";
+			this.firstListBox.Size = new System.Drawing.Size(543, 108);
+			this.firstListBox.TabIndex = 6;
+			// 
+			// firstTextBox
+			// 
+			this.firstTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstTextBox.Location = new System.Drawing.Point(6, 18);
+			this.firstTextBox.Name = "firstTextBox";
+			this.firstTextBox.Size = new System.Drawing.Size(394, 20);
+			this.firstTextBox.TabIndex = 3;
 			// 
 			// secondGroupBox
 			// 
@@ -140,9 +227,9 @@
 			this.secondGroupBox.Controls.Add(this.secondListBox);
 			this.secondGroupBox.Controls.Add(this.secondAddButton);
 			this.secondGroupBox.Controls.Add(this.secondComboBox);
-			this.secondGroupBox.Location = new System.Drawing.Point(14, 213);
+			this.secondGroupBox.Location = new System.Drawing.Point(6, 206);
 			this.secondGroupBox.Name = "secondGroupBox";
-			this.secondGroupBox.Size = new System.Drawing.Size(571, 229);
+			this.secondGroupBox.Size = new System.Drawing.Size(555, 201);
 			this.secondGroupBox.TabIndex = 15;
 			this.secondGroupBox.TabStop = false;
 			this.secondGroupBox.Text = "Iteration";
@@ -151,7 +238,7 @@
 			// 
 			this.secondRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.secondRemoveButton.Enabled = false;
-			this.secondRemoveButton.Location = new System.Drawing.Point(490, 17);
+			this.secondRemoveButton.Location = new System.Drawing.Point(474, 17);
 			this.secondRemoveButton.Name = "secondRemoveButton";
 			this.secondRemoveButton.Size = new System.Drawing.Size(75, 23);
 			this.secondRemoveButton.TabIndex = 10;
@@ -165,16 +252,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.secondListBox.FormattingEnabled = true;
-			this.secondListBox.Location = new System.Drawing.Point(6, 45);
+			this.secondListBox.Location = new System.Drawing.Point(6, 48);
 			this.secondListBox.Name = "secondListBox";
-			this.secondListBox.Size = new System.Drawing.Size(559, 160);
+			this.secondListBox.Size = new System.Drawing.Size(543, 134);
 			this.secondListBox.TabIndex = 9;
 			// 
 			// secondAddButton
 			// 
 			this.secondAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.secondAddButton.Enabled = false;
-			this.secondAddButton.Location = new System.Drawing.Point(422, 17);
+			this.secondAddButton.Location = new System.Drawing.Point(406, 17);
 			this.secondAddButton.Name = "secondAddButton";
 			this.secondAddButton.Size = new System.Drawing.Size(62, 23);
 			this.secondAddButton.TabIndex = 8;
@@ -190,88 +277,71 @@
 			this.secondComboBox.FormattingEnabled = true;
 			this.secondComboBox.Location = new System.Drawing.Point(6, 19);
 			this.secondComboBox.Name = "secondComboBox";
-			this.secondComboBox.Size = new System.Drawing.Size(410, 21);
+			this.secondComboBox.Size = new System.Drawing.Size(394, 21);
 			this.secondComboBox.TabIndex = 6;
 			// 
-			// firstGroupBox
+			// subTreesCheckBox
 			// 
-			this.firstGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.subTreesCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.subTreesCheckBox.AutoSize = true;
+			this.subTreesCheckBox.Checked = true;
+			this.subTreesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.subTreesCheckBox.Location = new System.Drawing.Point(343, 181);
+			this.subTreesCheckBox.Name = "subTreesCheckBox";
+			this.subTreesCheckBox.Size = new System.Drawing.Size(92, 17);
+			this.subTreesCheckBox.TabIndex = 16;
+			this.subTreesCheckBox.Text = "with subTrees";
+			this.subTreesCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// exchangeButton
+			// 
+			this.exchangeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.exchangeButton.Image = global::TaskSchedulerForms.Properties.Resources.Exchange;
+			this.exchangeButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.exchangeButton.Location = new System.Drawing.Point(480, 177);
+			this.exchangeButton.Name = "exchangeButton";
+			this.exchangeButton.Size = new System.Drawing.Size(75, 23);
+			this.exchangeButton.TabIndex = 17;
+			this.exchangeButton.Text = "Exchange";
+			this.exchangeButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.exchangeButton.UseVisualStyleBackColor = true;
+			this.exchangeButton.Click += new System.EventHandler(this.ExchangeButtonClick);
+			// 
+			// queryGroupBox
+			// 
+			this.queryGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstGroupBox.Controls.Add(this.firstRemoveButton);
-			this.firstGroupBox.Controls.Add(this.firstAddButton);
-			this.firstGroupBox.Controls.Add(this.firstListBox);
-			this.firstGroupBox.Controls.Add(this.firstTextBox);
-			this.firstGroupBox.Location = new System.Drawing.Point(8, 6);
-			this.firstGroupBox.Name = "firstGroupBox";
-			this.firstGroupBox.Size = new System.Drawing.Size(577, 174);
-			this.firstGroupBox.TabIndex = 14;
-			this.firstGroupBox.TabStop = false;
-			this.firstGroupBox.Text = "Area";
+			this.queryGroupBox.Controls.Add(this.queryLabel);
+			this.queryGroupBox.Controls.Add(this.queryTextBox);
+			this.queryGroupBox.Location = new System.Drawing.Point(3, 437);
+			this.queryGroupBox.Name = "queryGroupBox";
+			this.queryGroupBox.Size = new System.Drawing.Size(568, 36);
+			this.queryGroupBox.TabIndex = 22;
+			this.queryGroupBox.TabStop = false;
 			// 
-			// firstRemoveButton
+			// queryLabel
 			// 
-			this.firstRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstRemoveButton.Location = new System.Drawing.Point(496, 17);
-			this.firstRemoveButton.Name = "firstRemoveButton";
-			this.firstRemoveButton.Size = new System.Drawing.Size(75, 23);
-			this.firstRemoveButton.TabIndex = 8;
-			this.firstRemoveButton.Text = "Remove";
-			this.firstRemoveButton.UseVisualStyleBackColor = true;
-			this.firstRemoveButton.Click += new System.EventHandler(this.FirstRemoveButtonClick);
+			this.queryLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.queryLabel.AutoSize = true;
+			this.queryLabel.Location = new System.Drawing.Point(12, 14);
+			this.queryLabel.Name = "queryLabel";
+			this.queryLabel.Size = new System.Drawing.Size(81, 13);
+			this.queryLabel.TabIndex = 21;
+			this.queryLabel.Text = "Tfs Query Path:";
 			// 
-			// firstAddButton
+			// queryTextBox
 			// 
-			this.firstAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstAddButton.Location = new System.Drawing.Point(428, 17);
-			this.firstAddButton.Name = "firstAddButton";
-			this.firstAddButton.Size = new System.Drawing.Size(62, 23);
-			this.firstAddButton.TabIndex = 7;
-			this.firstAddButton.Text = "Add";
-			this.firstAddButton.UseVisualStyleBackColor = true;
-			this.firstAddButton.Click += new System.EventHandler(this.FirstAddButtonClick);
-			// 
-			// firstListBox
-			// 
-			this.firstListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.queryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstListBox.FormattingEnabled = true;
-			this.firstListBox.Location = new System.Drawing.Point(6, 45);
-			this.firstListBox.Name = "firstListBox";
-			this.firstListBox.Size = new System.Drawing.Size(565, 108);
-			this.firstListBox.TabIndex = 6;
-			// 
-			// firstTextBox
-			// 
-			this.firstTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstTextBox.Location = new System.Drawing.Point(6, 19);
-			this.firstTextBox.Name = "firstTextBox";
-			this.firstTextBox.Size = new System.Drawing.Size(416, 20);
-			this.firstTextBox.TabIndex = 3;
-			// 
-			// loadLeadTasksButton
-			// 
-			this.loadLeadTasksButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.loadLeadTasksButton.Location = new System.Drawing.Point(229, 186);
-			this.loadLeadTasksButton.Name = "loadLeadTasksButton";
-			this.loadLeadTasksButton.Size = new System.Drawing.Size(107, 23);
-			this.loadLeadTasksButton.TabIndex = 5;
-			this.loadLeadTasksButton.Text = "Load LeadTasks";
-			this.loadLeadTasksButton.UseVisualStyleBackColor = true;
-			this.loadLeadTasksButton.Click += new System.EventHandler(this.LoadLeadTasksButtonClick);
-			// 
-			// makeScheduleButton
-			// 
-			this.makeScheduleButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.makeScheduleButton.Enabled = false;
-			this.makeScheduleButton.Location = new System.Drawing.Point(229, 448);
-			this.makeScheduleButton.Name = "makeScheduleButton";
-			this.makeScheduleButton.Size = new System.Drawing.Size(107, 23);
-			this.makeScheduleButton.TabIndex = 4;
-			this.makeScheduleButton.Text = "Make Schedule";
-			this.makeScheduleButton.UseVisualStyleBackColor = true;
-			this.makeScheduleButton.Click += new System.EventHandler(this.MakeScheduleButtonClick);
+			this.queryTextBox.ForeColor = System.Drawing.Color.Gray;
+			this.queryTextBox.Location = new System.Drawing.Point(96, 11);
+			this.queryTextBox.Name = "queryTextBox";
+			this.queryTextBox.Size = new System.Drawing.Size(459, 20);
+			this.queryTextBox.TabIndex = 20;
+			this.queryTextBox.Text = "example: FORIS_Mobile/My Queries/My query";
+			this.queryTextBox.Enter += new System.EventHandler(this.QueryTextBoxEnter);
+			this.queryTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.QueryTextBoxKeyUp);
+			this.queryTextBox.Leave += new System.EventHandler(this.QueryTextBoxLeave);
 			// 
 			// dataTabPage
 			// 
@@ -285,7 +355,7 @@
 			this.dataTabPage.Location = new System.Drawing.Point(4, 22);
 			this.dataTabPage.Name = "dataTabPage";
 			this.dataTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.dataTabPage.Size = new System.Drawing.Size(593, 479);
+			this.dataTabPage.Size = new System.Drawing.Size(574, 502);
 			this.dataTabPage.TabIndex = 0;
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
@@ -378,7 +448,7 @@
 			this.scheduleDataGridView.Name = "scheduleDataGridView";
 			this.scheduleDataGridView.ReadOnly = true;
 			this.scheduleDataGridView.RowHeadersVisible = false;
-			this.scheduleDataGridView.Size = new System.Drawing.Size(590, 446);
+			this.scheduleDataGridView.Size = new System.Drawing.Size(575, 473);
 			this.scheduleDataGridView.TabIndex = 0;
 			// 
 			// Priority
@@ -457,7 +527,7 @@
 			this.settingsPage.Controls.Add(this.tfsUrlLabel);
 			this.settingsPage.Location = new System.Drawing.Point(4, 22);
 			this.settingsPage.Name = "settingsPage";
-			this.settingsPage.Size = new System.Drawing.Size(593, 479);
+			this.settingsPage.Size = new System.Drawing.Size(574, 502);
 			this.settingsPage.TabIndex = 2;
 			this.settingsPage.Text = "Settings";
 			this.settingsPage.UseVisualStyleBackColor = true;
@@ -510,7 +580,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(601, 505);
+			this.ClientSize = new System.Drawing.Size(582, 528);
 			this.Controls.Add(this.mainTabControl);
 			this.Name = "MainForm";
 			this.Text = "Task Scheduler";
@@ -518,9 +588,13 @@
 			this.mainTabControl.ResumeLayout(false);
 			this.mainTabPage.ResumeLayout(false);
 			this.mainTabPage.PerformLayout();
-			this.secondGroupBox.ResumeLayout(false);
+			this.ParamsGroupBox.ResumeLayout(false);
+			this.ParamsGroupBox.PerformLayout();
 			this.firstGroupBox.ResumeLayout(false);
 			this.firstGroupBox.PerformLayout();
+			this.secondGroupBox.ResumeLayout(false);
+			this.queryGroupBox.ResumeLayout(false);
+			this.queryGroupBox.PerformLayout();
 			this.dataTabPage.ResumeLayout(false);
 			this.dataTabPage.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).EndInit();
@@ -570,6 +644,11 @@
 		private System.Windows.Forms.CheckBox expandBlockersCheckBox;
 		private System.Windows.Forms.ToolTip secondToolTip;
 		private System.Windows.Forms.Button exchangeButton;
+		private System.Windows.Forms.GroupBox ParamsGroupBox;
+		private System.Windows.Forms.Label orLabel;
+		private System.Windows.Forms.Label queryLabel;
+		private System.Windows.Forms.TextBox queryTextBox;
+		private System.Windows.Forms.GroupBox queryGroupBox;
 	}
 }
 

@@ -27,7 +27,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>49</ApplicationRevision>
+    <ApplicationRevision>50</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -110,6 +110,7 @@
     <Compile Include="ViewFiltersApplier.cs" />
     <Compile Include="ViewFiltersBuilder.cs" />
     <Compile Include="WorkItemInfoFiller.cs" />
+    <Compile Include="WorkMode.cs" />
     <EmbeddedResource Include="HolidaysForm.resx">
       <DependentUpon>HolidaysForm.cs</DependentUpon>
     </EmbeddedResource>

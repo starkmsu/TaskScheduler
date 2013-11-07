@@ -5,10 +5,22 @@ namespace TaskSchedulerForms
 {
 	internal class StateContainer
 	{
+		private WorkMode m_workMode;
 		private List<string> LastAreaPaths { get; set; }
 		private List<string> LastIterationPaths { get; set; }
 
-		internal bool IsAreaFirstMode { get; set; }
+		internal WorkMode WorkMode
+		{
+			get { return m_workMode; }
+			set
+			{
+				if (value != WorkMode.Query)
+					ByArea = value == WorkMode.AreaFirst;
+				m_workMode = value;
+			}
+		}
+
+		internal bool ByArea { get; set; }
 
 		internal string LastTfsUrl { get; set; }
 
@@ -16,27 +28,28 @@ namespace TaskSchedulerForms
 
 		internal StateContainer()
 		{
-			IsAreaFirstMode = true;
+			ByArea = true;
+			WorkMode = WorkMode.AreaFirst;
 			LastAreaPaths = new List<string>();
 			LastIterationPaths = new List<string>();
 		}
 
 		internal void SaveChosenFirstToConfig(Config config, List<string> values)
 		{
-			if (IsAreaFirstMode)
+			if (WorkMode == WorkMode.AreaFirst)
 				config.AreaPaths = values;
-			else
+			else if (WorkMode == WorkMode.IterationFirst)
 				config.IterationPaths = values;
 		}
 
 		internal void SaveAllSecondToConfig(Config config, List<string> values)
 		{
-			if (IsAreaFirstMode)
+			if (WorkMode == WorkMode.AreaFirst)
 			{
 				config.AllIterationPaths = values;
 				config.AllAreaPaths = null;
 			}
-			else
+			else if (WorkMode == WorkMode.IterationFirst)
 			{
 				config.AllAreaPaths = values;
 				config.AllIterationPaths = null;
@@ -45,46 +58,54 @@ namespace TaskSchedulerForms
 
 		internal void SaveChosenSecondToConfig(Config config, List<string> values)
 		{
-			if (IsAreaFirstMode)
+			if (WorkMode == WorkMode.AreaFirst)
+			{
 				config.IterationPaths = values;
-			else
+				config.WorkMode = WorkMode.AreaFirst;
+				config.ByArea = true;
+			}
+			else if (WorkMode == WorkMode.IterationFirst)
+			{
 				config.AreaPaths = values;
+				config.WorkMode = WorkMode.IterationFirst;
+				config.ByArea = false;
+			}
 		}
 
 		internal void SaveChosenFirstToState(List<string> values)
 		{
-			if (IsAreaFirstMode)
+			if (WorkMode == WorkMode.AreaFirst)
 				LastAreaPaths = values;
-			else
+			else if (WorkMode == WorkMode.IterationFirst)
 				LastIterationPaths = values;
 		}
 
 		internal void SaveChosenSecondToState(List<string> values)
 		{
-			if (IsAreaFirstMode)
+			if (WorkMode == WorkMode.AreaFirst)
 				LastIterationPaths = values;
-			else
+			else if (WorkMode == WorkMode.IterationFirst)
 				LastAreaPaths = values;
 		}
 
 		internal string GetParamForFirst(WorkItem workItem)
 		{
-			return IsAreaFirstMode ? workItem.AreaPath : workItem.IterationPath;
+			return WorkMode == WorkMode.AreaFirst ? workItem.AreaPath : workItem.IterationPath;
 		}
 
 		internal string GetParamForSecond(WorkItem workItem)
 		{
-			return IsAreaFirstMode ? workItem.IterationPath : workItem.AreaPath;
+			return WorkMode == WorkMode.AreaFirst ? workItem.IterationPath : workItem.AreaPath;
 		}
 
 		internal List<string> GetFirstList()
 		{
-			return IsAreaFirstMode ? LastAreaPaths : LastIterationPaths;
+			return WorkMode == WorkMode.AreaFirst ? LastAreaPaths : LastIterationPaths;
 		}
 
 		internal bool IsSecondFromStateContains(string value)
 		{
-			return IsAreaFirstMode ? LastIterationPaths.Contains(value) : LastAreaPaths.Contains(value);
+			return WorkMode == WorkMode.AreaFirst ? LastIterationPaths.Contains(value) : LastAreaPaths.Contains(value);
 		}
 	}
 }

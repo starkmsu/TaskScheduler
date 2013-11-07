@@ -51,15 +51,32 @@ namespace TaskSchedulerForms
 			}
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
+			s_stateContainer.ByArea = m_config.ByArea;
+			if (m_config.WorkMode != WorkMode.Query)
+			{
+				s_stateContainer.WorkMode = m_config.WorkMode;
+				InitFirst();
+				queryTextBox.Text = Resources.QueryExample;
+			}
+			else
+			{
+				queryTextBox.Text = m_config.QueryPath;
+				queryTextBox.ForeColor = Color.Black;
+				ParamsGroupBox.Enabled = false;
+				makeScheduleButton.Enabled = true;
+			}
+		}
+
+		private void InitFirst()
+		{
 			subTreesCheckBox.Checked = m_config.WithSubAreaPaths;
-			s_stateContainer.IsAreaFirstMode = m_config.IsAreaFirstMode;
-			List<string> firstList = m_config.IsAreaFirstMode ? m_config.AreaPaths : m_config.IterationPaths;
+			List<string> firstList = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AreaPaths : m_config.IterationPaths;
 			if (firstList != null && firstList.Count > 0)
 			{
 				firstTextBox.Text = firstList[0];
 				firstList.ForEach(i => firstListBox.Items.Add(i));
 			}
-			if (!m_config.IsAreaFirstMode)
+			if (s_stateContainer.WorkMode == WorkMode.IterationFirst)
 				ExchangeNames();
 		}
 
@@ -103,7 +120,7 @@ namespace TaskSchedulerForms
 				s_stateContainer.SaveChosenFirstToState(firstListBox.Items.Cast<string>().ToList());
 				m_leadTasks = s_dataLoader.GetLeadTasks(
 					tfsUrlTextBox.Text,
-					s_stateContainer.IsAreaFirstMode,
+					s_stateContainer.WorkMode == WorkMode.AreaFirst,
 					s_stateContainer.GetFirstList(),
 					subTreesCheckBox.Checked);
 			}
@@ -135,7 +152,7 @@ namespace TaskSchedulerForms
 			secondList.Sort();
 
 			var newSecond = new List<string>(secondList.Count);
-			var oldSecond = s_stateContainer.IsAreaFirstMode ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+			var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AllIterationPaths : m_config.AllAreaPaths;
 			if (oldSecond != null && oldSecond.Count > 0)
 				newSecond.AddRange(secondList.Where(i => !oldSecond.Contains(i)));
 
@@ -153,7 +170,7 @@ namespace TaskSchedulerForms
 			s_stateContainer.SaveAllSecondToConfig(m_config, secondList);
 
 			var validSecond = new List<string>();
-			var configSecond = s_stateContainer.IsAreaFirstMode ? m_config.IterationPaths : m_config.AreaPaths;
+			var configSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.IterationPaths : m_config.AreaPaths;
 			if (configSecond != null && configSecond.Count > 0)
 				validSecond = configSecond.Where(secondList.Contains).ToList();
 			validSecond.Sort();
@@ -192,8 +209,10 @@ namespace TaskSchedulerForms
 
 		private void MakeScheduleButtonClick(object sender, EventArgs e)
 		{
-			loadLeadTasksButton.Enabled = false;
 			makeScheduleButton.Enabled = false;
+			loadLeadTasksButton.Enabled = false;
+			queryTextBox.Enabled = false;
+
 			usersLabel.Enabled = false;
 			usersFilterСomboBox.Enabled = false;
 			mainTabControl.SelectTab(mainTabPage);
@@ -204,33 +223,58 @@ namespace TaskSchedulerForms
 			ThreadPool.QueueUserWorkItem(x => ProcessData());
 		}
 
+		private List<WorkItem> GetLeadTasks()
+		{
+			List<WorkItem> result;
+			if (s_stateContainer.WorkMode != WorkMode.Query)
+			{
+				s_stateContainer.LastWithSubTree = subTreesCheckBox.Checked;
+
+				List<string> firstList = null;
+				List<string> secondList = null;
+				secondComboBox.Invoke(new Action(() =>
+					{
+						firstList = firstListBox.Items.Cast<string>().ToList();
+						secondList = secondListBox.Items.Cast<string>().ToList();
+					}));
+				s_stateContainer.SaveChosenSecondToConfig(m_config, secondList);
+				s_stateContainer.SaveChosenSecondToState(secondList);
+
+				result = new List<WorkItem>(m_leadTasks.Count);
+				for (int i = 0; i < m_leadTasks.Count; i++)
+				{
+					var leadTask = m_leadTasks[i];
+					if (!firstList.Contains(s_stateContainer.GetParamForFirst(leadTask))
+						|| !secondList.Contains(s_stateContainer.GetParamForSecond(leadTask)))
+						continue;
+					result.Add(leadTask);
+				}
+			}
+			else
+			{
+				var items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
+				m_config.WorkMode = WorkMode.Query;
+				m_config.QueryPath = queryTextBox.Text;
+				result = new List<WorkItem>(items.Count);
+				for (int i = 0; i < items.Count; i++)
+				{
+					WorkItem item = items[i];
+					if (item.Type.Name == TfsUtils.Const.WorkItemType.LeadTask)
+						result.Add(item);
+				}
+			}
+
+			return result;
+		}
+
 		private void ProcessData()
 		{
 			s_stateContainer.LastTfsUrl = tfsUrlTextBox.Text;
-			s_stateContainer.LastWithSubTree = subTreesCheckBox.Checked;
-
-			List<string> firstList = null;
-			List<string> secondList = null;
-			secondComboBox.Invoke(new Action(() =>
-				{
-					firstList = firstListBox.Items.Cast<string>().ToList();
-					secondList = secondListBox.Items.Cast<string>().ToList();
-				}));
-			s_stateContainer.SaveChosenSecondToConfig(m_config, secondList);
-			s_stateContainer.SaveChosenSecondToState(secondList);
-
-			var leadTasks = new List<WorkItem>(m_leadTasks.Count);
-			for (int i = 0; i < m_leadTasks.Count; i++)
-			{
-				var leadTask = m_leadTasks[i];
-				if (!firstList.Contains(s_stateContainer.GetParamForFirst(leadTask))
-					|| !secondList.Contains(s_stateContainer.GetParamForSecond(leadTask)))
-					continue;
-				leadTasks.Add(leadTask);
-			}
 
 			try
 			{
+				List<WorkItem> leadTasks = GetLeadTasks();
+
 				var data = s_dataProcessor.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
@@ -245,6 +289,7 @@ namespace TaskSchedulerForms
 						usersLabel.Enabled = true;
 						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
+						queryTextBox.Enabled = true;
 						refreshButton.Enabled = true;
 						mainTabControl.SelectTab(dataTabPage);
 					}));
@@ -256,6 +301,7 @@ namespace TaskSchedulerForms
 						MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
 						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
+						queryTextBox.Enabled = true;
 					}));
 			}
 		}
@@ -269,6 +315,30 @@ namespace TaskSchedulerForms
 		private void RefreshButtonClick(object sender, EventArgs e)
 		{
 			ThreadPool.QueueUserWorkItem(x => RefreshData());
+		}
+
+		private List<WorkItem> GetLastLeadTasks()
+		{
+
+			WorkItemCollection items;
+			if (s_stateContainer.WorkMode != WorkMode.Query)
+				items = s_dataLoader.GetLeadTasks(
+					s_stateContainer.LastTfsUrl,
+					s_stateContainer.WorkMode == WorkMode.AreaFirst,
+					s_stateContainer.GetFirstList(),
+					s_stateContainer.LastWithSubTree);
+			else
+				items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
+
+			var result = new List<WorkItem>(items.Count);
+			for (int i = 0; i < items.Count; i++)
+			{
+				WorkItem item = items[i];
+				if (item.Type.Name == TfsUtils.Const.WorkItemType.LeadTask)
+					result.Add(item);
+			}
+
+			return result;
 		}
 
 		private void RefreshData()
@@ -286,24 +356,21 @@ namespace TaskSchedulerForms
 				}));
 			try
 			{
-				WorkItemCollection leadTasksCollection = s_dataLoader.GetLeadTasks(
-					s_stateContainer.LastTfsUrl,
-					s_stateContainer.IsAreaFirstMode,
-					s_stateContainer.GetFirstList(),
-					s_stateContainer.LastWithSubTree);
+				var leadTasksCollection = GetLastLeadTasks();
 
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-				var oldSecond = s_stateContainer.IsAreaFirstMode ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+				var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AllIterationPaths : m_config.AllAreaPaths;
 				var newSecond = new List<string>();
-				for (int i = 0; i < leadTasksCollection.Count; i++)
+				foreach (WorkItem leadTask in leadTasksCollection)
 				{
-					WorkItem leadTask = leadTasksCollection[i];
-					string second = s_stateContainer.GetParamForSecond(leadTask);
-					if (!oldSecond.Contains(second)
-						&& !newSecond.Contains(second))
-						newSecond.Add(second);
-					if (!s_stateContainer.IsSecondFromStateContains(second))
-						continue;
+					if (s_stateContainer.WorkMode != WorkMode.Query)
+					{
+						string second = s_stateContainer.GetParamForSecond(leadTask);
+						if (!oldSecond.Contains(second) && !newSecond.Contains(second))
+							newSecond.Add(second);
+						if (!s_stateContainer.IsSecondFromStateContains(second))
+							continue;
+					}
 					leadTasks.Add(leadTask);
 				}
 				var data = s_dataProcessor.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
@@ -455,8 +522,9 @@ namespace TaskSchedulerForms
 
 		private void ExchangeButtonClick(object sender, EventArgs e)
 		{
-			s_stateContainer.IsAreaFirstMode = !s_stateContainer.IsAreaFirstMode;
-			m_config.IsAreaFirstMode = s_stateContainer.IsAreaFirstMode;
+			s_stateContainer.WorkMode = s_stateContainer.WorkMode == WorkMode.AreaFirst ? WorkMode.IterationFirst : WorkMode.AreaFirst;
+			m_config.WorkMode = s_stateContainer.WorkMode;
+			m_config.ByArea = s_stateContainer.ByArea;
 
 			ExchangeNames();
 			var itemsCopy = new object[firstListBox.Items.Count];
@@ -477,6 +545,36 @@ namespace TaskSchedulerForms
 			string tmp = firstGroupBox.Text;
 			firstGroupBox.Text = secondGroupBox.Text;
 			secondGroupBox.Text = tmp;
+		}
+
+		private void QueryTextBoxKeyUp(object sender, KeyEventArgs e)
+		{
+			bool isQueryMode = queryTextBox.Text.Length > 0;
+			ParamsGroupBox.Enabled = !isQueryMode;
+			makeScheduleButton.Enabled = isQueryMode;
+		}
+
+		private void QueryTextBoxEnter(object sender, EventArgs e)
+		{
+			if (queryTextBox.ForeColor != Color.Gray)
+				return;
+
+			queryTextBox.ForeColor = Color.Black;
+			queryTextBox.Text = string.Empty;
+		}
+
+		private void QueryTextBoxLeave(object sender, EventArgs e)
+		{
+			bool isQueryMode = queryTextBox.Text.Length > 0;
+			s_stateContainer.WorkMode = isQueryMode
+				? WorkMode.Query
+				: (s_stateContainer.ByArea ? WorkMode.AreaFirst : WorkMode.IterationFirst);
+			if (isQueryMode)
+				return;
+
+			queryTextBox.ForeColor = Color.Gray;
+			queryTextBox.Text = Resources.QueryExample;
+			InitFirst();
 		}
 	}
 }

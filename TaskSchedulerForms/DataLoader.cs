@@ -8,6 +8,14 @@ namespace TaskSchedulerForms
 {
 	internal class DataLoader
 	{
+		internal WorkItemCollection GetLeadTasks(string tfsUrl, string queryPath)
+		{
+			using (var queryAccessor = new TfsQueryAccessor(tfsUrl))
+			{
+				return queryAccessor.QueryWorkItems(queryPath);
+			}
+		}
+
 		internal WorkItemCollection GetLeadTasks(
 			string tfsUrl,
 			bool byArea,

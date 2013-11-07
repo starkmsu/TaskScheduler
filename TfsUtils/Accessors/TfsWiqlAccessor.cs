@@ -8,17 +8,27 @@ namespace TfsUtils.Accessors
 	public class TfsWiqlAccessor : IDisposable
 	{
 		private readonly WorkItemStore m_workItemStore;
+		private readonly bool m_shouldDisposeOfAccessor;
 		private readonly TfsAccessor m_tfsAccessor;
 
 		public TfsWiqlAccessor(string tfsUrl)
 		{
 			m_tfsAccessor = new TfsAccessor(tfsUrl);
+			m_shouldDisposeOfAccessor = true;
+			m_workItemStore = m_tfsAccessor.GetWorkItemStore();
+		}
+
+		public TfsWiqlAccessor(TfsAccessor tfsAccessor)
+		{
+			m_tfsAccessor = tfsAccessor;
+			m_shouldDisposeOfAccessor = false;
 			m_workItemStore = m_tfsAccessor.GetWorkItemStore();
 		}
 
 		public void Dispose()
 		{
-			m_tfsAccessor.Dispose();
+			if (m_shouldDisposeOfAccessor)
+				m_tfsAccessor.Dispose();
 		}
 
 		public string AddUsersConditions(string wiqlString, List<string> users)
@@ -57,19 +67,6 @@ namespace TfsUtils.Accessors
 			var query = new Query(m_workItemStore, wiqlString, paramValues);
 
 			return query.RunQuery();
-		}
-
-		public WorkItemLinkInfo[] QueryLinks(
-			string wiqlString,
-			Dictionary<string, object> paramValues,
-			Dictionary<string, List<object>> complexParamValues)
-		{
-			if (complexParamValues != null && complexParamValues.Count > 0)
-				wiqlString = UpdateParams(wiqlString, paramValues, complexParamValues);
-
-			var query = new Query(m_workItemStore, wiqlString, paramValues);
-
-			return query.RunLinkQuery();
 		}
 
 		private string UpdateParams(
