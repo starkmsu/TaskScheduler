@@ -22,11 +22,14 @@ namespace TaskSchedulerForms
 
 		public bool WithSubAreaPaths { get; set; }
 
+		public bool IsAreaFirstMode { get; set; }
+
 		public Config()
 		{
 			TfsUrl = "https://tfs.sts.sitronics.com/sts";
 			Holidays = new List<DateTime>();
 			Vacations = new List<VacationData>();
+			IsAreaFirstMode = true;
 		}
 	}
 }

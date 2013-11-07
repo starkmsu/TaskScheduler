@@ -32,9 +32,15 @@ namespace TaskSchedulerForms
 		internal void SaveAllSecondToConfig(Config config, List<string> values)
 		{
 			if (IsAreaFirstMode)
+			{
 				config.AllIterationPaths = values;
+				config.AllAreaPaths = null;
+			}
 			else
+			{
 				config.AllAreaPaths = values;
+				config.AllIterationPaths = null;
+			}
 		}
 
 		internal void SaveChosenSecondToConfig(Config config, List<string> values)

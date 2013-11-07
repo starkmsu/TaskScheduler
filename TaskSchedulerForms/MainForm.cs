@@ -39,14 +39,6 @@ namespace TaskSchedulerForms
 			m_holidays = m_config.Holidays;
 			s_dataPresenter.SetHolidays(m_holidays);
 
-			tfsUrlTextBox.Text = m_config.TfsUrl;
-			if (m_config.AreaPaths != null && m_config.AreaPaths.Count > 0)
-			{
-				firstTextBox.Text = m_config.AreaPaths[0];
-				m_config.AreaPaths.ForEach(i => firstListBox.Items.Add(i));
-			}
-			subTreesCheckBox.Checked = m_config.WithSubAreaPaths;
-
 			UpdateHolidays();
 
 			if (m_config.Vacations.Count > 0)
@@ -57,6 +49,18 @@ namespace TaskSchedulerForms
 				usersVacationsComboBox.DataSource = vacationsUsers;
 				s_dataPresenter.SetVacations(m_config.Vacations);
 			}
+
+			tfsUrlTextBox.Text = m_config.TfsUrl;
+			subTreesCheckBox.Checked = m_config.WithSubAreaPaths;
+			s_stateContainer.IsAreaFirstMode = m_config.IsAreaFirstMode;
+			List<string> firstList = m_config.IsAreaFirstMode ? m_config.AreaPaths : m_config.IterationPaths;
+			if (firstList != null && firstList.Count > 0)
+			{
+				firstTextBox.Text = firstList[0];
+				firstList.ForEach(i => firstListBox.Items.Add(i));
+			}
+			if (!m_config.IsAreaFirstMode)
+				ExchangeNames();
 		}
 
 		private void UpdateHolidays()
@@ -452,9 +456,9 @@ namespace TaskSchedulerForms
 		private void ExchangeButtonClick(object sender, EventArgs e)
 		{
 			s_stateContainer.IsAreaFirstMode = !s_stateContainer.IsAreaFirstMode;
-			string tmp = firstGroupBox.Text;
-			firstGroupBox.Text = secondGroupBox.Text;
-			secondGroupBox.Text = tmp;
+			m_config.IsAreaFirstMode = s_stateContainer.IsAreaFirstMode;
+
+			ExchangeNames();
 			var itemsCopy = new object[firstListBox.Items.Count];
 			firstTextBox.Text = secondListBox.Items.Count > 0
 				? secondListBox.Items[0].ToString()
@@ -466,6 +470,13 @@ namespace TaskSchedulerForms
 			secondListBox.Items.AddRange(itemsCopy);
 			secondComboBox.Text = string.Empty;
 			secondComboBox.DataSource = itemsCopy;
+		}
+
+		private void ExchangeNames()
+		{
+			string tmp = firstGroupBox.Text;
+			firstGroupBox.Text = secondGroupBox.Text;
+			secondGroupBox.Text = tmp;
 		}
 	}
 }
