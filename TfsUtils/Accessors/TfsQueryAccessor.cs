@@ -40,7 +40,7 @@ namespace TfsUtils.Accessors
 			if (item == null)
 				throw new InvalidOperationException("Invalid Query Path.");
 
-			string queryText = m_workItemStore.GetQueryDefinition(item.Id).QueryText;
+			string queryText = m_workItemStore.GetQueryDefinition(item.Id).QueryText.Replace("@project", "'" + project.Name + "'");
 			var query = new Query(m_workItemStore, queryText);
 			if (query.IsLinkQuery)
 			{

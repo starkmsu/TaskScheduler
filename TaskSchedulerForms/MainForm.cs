@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Properties;
+using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms
 {
@@ -253,6 +254,7 @@ namespace TaskSchedulerForms
 			else
 			{
 				var items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
+				m_config.TfsUrl = tfsUrlTextBox.Text;
 				m_config.WorkMode = WorkMode.Query;
 				m_config.QueryPath = queryTextBox.Text;
 				result = new List<WorkItem>(items.Count);
@@ -262,6 +264,7 @@ namespace TaskSchedulerForms
 					if (item.Type.Name == TfsUtils.Const.WorkItemType.LeadTask)
 						result.Add(item);
 				}
+				result = result.OrderBy(i => i.Priority()).ToList();
 			}
 
 			return result;
