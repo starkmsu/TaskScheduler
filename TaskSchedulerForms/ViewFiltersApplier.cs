@@ -14,7 +14,7 @@ namespace TaskSchedulerForms
 		private readonly Dictionary<int, int> m_taskToLeadTaskIndexesDict = new Dictionary<int, int>();
 		private readonly Dictionary<int, List<int>> m_leadTaskToTaskIndexesDict = new Dictionary<int, List<int>>();
 		private readonly Dictionary<string, List<int>> m_usersTasksIndexesDict = new Dictionary<string, List<int>>();
-		private readonly Dictionary<int, int> m_blockersIndexesDict = new Dictionary<int, int>();
+		private readonly Dictionary<int, List<int>> m_blockersIndexesDict = new Dictionary<int, List<int>>();
 
 		private string m_filteringUser;
 		private bool m_filterByDevCompleted;
@@ -30,7 +30,7 @@ namespace TaskSchedulerForms
 			Dictionary<int, int> taskToLeadTasksIndexesDict,
 			Dictionary<int, List<int>> leadTaskToTaskIndexesDict,
 			Dictionary<string, List<int>> usersTasksIndexesDict,
-			Dictionary<int, int> blockersIndexesDict)
+			Dictionary<int, List<int>> blockersIndexesDict)
 		{
 			m_dataGridView = dataGridView;
 
@@ -120,7 +120,7 @@ namespace TaskSchedulerForms
 			{
 				var blockersIndexes = result
 					.Where(i => m_blockersIndexesDict.ContainsKey(i))
-					.Select(i => m_blockersIndexesDict[i])
+					.SelectMany(i => m_blockersIndexesDict[i])
 					.ToList();
 				result.AddRange(blockersIndexes);
 			}

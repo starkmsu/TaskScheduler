@@ -16,7 +16,7 @@ namespace TaskSchedulerForms
 		private readonly Dictionary<int, int> m_taskToLeadTaskIndexesDict = new Dictionary<int, int>();
 		private readonly Dictionary<int, List<int>> m_leadTaskToTaskIndexesDict = new Dictionary<int, List<int>>();
 		private readonly Dictionary<string, List<int>> m_usersTasksIndexesDict = new Dictionary<string, List<int>>();
-		private readonly Dictionary<int, int> m_blockersIndexesDict = new Dictionary<int, int>(); 
+		private readonly Dictionary<int, List<int>> m_blockersIndexesDict = new Dictionary<int, List<int>>();
 
 		private int m_currentLeadTaskRowIndex;
 		private int m_currentRowIndex;
@@ -72,7 +72,10 @@ namespace TaskSchedulerForms
 		internal void MarkBlockerRow(DataGridViewRow row)
 		{
 			int index = m_dataGridView.Rows.IndexOf(row);
-			m_blockersIndexesDict[m_currentRowIndex] = index;
+			if (m_blockersIndexesDict.ContainsKey(m_currentRowIndex))
+				m_blockersIndexesDict[m_currentRowIndex].Add(index);
+			else
+				m_blockersIndexesDict.Add(m_currentRowIndex, new List<int> {index});
 		}
 
 		internal ViewFiltersApplier Build()
