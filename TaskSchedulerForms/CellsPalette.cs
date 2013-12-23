@@ -16,7 +16,7 @@ namespace TaskSchedulerForms
 
 		internal static Color StateDevCompleted = Color.Green;
 
-		internal static Color Holiday = Color.LightGray;
+		internal static Color FreeDay = Color.LightGray;
 
 		internal static Color WeekEnd = Color.Gray;
 	}

@@ -93,7 +93,7 @@ namespace TaskSchedulerForms
 					continue;
 				var column = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex + ind];
 				var color = m_holidays.Contains(i)
-					? CellsPalette.Holiday
+					? CellsPalette.FreeDay
 					: scheduleDataGridView.Columns[1].HeaderCell.Style.BackColor;
 				column.HeaderCell.Style.BackColor = column.DefaultCellStyle.BackColor = color;
 			}
@@ -101,7 +101,6 @@ namespace TaskSchedulerForms
 
 		private void LoadLeadTasksButtonClick(object sender, EventArgs e)
 		{
-			holidaysButton.Enabled = false;
 			subTreesCheckBox.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
 			refreshButton.Enabled = false;
@@ -130,7 +129,6 @@ namespace TaskSchedulerForms
 				secondComboBox.Invoke(new Action(() =>
 					{
 						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
-						holidaysButton.Enabled = true;
 						subTreesCheckBox.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
@@ -213,6 +211,7 @@ namespace TaskSchedulerForms
 			makeScheduleButton.Enabled = false;
 			loadLeadTasksButton.Enabled = false;
 			queryTextBox.Enabled = false;
+			holidaysButton.Enabled = false;
 
 			usersLabel.Enabled = false;
 			usersFilterСomboBox.Enabled = false;
@@ -292,6 +291,7 @@ namespace TaskSchedulerForms
 						usersLabel.Enabled = true;
 						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
+						holidaysButton.Enabled = true;
 						queryTextBox.Enabled = true;
 						refreshButton.Enabled = true;
 						mainTabControl.SelectTab(dataTabPage);

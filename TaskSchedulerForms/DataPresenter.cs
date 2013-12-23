@@ -481,7 +481,7 @@ namespace TaskSchedulerForms
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
 				if (vacationsDays.Any(d => d == i))
-					row.Cells[ind].Style.BackColor = CellsPalette.WeekEnd;
+					row.Cells[ind].Style.BackColor = CellsPalette.FreeDay;
 				++ind;
 			}
 		}
