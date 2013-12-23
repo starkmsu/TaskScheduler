@@ -9,6 +9,8 @@ namespace TaskSchedulerForms
 		private const string s_oldConfigFileName = "config.cfg";
 		private const string s_configExtension = "cfg";
 
+		private static Config m_lastConfig;
+
 		internal static Config LoadConfig()
 		{
 			string userAppDaraPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -32,7 +34,10 @@ namespace TaskSchedulerForms
 				try
 				{
 					var configObj = new XmlSerializer(typeof(Config)).Deserialize(fs);
-					return configObj as Config;
+					var config = configObj as Config;
+					if (config != null)
+						m_lastConfig = config.Copy();
+					return config;
 				}
 				catch (Exception)
 				{
@@ -43,6 +48,9 @@ namespace TaskSchedulerForms
 
 		internal static void SaveConfig(Config config)
 		{
+			if (config.Equals(m_lastConfig))
+				return;
+
 			string userAppDaraPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			string appName = AppDomain.CurrentDomain.FriendlyName;
 			while (appName.Contains("."))
@@ -54,15 +62,8 @@ namespace TaskSchedulerForms
 
 			using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write))
 			{
-				try
-				{
-					var serializer = new XmlSerializer(typeof(Config));
-					serializer.Serialize(fs, config);
-				}
-				catch (Exception)
-				{
-					throw;
-				}
+				var serializer = new XmlSerializer(typeof(Config));
+				serializer.Serialize(fs, config);
 			}
 		}
 	}
