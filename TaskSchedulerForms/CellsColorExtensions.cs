@@ -38,6 +38,16 @@ namespace TaskSchedulerForms
 			cell.Style.BackColor = CellsPalette.Warning;
 		}
 
+		internal static void SetWeekEndColor(this DataGridViewCell cell)
+		{
+			cell.Style.BackColor = CellsPalette.WeekEnd;
+		}
+
+		internal static void SetFreeDayColor(this DataGridViewCell cell)
+		{
+			cell.Style.BackColor = CellsPalette.FreeDay;
+		}
+
 		internal static bool IsColorForState(this DataGridViewCell cell, string state)
 		{
 			if (state == WorkItemState.Proposed || state == WorkItemState.ToDo)

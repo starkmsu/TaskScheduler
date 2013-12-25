@@ -13,12 +13,13 @@ namespace TaskSchedulerForms
 	internal class DataPresenter
 	{
 		private const double m_focusFactor = 0.5f;
-		
+		private const string m_proposedLtMark = "O";
+		private const string m_activeLtMark = "X";
 		private readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
 
-		private List<DateTime> m_holidays;
-
 		private Dictionary<string, List<DateTime>> m_vacations = new Dictionary<string, List<DateTime>>(0);
+
+		private List<DateTime> m_holidays;
 
 		internal void SetHolidays(List<DateTime> holidays)
 		{
@@ -160,14 +161,14 @@ namespace TaskSchedulerForms
 					leadTask,
 					leadTaskRow,
 					viewColumnsIndexes.FirstDateColumnIndex,
-					"O",
+					m_proposedLtMark,
 					shouldCheckEstimate);
 			return AddDatesActive(
 				viewColumnsIndexes,
 				leadTask,
 				leadTaskRow,
 				viewColumnsIndexes.FirstDateColumnIndex,
-				"X");
+				m_activeLtMark);
 		}
 
 		private void AddBlockerRow(
@@ -368,13 +369,8 @@ namespace TaskSchedulerForms
 				for (int i = indStart; i <= indFinish; i++)
 				{
 					DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
-					if (IsHoliday(date))
+					if (ColorCellIfFreeDay(row.Cells[i], date, userMark))
 						continue;
-					if (IsVacation(date, userMark))
-					{
-						row.Cells[i].Style.BackColor = CellsPalette.WeekEnd;
-						continue;
-					}
 					row.Cells[i].Value = userMark;
 				}
 				return indFinish + 1;
@@ -411,7 +407,7 @@ namespace TaskSchedulerForms
 				while (finishShift > 0 && startDate >= today)
 				{
 					startDate = startDate.AddDays(-1);
-					if (!IsHoliday(startDate))
+					if (!IsFreeDay(startDate, userMark))
 						--finishShift;
 				}
 				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
@@ -438,19 +434,14 @@ namespace TaskSchedulerForms
 			int ind = 0;
 			while (length > 0)
 			{
-				var date = DateTime.Now.AddDays(startInd - viewColumnsIndexes.FirstDateColumnIndex + ind);
-				if (IsHoliday(date))
-				{
-					++ind;
-					continue;
-				}
-				if (startInd - viewColumnsIndexes.FirstDateColumnIndex + ind > m_maxInd)
+				int dateIndexShift = startInd - viewColumnsIndexes.FirstDateColumnIndex + ind;
+				if (dateIndexShift > m_maxInd)
 					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+				var date = DateTime.Now.AddDays(dateIndexShift);
 				var cell = row.Cells[startInd + ind];
-				if (IsVacation(date, userMark))
+				if (ColorCellIfFreeDay(cell, date, userMark))
 				{
 					++ind;
-					cell.Style.BackColor = CellsPalette.WeekEnd;
 					continue;
 				}
 				if (cell.Value == null)
@@ -481,7 +472,7 @@ namespace TaskSchedulerForms
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
 				if (vacationsDays.Any(d => d == i))
-					row.Cells[ind].Style.BackColor = CellsPalette.FreeDay;
+					row.Cells[ind].SetFreeDayColor();
 				++ind;
 			}
 		}
@@ -497,12 +488,43 @@ namespace TaskSchedulerForms
 			return m_holidays.Contains(date);
 		}
 
-		private bool IsVacation(DateTime dateTime, string user)
+		private bool ColorCellIfFreeDay(DataGridViewCell cell, DateTime dateTime, string user)
 		{
-			if (!m_vacations.ContainsKey(user) || m_vacations[user].Count == 0)
-				return false;
 			var date = dateTime.Date;
-			return m_vacations[user].Any(v => v == date);
+			var dayOfWeek = date.DayOfWeek;
+			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
+			{
+				cell.SetWeekEndColor();
+				return true;
+			}
+			if (m_holidays != null && m_holidays.Contains(date))
+			{
+				cell.SetFreeDayColor();
+				return true;
+			}
+			if (m_vacations != null
+				&& m_vacations.ContainsKey(user)
+				&& m_vacations[user].Any(v => v == date))
+			{
+				cell.SetFreeDayColor();
+				return true;
+			}
+			return false;
+		}
+
+		private bool IsFreeDay(DateTime dateTime, string user)
+		{
+			var date = dateTime.Date;
+			var dayOfWeek = date.DayOfWeek;
+			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
+				return true;
+			if (m_holidays != null && m_holidays.Contains(date))
+				return true;
+			if (m_vacations != null
+				&& m_vacations.ContainsKey(user)
+				&& m_vacations[user].Any(v => v == date))
+				return true;
+			return false;
 		}
 	}
 }
