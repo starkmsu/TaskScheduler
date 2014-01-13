@@ -77,6 +77,7 @@ namespace TaskSchedulerForms
 								viewColumnsIndexes,
 								task,
 								childrenTasks,
+								leadTask.Priority(),
 								data,
 								alreadyAdded,
 								tasksByUser))
@@ -194,6 +195,7 @@ namespace TaskSchedulerForms
 			ViewColumnsIndexes viewColumnsIndexes,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
+			int? leadTaskPriority,
 			DataContainer data,
 			Dictionary<int, int> alreadyAdded,
 			Dictionary<string, int> tasksByUser)
@@ -211,6 +213,7 @@ namespace TaskSchedulerForms
 				data,
 				task,
 				childrenTasks,
+				leadTaskPriority,
 				alreadyAdded,
 				nextInds,
 				tasksByUser);
@@ -221,6 +224,7 @@ namespace TaskSchedulerForms
 			string assignedTo = workItemInfoFiller.FillTaskInfo(
 				viewFiltersBuilder,
 				task,
+				leadTaskPriority,
 				taskRow,
 				data,
 				blockerIds);
@@ -282,6 +286,7 @@ namespace TaskSchedulerForms
 			DataContainer data,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
+			int? leadTaskPriority,
 			Dictionary<int, int> alreadyAdded,
 			List<int> nextInds,
 			Dictionary<string, int> tasksByUser)
@@ -313,6 +318,7 @@ namespace TaskSchedulerForms
 						viewColumnsIndexes,
 						blockerSiblingTask,
 						childrenTasks,
+						leadTaskPriority,
 						data,
 						alreadyAdded,
 						tasksByUser);

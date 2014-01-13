@@ -114,14 +114,22 @@ namespace TaskSchedulerForms
 		internal string FillTaskInfo(
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
+			int? leadTaskPriority,
 			DataGridViewRow taskRow,
 			DataContainer data,
 			List<int> blockerIds)
 		{
-			var priorityCell = taskRow.Cells[0];
+			var priorityCell = taskRow.Cells[m_viewColumnsIndexes.PriorityColumnIndex];
 			priorityCell.Value = task.Priority();
 			priorityCell.SetColorByState(task);
 			priorityCell.ToolTipText = task.State;
+
+			if (leadTaskPriority.HasValue && task.Priority() > leadTaskPriority.Value)
+			{
+				var priorityWarningCell = taskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
+				priorityWarningCell.SetWarningColor();
+				priorityWarningCell.ToolTipText = Messages.TaskHasPriorityLowerThanLT();
+			}
 
 			var titleCell = taskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];
 			titleCell.Value = task.Id + " " + task.Title;
@@ -129,8 +137,8 @@ namespace TaskSchedulerForms
 				task.Discipline() + " "
 				+ task.Title + " "
 				+ (task.State == WorkItemState.Active
-					? "Remaining " + task.Remaining().ToString()
-					: "Estimate " + task.Estimate().ToString());
+					? "Remaining " + task.Remaining()
+					: "Estimate " + task.Estimate());
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
 			var blockersCell = taskRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex];

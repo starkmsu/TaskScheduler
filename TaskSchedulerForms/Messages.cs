@@ -51,5 +51,10 @@
 		{
 			return "LeadTask has no child tasks";
 		}
+
+		internal static string TaskHasPriorityLowerThanLT()
+		{
+			return "Task has priority lower than LeadTask";
+		}
 	}
 }
