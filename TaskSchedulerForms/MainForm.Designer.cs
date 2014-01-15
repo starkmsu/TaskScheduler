@@ -51,6 +51,7 @@
 			this.queryLabel = new System.Windows.Forms.Label();
 			this.queryTextBox = new System.Windows.Forms.TextBox();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.showIterationCheckBox = new System.Windows.Forms.CheckBox();
 			this.expandBlockersCheckBox = new System.Windows.Forms.CheckBox();
 			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
 			this.devCmpletedCheckBox = new System.Windows.Forms.CheckBox();
@@ -58,13 +59,6 @@
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
-			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.settingsPage = new System.Windows.Forms.TabPage();
 			this.vacationsButton = new System.Windows.Forms.Button();
 			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
@@ -72,6 +66,14 @@
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Iteration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -92,7 +94,7 @@
 			this.mainTabControl.Location = new System.Drawing.Point(0, 0);
 			this.mainTabControl.Name = "mainTabControl";
 			this.mainTabControl.SelectedIndex = 0;
-			this.mainTabControl.Size = new System.Drawing.Size(582, 528);
+			this.mainTabControl.Size = new System.Drawing.Size(887, 574);
 			this.mainTabControl.TabIndex = 0;
 			// 
 			// mainTabPage
@@ -104,7 +106,7 @@
 			this.mainTabPage.Location = new System.Drawing.Point(4, 22);
 			this.mainTabPage.Name = "mainTabPage";
 			this.mainTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.mainTabPage.Size = new System.Drawing.Size(574, 502);
+			this.mainTabPage.Size = new System.Drawing.Size(879, 548);
 			this.mainTabPage.TabIndex = 1;
 			this.mainTabPage.Text = "Main";
 			this.mainTabPage.UseVisualStyleBackColor = true;
@@ -116,7 +118,7 @@
 			this.orLabel.BackColor = System.Drawing.Color.Transparent;
 			this.orLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.orLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.orLabel.Location = new System.Drawing.Point(266, 416);
+			this.orLabel.Location = new System.Drawing.Point(416, 414);
 			this.orLabel.Name = "orLabel";
 			this.orLabel.Size = new System.Drawing.Size(35, 22);
 			this.orLabel.TabIndex = 19;
@@ -126,7 +128,7 @@
 			// 
 			this.makeScheduleButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
 			this.makeScheduleButton.Enabled = false;
-			this.makeScheduleButton.Location = new System.Drawing.Point(230, 475);
+			this.makeScheduleButton.Location = new System.Drawing.Point(385, 474);
 			this.makeScheduleButton.Name = "makeScheduleButton";
 			this.makeScheduleButton.Size = new System.Drawing.Size(107, 23);
 			this.makeScheduleButton.TabIndex = 4;
@@ -146,14 +148,14 @@
 			this.ParamsGroupBox.Controls.Add(this.exchangeButton);
 			this.ParamsGroupBox.Location = new System.Drawing.Point(3, 1);
 			this.ParamsGroupBox.Name = "ParamsGroupBox";
-			this.ParamsGroupBox.Size = new System.Drawing.Size(568, 410);
+			this.ParamsGroupBox.Size = new System.Drawing.Size(873, 410);
 			this.ParamsGroupBox.TabIndex = 18;
 			this.ParamsGroupBox.TabStop = false;
 			// 
 			// loadLeadTasksButton
 			// 
 			this.loadLeadTasksButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.loadLeadTasksButton.Location = new System.Drawing.Point(230, 177);
+			this.loadLeadTasksButton.Location = new System.Drawing.Point(382, 177);
 			this.loadLeadTasksButton.Name = "loadLeadTasksButton";
 			this.loadLeadTasksButton.Size = new System.Drawing.Size(107, 23);
 			this.loadLeadTasksButton.TabIndex = 5;
@@ -171,7 +173,7 @@
 			this.firstGroupBox.Controls.Add(this.firstTextBox);
 			this.firstGroupBox.Location = new System.Drawing.Point(6, 10);
 			this.firstGroupBox.Name = "firstGroupBox";
-			this.firstGroupBox.Size = new System.Drawing.Size(555, 162);
+			this.firstGroupBox.Size = new System.Drawing.Size(860, 162);
 			this.firstGroupBox.TabIndex = 14;
 			this.firstGroupBox.TabStop = false;
 			this.firstGroupBox.Text = "Area";
@@ -179,7 +181,7 @@
 			// firstRemoveButton
 			// 
 			this.firstRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstRemoveButton.Location = new System.Drawing.Point(474, 16);
+			this.firstRemoveButton.Location = new System.Drawing.Point(779, 16);
 			this.firstRemoveButton.Name = "firstRemoveButton";
 			this.firstRemoveButton.Size = new System.Drawing.Size(75, 23);
 			this.firstRemoveButton.TabIndex = 8;
@@ -190,7 +192,7 @@
 			// firstAddButton
 			// 
 			this.firstAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstAddButton.Location = new System.Drawing.Point(406, 16);
+			this.firstAddButton.Location = new System.Drawing.Point(711, 16);
 			this.firstAddButton.Name = "firstAddButton";
 			this.firstAddButton.Size = new System.Drawing.Size(62, 23);
 			this.firstAddButton.TabIndex = 7;
@@ -206,7 +208,7 @@
 			this.firstListBox.FormattingEnabled = true;
 			this.firstListBox.Location = new System.Drawing.Point(6, 44);
 			this.firstListBox.Name = "firstListBox";
-			this.firstListBox.Size = new System.Drawing.Size(543, 108);
+			this.firstListBox.Size = new System.Drawing.Size(848, 108);
 			this.firstListBox.TabIndex = 6;
 			// 
 			// firstTextBox
@@ -215,7 +217,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.firstTextBox.Location = new System.Drawing.Point(6, 18);
 			this.firstTextBox.Name = "firstTextBox";
-			this.firstTextBox.Size = new System.Drawing.Size(394, 20);
+			this.firstTextBox.Size = new System.Drawing.Size(699, 20);
 			this.firstTextBox.TabIndex = 3;
 			// 
 			// secondGroupBox
@@ -229,7 +231,7 @@
 			this.secondGroupBox.Controls.Add(this.secondComboBox);
 			this.secondGroupBox.Location = new System.Drawing.Point(6, 206);
 			this.secondGroupBox.Name = "secondGroupBox";
-			this.secondGroupBox.Size = new System.Drawing.Size(555, 201);
+			this.secondGroupBox.Size = new System.Drawing.Size(860, 201);
 			this.secondGroupBox.TabIndex = 15;
 			this.secondGroupBox.TabStop = false;
 			this.secondGroupBox.Text = "Iteration";
@@ -238,7 +240,7 @@
 			// 
 			this.secondRemoveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.secondRemoveButton.Enabled = false;
-			this.secondRemoveButton.Location = new System.Drawing.Point(474, 17);
+			this.secondRemoveButton.Location = new System.Drawing.Point(779, 17);
 			this.secondRemoveButton.Name = "secondRemoveButton";
 			this.secondRemoveButton.Size = new System.Drawing.Size(75, 23);
 			this.secondRemoveButton.TabIndex = 10;
@@ -254,14 +256,14 @@
 			this.secondListBox.FormattingEnabled = true;
 			this.secondListBox.Location = new System.Drawing.Point(6, 48);
 			this.secondListBox.Name = "secondListBox";
-			this.secondListBox.Size = new System.Drawing.Size(543, 134);
+			this.secondListBox.Size = new System.Drawing.Size(848, 134);
 			this.secondListBox.TabIndex = 9;
 			// 
 			// secondAddButton
 			// 
 			this.secondAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.secondAddButton.Enabled = false;
-			this.secondAddButton.Location = new System.Drawing.Point(406, 17);
+			this.secondAddButton.Location = new System.Drawing.Point(711, 17);
 			this.secondAddButton.Name = "secondAddButton";
 			this.secondAddButton.Size = new System.Drawing.Size(62, 23);
 			this.secondAddButton.TabIndex = 8;
@@ -277,7 +279,7 @@
 			this.secondComboBox.FormattingEnabled = true;
 			this.secondComboBox.Location = new System.Drawing.Point(6, 19);
 			this.secondComboBox.Name = "secondComboBox";
-			this.secondComboBox.Size = new System.Drawing.Size(394, 21);
+			this.secondComboBox.Size = new System.Drawing.Size(699, 21);
 			this.secondComboBox.TabIndex = 6;
 			// 
 			// subTreesCheckBox
@@ -286,7 +288,7 @@
 			this.subTreesCheckBox.AutoSize = true;
 			this.subTreesCheckBox.Checked = true;
 			this.subTreesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.subTreesCheckBox.Location = new System.Drawing.Point(343, 181);
+			this.subTreesCheckBox.Location = new System.Drawing.Point(495, 181);
 			this.subTreesCheckBox.Name = "subTreesCheckBox";
 			this.subTreesCheckBox.Size = new System.Drawing.Size(92, 17);
 			this.subTreesCheckBox.TabIndex = 16;
@@ -298,7 +300,7 @@
 			this.exchangeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.exchangeButton.Image = global::TaskSchedulerForms.Properties.Resources.Exchange;
 			this.exchangeButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.exchangeButton.Location = new System.Drawing.Point(480, 177);
+			this.exchangeButton.Location = new System.Drawing.Point(785, 177);
 			this.exchangeButton.Name = "exchangeButton";
 			this.exchangeButton.Size = new System.Drawing.Size(75, 23);
 			this.exchangeButton.TabIndex = 17;
@@ -315,7 +317,7 @@
 			this.queryGroupBox.Controls.Add(this.queryTextBox);
 			this.queryGroupBox.Location = new System.Drawing.Point(3, 437);
 			this.queryGroupBox.Name = "queryGroupBox";
-			this.queryGroupBox.Size = new System.Drawing.Size(568, 36);
+			this.queryGroupBox.Size = new System.Drawing.Size(873, 36);
 			this.queryGroupBox.TabIndex = 22;
 			this.queryGroupBox.TabStop = false;
 			// 
@@ -336,7 +338,7 @@
 			this.queryTextBox.ForeColor = System.Drawing.Color.Gray;
 			this.queryTextBox.Location = new System.Drawing.Point(96, 11);
 			this.queryTextBox.Name = "queryTextBox";
-			this.queryTextBox.Size = new System.Drawing.Size(459, 20);
+			this.queryTextBox.Size = new System.Drawing.Size(764, 20);
 			this.queryTextBox.TabIndex = 20;
 			this.queryTextBox.Text = "example: FORIS_Mobile/My Queries/My query";
 			this.queryTextBox.Enter += new System.EventHandler(this.QueryTextBoxEnter);
@@ -345,6 +347,7 @@
 			// 
 			// dataTabPage
 			// 
+			this.dataTabPage.Controls.Add(this.showIterationCheckBox);
 			this.dataTabPage.Controls.Add(this.expandBlockersCheckBox);
 			this.dataTabPage.Controls.Add(this.ltOnlyCheckBox);
 			this.dataTabPage.Controls.Add(this.devCmpletedCheckBox);
@@ -355,10 +358,21 @@
 			this.dataTabPage.Location = new System.Drawing.Point(4, 22);
 			this.dataTabPage.Name = "dataTabPage";
 			this.dataTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.dataTabPage.Size = new System.Drawing.Size(574, 502);
+			this.dataTabPage.Size = new System.Drawing.Size(879, 548);
 			this.dataTabPage.TabIndex = 0;
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
+			// 
+			// showIterationCheckBox
+			// 
+			this.showIterationCheckBox.AutoSize = true;
+			this.showIterationCheckBox.Location = new System.Drawing.Point(683, 8);
+			this.showIterationCheckBox.Name = "showIterationCheckBox";
+			this.showIterationCheckBox.Size = new System.Drawing.Size(94, 17);
+			this.showIterationCheckBox.TabIndex = 15;
+			this.showIterationCheckBox.Text = "Show Iteration";
+			this.showIterationCheckBox.UseVisualStyleBackColor = true;
+			this.showIterationCheckBox.CheckedChanged += new System.EventHandler(this.ShowIterationCheckBoxCheckedChanged);
 			// 
 			// expandBlockersCheckBox
 			// 
@@ -437,6 +451,7 @@
 			this.scheduleDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.scheduleDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Priority,
+            this.Iteration,
             this.LeadTask,
             this.Docs,
             this.Task,
@@ -448,8 +463,66 @@
 			this.scheduleDataGridView.Name = "scheduleDataGridView";
 			this.scheduleDataGridView.ReadOnly = true;
 			this.scheduleDataGridView.RowHeadersVisible = false;
-			this.scheduleDataGridView.Size = new System.Drawing.Size(575, 473);
+			this.scheduleDataGridView.Size = new System.Drawing.Size(880, 519);
 			this.scheduleDataGridView.TabIndex = 0;
+			// 
+			// settingsPage
+			// 
+			this.settingsPage.Controls.Add(this.vacationsButton);
+			this.settingsPage.Controls.Add(this.usersVacationsComboBox);
+			this.settingsPage.Controls.Add(this.holidaysButton);
+			this.settingsPage.Controls.Add(this.tfsUrlTextBox);
+			this.settingsPage.Controls.Add(this.tfsUrlLabel);
+			this.settingsPage.Location = new System.Drawing.Point(4, 22);
+			this.settingsPage.Name = "settingsPage";
+			this.settingsPage.Size = new System.Drawing.Size(879, 548);
+			this.settingsPage.TabIndex = 2;
+			this.settingsPage.Text = "Settings";
+			this.settingsPage.UseVisualStyleBackColor = true;
+			// 
+			// vacationsButton
+			// 
+			this.vacationsButton.Location = new System.Drawing.Point(302, 67);
+			this.vacationsButton.Name = "vacationsButton";
+			this.vacationsButton.Size = new System.Drawing.Size(158, 23);
+			this.vacationsButton.TabIndex = 14;
+			this.vacationsButton.Text = "Configure Vacations";
+			this.vacationsButton.UseVisualStyleBackColor = true;
+			this.vacationsButton.Click += new System.EventHandler(this.VacationsButtonClick);
+			// 
+			// usersVacationsComboBox
+			// 
+			this.usersVacationsComboBox.FormattingEnabled = true;
+			this.usersVacationsComboBox.Location = new System.Drawing.Point(8, 69);
+			this.usersVacationsComboBox.Name = "usersVacationsComboBox";
+			this.usersVacationsComboBox.Size = new System.Drawing.Size(288, 21);
+			this.usersVacationsComboBox.TabIndex = 13;
+			// 
+			// holidaysButton
+			// 
+			this.holidaysButton.Location = new System.Drawing.Point(8, 40);
+			this.holidaysButton.Name = "holidaysButton";
+			this.holidaysButton.Size = new System.Drawing.Size(117, 23);
+			this.holidaysButton.TabIndex = 12;
+			this.holidaysButton.Text = "Configure holidays";
+			this.holidaysButton.UseVisualStyleBackColor = true;
+			this.holidaysButton.Click += new System.EventHandler(this.HolidaysButtonClick);
+			// 
+			// tfsUrlTextBox
+			// 
+			this.tfsUrlTextBox.Location = new System.Drawing.Point(55, 14);
+			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
+			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
+			this.tfsUrlTextBox.TabIndex = 11;
+			// 
+			// tfsUrlLabel
+			// 
+			this.tfsUrlLabel.AutoSize = true;
+			this.tfsUrlLabel.Location = new System.Drawing.Point(5, 17);
+			this.tfsUrlLabel.Name = "tfsUrlLabel";
+			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
+			this.tfsUrlLabel.TabIndex = 10;
+			this.tfsUrlLabel.Text = "TFS url:";
 			// 
 			// Priority
 			// 
@@ -460,6 +533,16 @@
 			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			this.Priority.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Priority.Width = 30;
+			// 
+			// Iteration
+			// 
+			this.Iteration.Frozen = true;
+			this.Iteration.HeaderText = "Iteration";
+			this.Iteration.Name = "Iteration";
+			this.Iteration.ReadOnly = true;
+			this.Iteration.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Iteration.Visible = false;
+			this.Iteration.Width = 180;
 			// 
 			// LeadTask
 			// 
@@ -518,69 +601,11 @@
 			this.Past.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Past.Width = 40;
 			// 
-			// settingsPage
-			// 
-			this.settingsPage.Controls.Add(this.vacationsButton);
-			this.settingsPage.Controls.Add(this.usersVacationsComboBox);
-			this.settingsPage.Controls.Add(this.holidaysButton);
-			this.settingsPage.Controls.Add(this.tfsUrlTextBox);
-			this.settingsPage.Controls.Add(this.tfsUrlLabel);
-			this.settingsPage.Location = new System.Drawing.Point(4, 22);
-			this.settingsPage.Name = "settingsPage";
-			this.settingsPage.Size = new System.Drawing.Size(574, 502);
-			this.settingsPage.TabIndex = 2;
-			this.settingsPage.Text = "Settings";
-			this.settingsPage.UseVisualStyleBackColor = true;
-			// 
-			// vacationsButton
-			// 
-			this.vacationsButton.Location = new System.Drawing.Point(302, 67);
-			this.vacationsButton.Name = "vacationsButton";
-			this.vacationsButton.Size = new System.Drawing.Size(158, 23);
-			this.vacationsButton.TabIndex = 14;
-			this.vacationsButton.Text = "Configure Vacations";
-			this.vacationsButton.UseVisualStyleBackColor = true;
-			this.vacationsButton.Click += new System.EventHandler(this.VacationsButtonClick);
-			// 
-			// usersVacationsComboBox
-			// 
-			this.usersVacationsComboBox.FormattingEnabled = true;
-			this.usersVacationsComboBox.Location = new System.Drawing.Point(8, 69);
-			this.usersVacationsComboBox.Name = "usersVacationsComboBox";
-			this.usersVacationsComboBox.Size = new System.Drawing.Size(288, 21);
-			this.usersVacationsComboBox.TabIndex = 13;
-			// 
-			// holidaysButton
-			// 
-			this.holidaysButton.Location = new System.Drawing.Point(8, 40);
-			this.holidaysButton.Name = "holidaysButton";
-			this.holidaysButton.Size = new System.Drawing.Size(117, 23);
-			this.holidaysButton.TabIndex = 12;
-			this.holidaysButton.Text = "Configure holidays";
-			this.holidaysButton.UseVisualStyleBackColor = true;
-			this.holidaysButton.Click += new System.EventHandler(this.HolidaysButtonClick);
-			// 
-			// tfsUrlTextBox
-			// 
-			this.tfsUrlTextBox.Location = new System.Drawing.Point(55, 14);
-			this.tfsUrlTextBox.Name = "tfsUrlTextBox";
-			this.tfsUrlTextBox.Size = new System.Drawing.Size(405, 20);
-			this.tfsUrlTextBox.TabIndex = 11;
-			// 
-			// tfsUrlLabel
-			// 
-			this.tfsUrlLabel.AutoSize = true;
-			this.tfsUrlLabel.Location = new System.Drawing.Point(5, 17);
-			this.tfsUrlLabel.Name = "tfsUrlLabel";
-			this.tfsUrlLabel.Size = new System.Drawing.Size(44, 13);
-			this.tfsUrlLabel.TabIndex = 10;
-			this.tfsUrlLabel.Text = "TFS url:";
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(582, 528);
+			this.ClientSize = new System.Drawing.Size(887, 574);
 			this.Controls.Add(this.mainTabControl);
 			this.Name = "MainForm";
 			this.Text = "Task Scheduler";
@@ -634,13 +659,6 @@
 		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
 		private System.Windows.Forms.Button vacationsButton;
 		private System.Windows.Forms.ComboBox usersVacationsComboBox;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
-		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
-		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox expandBlockersCheckBox;
 		private System.Windows.Forms.ToolTip secondToolTip;
 		private System.Windows.Forms.Button exchangeButton;
@@ -649,6 +667,15 @@
 		private System.Windows.Forms.Label queryLabel;
 		private System.Windows.Forms.TextBox queryTextBox;
 		private System.Windows.Forms.GroupBox queryGroupBox;
+		private System.Windows.Forms.CheckBox showIterationCheckBox;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
+		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
+		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 	}
 }
 

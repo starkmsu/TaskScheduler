@@ -8,6 +8,7 @@ namespace TaskSchedulerForms
 	internal class ViewColumnsIndexes
 	{
 		private readonly int? m_priorityInd;
+		private readonly int? m_iterationInd;
 		private readonly int? m_leadTaskIdInd;
 		private readonly int? m_docsInd;
 		private readonly int? m_titleInd;
@@ -17,6 +18,8 @@ namespace TaskSchedulerForms
 		private readonly int? m_indShift;
 
 		internal int PriorityColumnIndex { get { return m_priorityInd.Value; } }
+
+		internal int IterationColumnIndex { get { return m_iterationInd.Value; } }
 
 		internal int LeadTaskColumnIndex { get { return m_leadTaskIdInd.Value; } }
 
@@ -39,6 +42,8 @@ namespace TaskSchedulerForms
 				var column = dataGridView.Columns[i];
 				if (column.Name == "Priority")
 					m_priorityInd = i;
+				else if (column.Name == "Iteration")
+					m_iterationInd = i;
 				else if (column.Name == "LeadTask")
 					m_leadTaskIdInd = i;
 				else if (column.Name == "Docs")
@@ -55,6 +60,7 @@ namespace TaskSchedulerForms
 			var listOfIndexes = new List<int?>
 			{
 				m_priorityInd,
+				m_iterationInd,
 				m_leadTaskIdInd,
 				m_docsInd,
 				m_titleInd,

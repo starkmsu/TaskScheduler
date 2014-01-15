@@ -35,6 +35,14 @@ namespace TaskSchedulerForms
 			}
 		}
 
+		internal void ToggleIteration(
+			DataGridView dgv,
+			ViewColumnsIndexes viewColumnsIndexes,
+			bool showIterationGlag)
+		{
+			dgv.Columns[viewColumnsIndexes.IterationColumnIndex].Visible = showIterationGlag;
+		}
+
 		internal ViewFiltersApplier PresentData(
 			DataContainer data,
 			ViewColumnsIndexes viewColumnsIndexes,
@@ -258,14 +266,14 @@ namespace TaskSchedulerForms
 			string userMark = assignedTo.Length > 0 ? assignedTo.Substring(0, 3) : Resources.Nobody;
 			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? AddDatesProposed(
-				viewColumnsIndexes,
+					viewColumnsIndexes,
 					task,
 					taskRow,
 					maxNextInd,
 					userMark,
 					true)
 				: AddDatesActive(
-				viewColumnsIndexes,
+					viewColumnsIndexes,
 					task,
 					taskRow,
 					maxNextInd,

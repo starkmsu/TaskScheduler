@@ -17,6 +17,7 @@ namespace TaskSchedulerForms
 
 		private const string m_groupPrefix = "g ";
 		private const string m_blockersPrefix = "-->";
+		private const char m_iterationSeparator = '\\';
 
 		internal string GroupPrefix { get { return m_groupPrefix; } }
 
@@ -33,10 +34,17 @@ namespace TaskSchedulerForms
 			DataContainer data,
 			List<int> blockersIds)
 		{
-			var priorityCell = leadTaskRow.Cells[0];
+			var priorityCell = leadTaskRow.Cells[m_viewColumnsIndexes.PriorityColumnIndex];
 			priorityCell.Value = leadTask.Priority();
 			priorityCell.SetColorByState(leadTask);
 			priorityCell.ToolTipText = leadTask.IsDevCompleted() ? WorkItemState.DevCompleted : leadTask.State;
+
+			var iterationCell = leadTaskRow.Cells[m_viewColumnsIndexes.IterationColumnIndex];
+			string iteration = leadTask.IterationPath;
+			int ind = iteration.IndexOf(m_iterationSeparator);
+			if (ind != -1)
+				iteration = iteration.Substring(ind + 1);
+			iterationCell.Value = iteration;
 
 			var idCell = leadTaskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
 			idCell.Value = leadTask.Id;

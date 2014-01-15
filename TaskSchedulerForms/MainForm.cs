@@ -579,5 +579,14 @@ namespace TaskSchedulerForms
 			queryTextBox.Text = Resources.QueryExample;
 			InitFirst();
 		}
+
+		private void ShowIterationCheckBoxCheckedChanged(object sender, EventArgs e)
+		{
+			bool showIteration = showIterationCheckBox.Checked;
+			s_dataPresenter.ToggleIteration(
+				scheduleDataGridView,
+				s_viewColumnsIndexes,
+				showIteration);
+		}
 	}
 }
