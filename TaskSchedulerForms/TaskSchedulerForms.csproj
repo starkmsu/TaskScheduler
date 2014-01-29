@@ -27,7 +27,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>58</ApplicationRevision>
+    <ApplicationRevision>59</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -84,6 +84,7 @@
     <Compile Include="CellsPalette.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ConfigManager.cs" />
+    <Compile Include="Const.cs" />
     <Compile Include="DataContainer.cs" />
     <Compile Include="DataProcessor.cs" />
     <Compile Include="DataLoader.cs" />

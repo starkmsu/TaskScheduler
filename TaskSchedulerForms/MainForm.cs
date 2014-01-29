@@ -282,7 +282,7 @@ namespace TaskSchedulerForms
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
 						m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
-						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
+						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.StartsWith(Const.GroupPrefix)).ToList();
 						vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 						var users2 = new List<string>(m_viewFiltersApplier.Users);
 						users2.Insert(0, string.Empty);

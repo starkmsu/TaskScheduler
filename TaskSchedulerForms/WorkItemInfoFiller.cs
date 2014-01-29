@@ -15,11 +15,8 @@ namespace TaskSchedulerForms
 		private readonly DataGridView m_dataGridView;
 		private readonly ViewColumnsIndexes m_viewColumnsIndexes;
 
-		private const string m_groupPrefix = "g ";
 		private const string m_blockersPrefix = "-->";
 		private const char m_iterationSeparator = '\\';
-
-		internal string GroupPrefix { get { return m_groupPrefix; } }
 
 		internal WorkItemInfoFiller(DataGridView dataGridView, ViewColumnsIndexes viewColumnsIndexes)
 		{
@@ -183,7 +180,7 @@ namespace TaskSchedulerForms
 			var assignedCell = taskRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex];
 			string assignedTo = task.AssignedTo();
 			assignedCell.Value = assignedTo.Length > 0 ? assignedTo : Resources.Nobody;
-			if (assignedTo.StartsWith(m_groupPrefix))
+			if (assignedTo.StartsWith(Const.GroupPrefix))
 			{
 				assignedCell.SetWarningColor();
 				assignedCell.ToolTipText = Messages.TaskIsNotAssigned();

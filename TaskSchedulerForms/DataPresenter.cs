@@ -256,7 +256,7 @@ namespace TaskSchedulerForms
 				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
-			if (!assignedTo.StartsWith(workItemInfoFiller.GroupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
+			if (!assignedTo.StartsWith(Const.GroupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
 				nextInds.Add(tasksByUser[assignedTo]);
 
 			int maxNextInd = viewColumnsIndexes.FirstDateColumnIndex;
