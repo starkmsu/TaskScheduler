@@ -69,7 +69,8 @@ namespace TaskSchedulerForms
 			for (int i = 0; i < childrenTasks.Count; i++)
 			{
 				WorkItem task = childrenTasks[i];
-				dataContainer.WiDict.Add(task.Id, task);
+				if (!dataContainer.WiDict.ContainsKey(task.Id))
+					dataContainer.WiDict.Add(task.Id, task);
 				if (task.State == WorkItemState.Closed)
 					continue;
 				if (task.Type.Name != WorkItemType.Task)
