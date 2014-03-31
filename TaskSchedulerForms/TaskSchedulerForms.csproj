@@ -84,8 +84,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\BlockerData.cs" />
+    <Compile Include="Data\DayType.cs" />
     <Compile Include="Data\VerificationResult.cs" />
     <Compile Include="Data\WorkItemVerificationResult.cs" />
+    <Compile Include="Helpers\FreeDaysCalculator.cs" />
     <Compile Include="Presentation\CellsColorExtensions.cs" />
     <Compile Include="Const\CellsPalette.cs" />
     <Compile Include="Config\Config.cs" />
@@ -117,8 +119,8 @@
     <Compile Include="Presentation\ViewFiltersBuilder.cs" />
     <Compile Include="Presentation\WorkItemInfoFiller.cs" />
     <Compile Include="Const\WorkMode.cs" />
-    <Compile Include="AssignedToExtensions.cs" />
-    <Compile Include="TaskPriorityComparer.cs" />
+    <Compile Include="Helpers\AssignedToExtensions.cs" />
+    <Compile Include="Helpers\TaskPriorityComparer.cs" />
     <Compile Include="WorkItemsScheduler.cs" />
     <Compile Include="WorkItemVerifier.cs" />
     <EmbeddedResource Include="Forms\HolidaysForm.resx">

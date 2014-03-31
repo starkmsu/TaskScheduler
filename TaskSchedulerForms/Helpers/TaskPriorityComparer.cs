@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TfsUtils.Parsers;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Helpers
 {
 	internal class TaskPriorityComparer : IComparer<Tuple<WorkItem, WorkItem>>
 	{

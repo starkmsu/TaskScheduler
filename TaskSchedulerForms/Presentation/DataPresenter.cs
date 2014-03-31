@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TaskSchedulerForms.Config;
 using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Data;
+using TaskSchedulerForms.Helpers;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
-using WorkItemType = TfsUtils.Const.WorkItemType;
 
 namespace TaskSchedulerForms.Presentation
 {
@@ -19,24 +18,6 @@ namespace TaskSchedulerForms.Presentation
 		private const string m_proposedLtMark = "O";
 		private const string m_activeLtMark = "X";
 		private readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
-
-		private Dictionary<string, List<DateTime>> m_vacations = new Dictionary<string, List<DateTime>>(0);
-
-		private List<DateTime> m_holidays;
-
-		internal void SetHolidays(List<DateTime> holidays)
-		{
-			m_holidays = holidays;
-		}
-
-		internal void SetVacations(List<VacationData> vacations)
-		{
-			m_vacations = new Dictionary<string, List<DateTime>>();
-			foreach (VacationData vacation in vacations)
-			{
-				m_vacations.Add(vacation.User.Substring(0, 3), vacation.VacationDays);
-			}
-		}
 
 		internal void ToggleIteration(
 			DataGridView dgv,
@@ -49,6 +30,7 @@ namespace TaskSchedulerForms.Presentation
 		internal ViewFiltersApplier PresentData(
 			DataContainer data,
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			DataGridView dgv)
 		{
 			var alreadyAdded = new Dictionary<int, int>();
@@ -67,6 +49,7 @@ namespace TaskSchedulerForms.Presentation
 					resultBuilder,
 					workItemInfoFiller,
 					viewColumnsIndexes,
+					freeDaysCalculator,
 					leadTask,
 					data);
 				int ltRowInd = dgv.Rows.Count - 1;
@@ -86,6 +69,7 @@ namespace TaskSchedulerForms.Presentation
 								resultBuilder,
 								workItemInfoFiller,
 								viewColumnsIndexes,
+								freeDaysCalculator,
 								task,
 								childrenTasks,
 								leadTask.Priority(),
@@ -96,7 +80,7 @@ namespace TaskSchedulerForms.Presentation
 					for (int i = nextLtInd; i < lastTaskInd; i++)
 					{
 						DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
-						if (IsHoliday(date))
+						if (freeDaysCalculator.GetDayType(date) != DayType.WorkDay)
 							continue;
 						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
 						dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
@@ -138,6 +122,7 @@ namespace TaskSchedulerForms.Presentation
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			WorkItem leadTask,
 			DataContainer data)
 		{
@@ -170,6 +155,7 @@ namespace TaskSchedulerForms.Presentation
 			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
 				return AddDatesProposed(
 					viewColumnsIndexes,
+					freeDaysCalculator,
 					leadTask,
 					leadTaskRow,
 					viewColumnsIndexes.FirstDateColumnIndex,
@@ -177,6 +163,7 @@ namespace TaskSchedulerForms.Presentation
 					shouldCheckEstimate);
 			return AddDatesActive(
 				viewColumnsIndexes,
+				freeDaysCalculator,
 				leadTask,
 				leadTaskRow,
 				viewColumnsIndexes.FirstDateColumnIndex,
@@ -204,6 +191,7 @@ namespace TaskSchedulerForms.Presentation
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
 			int? leadTaskPriority,
@@ -221,6 +209,7 @@ namespace TaskSchedulerForms.Presentation
 				viewFiltersBuilder,
 				workItemInfoFiller,
 				viewColumnsIndexes,
+				freeDaysCalculator,
 				data,
 				task,
 				childrenTasks,
@@ -271,6 +260,7 @@ namespace TaskSchedulerForms.Presentation
 			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? AddDatesProposed(
 					viewColumnsIndexes,
+					freeDaysCalculator,
 					task,
 					taskRow,
 					maxNextInd,
@@ -278,12 +268,17 @@ namespace TaskSchedulerForms.Presentation
 					true)
 				: AddDatesActive(
 					viewColumnsIndexes,
+					freeDaysCalculator,
 					task,
 					taskRow,
 					maxNextInd,
 					userMark);
 
-			SetVacations(viewColumnsIndexes, taskRow, userMark);
+			SetVacations(
+				viewColumnsIndexes,
+				freeDaysCalculator,
+				taskRow,
+				userMark);
 
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;
@@ -295,6 +290,7 @@ namespace TaskSchedulerForms.Presentation
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			DataContainer data,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
@@ -328,6 +324,7 @@ namespace TaskSchedulerForms.Presentation
 						viewFiltersBuilder,
 						workItemInfoFiller,
 						viewColumnsIndexes,
+						freeDaysCalculator,
 						blockerSiblingTask,
 						childrenTasks,
 						leadTaskPriority,
@@ -343,6 +340,7 @@ namespace TaskSchedulerForms.Presentation
 
 		private int AddDatesActive(
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			WorkItem workItem,
 			DataGridViewRow row,
 			int startInd,
@@ -367,6 +365,7 @@ namespace TaskSchedulerForms.Presentation
 					var length = (int)Math.Ceiling(remaining.Value / 8 / m_focusFactor);
 					return AddDates(
 						viewColumnsIndexes,
+						freeDaysCalculator,
 						row,
 						startInd,
 						length,
@@ -386,7 +385,11 @@ namespace TaskSchedulerForms.Presentation
 				for (int i = indStart; i <= indFinish; i++)
 				{
 					DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
-					if (ColorCellIfFreeDay(row.Cells[i], date, userMark))
+					if (ColorCellIfFreeDay(
+						freeDaysCalculator,
+						row.Cells[i],
+						date,
+						userMark))
 						continue;
 					row.Cells[i].Value = userMark;
 				}
@@ -397,6 +400,7 @@ namespace TaskSchedulerForms.Presentation
 
 		private int AddDatesProposed(
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			WorkItem task,
 			DataGridViewRow taskRow,
 			int startInd,
@@ -427,7 +431,7 @@ namespace TaskSchedulerForms.Presentation
 				while (finishShift > 0 && startDate >= today)
 				{
 					startDate = startDate.AddDays(-1);
-					if (!IsFreeDay(startDate, userMark))
+					if (freeDaysCalculator.GetDayType(startDate, userMark) == DayType.WorkDay)
 						--finishShift;
 				}
 				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
@@ -436,6 +440,7 @@ namespace TaskSchedulerForms.Presentation
 
 			return AddDates(
 				viewColumnsIndexes,
+				freeDaysCalculator,
 				taskRow,
 				startInd,
 				length,
@@ -444,6 +449,7 @@ namespace TaskSchedulerForms.Presentation
 
 		private int AddDates(
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewRow row,
 			int startInd,
 			int length,
@@ -459,7 +465,11 @@ namespace TaskSchedulerForms.Presentation
 					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var date = DateTime.Now.AddDays(dateIndexShift);
 				var cell = row.Cells[startInd + ind];
-				if (ColorCellIfFreeDay(cell, date, userMark))
+				if (ColorCellIfFreeDay(
+					freeDaysCalculator,
+					cell,
+					date,
+					userMark))
 				{
 					++ind;
 					continue;
@@ -474,77 +484,53 @@ namespace TaskSchedulerForms.Presentation
 			return startInd + ind;
 		}
 
+
 		private void SetVacations(
 			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewRow row,
 			string user)
 		{
-			if (!m_vacations.ContainsKey(user) || m_vacations[user].Count == 0)
+			List<DateTime> vacations = freeDaysCalculator.GetVacations(user);
+			if (vacations == null || vacations.Count == 0)
 				return;
+
 			DateTime start = DateTime.Now.Date;
 			DateTime finish = DateTime.Now.AddMonths(1).Date;
-			var vacationsDays = m_vacations[user];
-			if (finish < vacationsDays[0])
+			if (finish < vacations[0])
 				return;
-			if (start > vacationsDays[vacationsDays.Count-1])
+			if (start > vacations[vacations.Count - 1])
 				return;
 			int ind = viewColumnsIndexes.FirstDateColumnIndex;
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
-				if (vacationsDays.Any(d => d == i))
+				if (vacations.Any(d => d == i))
 					row.Cells[ind].SetFreeDayColor();
 				++ind;
 			}
 		}
 
-		private bool IsHoliday(DateTime dateTime)
+		private bool ColorCellIfFreeDay(
+			FreeDaysCalculator freeDaysCalculator,
+			DataGridViewCell cell,
+			DateTime dateTime,
+			string user)
 		{
-			var date = dateTime.Date;
-			var dayOfWeek = date.DayOfWeek;
-			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
-				return true;
-			if (m_holidays == null)
-				return false;
-			return m_holidays.Contains(date);
-		}
-
-		private bool ColorCellIfFreeDay(DataGridViewCell cell, DateTime dateTime, string user)
-		{
-			var date = dateTime.Date;
-			var dayOfWeek = date.DayOfWeek;
-			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
+			DayType dt = freeDaysCalculator.GetDayType(dateTime, user);
+			switch (dt)
 			{
-				cell.SetWeekEndColor();
-				return true;
+				case DayType.WeekEnd:
+					cell.SetWeekEndColor();
+					return true;
+				case DayType.Holiday:
+					cell.SetFreeDayColor();
+					return true;
+				case DayType.Vacations:
+					cell.SetFreeDayColor();
+					return true;
+				default:
+					return false;
 			}
-			if (m_holidays != null && m_holidays.Contains(date))
-			{
-				cell.SetFreeDayColor();
-				return true;
-			}
-			if (m_vacations != null
-				&& m_vacations.ContainsKey(user)
-				&& m_vacations[user].Any(v => v == date))
-			{
-				cell.SetFreeDayColor();
-				return true;
-			}
-			return false;
-		}
-
-		private bool IsFreeDay(DateTime dateTime, string user)
-		{
-			var date = dateTime.Date;
-			var dayOfWeek = date.DayOfWeek;
-			if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
-				return true;
-			if (m_holidays != null && m_holidays.Contains(date))
-				return true;
-			if (m_vacations != null
-				&& m_vacations.ContainsKey(user)
-				&& m_vacations[user].Any(v => v == date))
-				return true;
-			return false;
 		}
 	}
 }

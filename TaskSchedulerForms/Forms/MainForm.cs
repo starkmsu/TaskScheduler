@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Config;
 using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Helpers;
 using TaskSchedulerForms.Presentation;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Parsers;
@@ -21,6 +22,7 @@ namespace TaskSchedulerForms.Forms
 		private static readonly DataFiller s_dataFiller = new DataFiller();
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
 		private static readonly StateContainer s_stateContainer = new StateContainer();
+		private static readonly FreeDaysCalculator s_freeDaysCalculator = new FreeDaysCalculator();
 
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
 		private static ScheduleColumnsPresenter s_columnsPresenter;
@@ -41,7 +43,7 @@ namespace TaskSchedulerForms.Forms
 			s_columnsPresenter.InitColumns(scheduleDataGridView);
 
 			m_holidays = m_config.Holidays;
-			s_dataPresenter.SetHolidays(m_holidays);
+			s_freeDaysCalculator.SetHolidays(m_holidays);
 
 			UpdateHolidays();
 
@@ -51,7 +53,7 @@ namespace TaskSchedulerForms.Forms
 				var vacationsUsers = m_config.Vacations.Select(v => v.User).ToList();
 				vacationsUsers.Sort();
 				usersVacationsComboBox.DataSource = vacationsUsers;
-				s_dataPresenter.SetVacations(m_config.Vacations);
+				s_freeDaysCalculator.SetVacations(m_config.Vacations);
 			}
 
 			tfsUrlTextBox.Text = m_config.TfsUrl;
@@ -284,7 +286,11 @@ namespace TaskSchedulerForms.Forms
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
-						m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
+						m_viewFiltersApplier = s_dataPresenter.PresentData(
+							data,
+							s_viewColumnsIndexes,
+							s_freeDaysCalculator,
+							scheduleDataGridView);
 						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
 						vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 						var users2 = new List<string>(m_viewFiltersApplier.Users);
@@ -386,7 +392,11 @@ namespace TaskSchedulerForms.Forms
 					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
 						s_columnsPresenter.InitColumns(scheduleDataGridView);
-					m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
+					m_viewFiltersApplier = s_dataPresenter.PresentData(
+						data,
+						s_viewColumnsIndexes,
+						s_freeDaysCalculator,
+						scheduleDataGridView);
 					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
 					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 					var users2 = new List<string>(m_viewFiltersApplier.Users);
@@ -441,7 +451,7 @@ namespace TaskSchedulerForms.Forms
 			m_holidays = holidaysForm.Holidays;
 
 			m_config.Holidays = m_holidays;
-			s_dataPresenter.SetHolidays(m_holidays);
+			s_freeDaysCalculator.SetHolidays(m_holidays);
 			UpdateHolidays();
 		}
 
@@ -517,7 +527,7 @@ namespace TaskSchedulerForms.Forms
 				m_config.Vacations.Remove(userVacations);
 			if (holidaysForm.Holidays.Count > 0)
 				m_config.Vacations.Add(new VacationData { User = user, VacationDays = holidaysForm.Holidays });
-			s_dataPresenter.SetVacations(m_config.Vacations);
+			s_freeDaysCalculator.SetVacations(m_config.Vacations);
 		}
 
 		private void ShowBlockersCheckBoxCheckedChanged(object sender, EventArgs e)

@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Data;
+using TaskSchedulerForms.Helpers;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 using WorkItemType = TfsUtils.Const.WorkItemType;
