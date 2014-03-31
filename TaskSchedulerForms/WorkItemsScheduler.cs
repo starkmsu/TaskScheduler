@@ -12,6 +12,7 @@ namespace TaskSchedulerForms
 	internal class WorkItemsScheduler
 	{
 		private const double s_workerFocusFactor = 0.5;
+		private const int s_maxUserReferenceCount = 32;
 
 		internal Dictionary<int, Tuple<int?, int>> MakeSchedule(DataContainer dataContainer, FreeDaysCalculator freeDaysCalculator)
 		{
@@ -19,6 +20,7 @@ namespace TaskSchedulerForms
 			var result = new Dictionary<int, Tuple<int?, int>>();
 			var usersBlockersDict = new Dictionary<string, Dictionary<int, BlockerData>>();
 			var usersToProcess = new List<string>(usersTasksDict.Keys);
+
 			while (usersToProcess.Count > 0)
 			{
 				string user = usersToProcess[0];
@@ -35,9 +37,12 @@ namespace TaskSchedulerForms
 					result,
 					user);
 
+				usersToProcess.RemoveAt(0);
+
 				usersToProcess.AddRange(usersToRecalculate);
 
-				usersToProcess.RemoveAt(0);
+				if (usersToProcess.Count > s_maxUserReferenceCount)
+					break;
 			}
 			return result;
 		}

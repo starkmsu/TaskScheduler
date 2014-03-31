@@ -51,7 +51,7 @@ namespace TaskSchedulerForms.Presentation
 			var verificationResult = WorkItemVerifier.VerifyChildrenExistance(leadTask, data);
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
-				idCell.SetVerificationColor(verificationResult.Result);
+				idCell.SetColorByVerification(verificationResult.Result);
 				idCell.ToolTipText += Environment.NewLine + verificationResult.AllMessagesString;
 			}
 
@@ -66,7 +66,7 @@ namespace TaskSchedulerForms.Presentation
 			else
 			{
 				docsCell.Value = verificationResult.AddidtionalData;
-				docsCell.SetVerificationColor(verificationResult.Result);
+				docsCell.SetColorByVerification(verificationResult.Result);
 				docsCell.ToolTipText = verificationResult.AllMessagesString;
 				result = false;
 			}
@@ -96,7 +96,7 @@ namespace TaskSchedulerForms.Presentation
 				}
 				else
 				{
-					blockersCell.SetVerificationColor(verificationResult.Result);
+					blockersCell.SetColorByVerification(verificationResult.Result);
 					blockersCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 			}
@@ -131,7 +131,7 @@ namespace TaskSchedulerForms.Presentation
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				var priorityWarningCell = taskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
-				priorityWarningCell.SetVerificationColor(verificationResult.Result);
+				priorityWarningCell.SetColorByVerification(verificationResult.Result);
 				priorityWarningCell.ToolTipText = verificationResult.AllMessagesString;
 			}
 
@@ -163,7 +163,7 @@ namespace TaskSchedulerForms.Presentation
 				}
 				else
 				{
-					blockersCell.SetVerificationColor(verificationResult.Result);
+					blockersCell.SetColorByVerification(verificationResult.Result);
 					blockersCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 			}
@@ -182,7 +182,7 @@ namespace TaskSchedulerForms.Presentation
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				
-				assignedCell.SetVerificationColor(verificationResult.Result);
+				assignedCell.SetColorByVerification(verificationResult.Result);
 				assignedCell.ToolTipText = verificationResult.AllMessagesString;
 			}
 		}

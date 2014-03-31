@@ -30,7 +30,7 @@ namespace TaskSchedulerForms.Presentation
 			}
 		}
 
-		internal static void SetVerificationColor(this DataGridViewCell cell, VerificationResult result)
+		internal static void SetColorByVerification(this DataGridViewCell cell, VerificationResult result)
 		{
 			switch (result)
 			{
@@ -48,19 +48,18 @@ namespace TaskSchedulerForms.Presentation
 			cell.Style.BackColor = CellsPalette.Error;
 		}
 
-		internal static void SetWarningColor(this DataGridViewCell cell)
+		internal static void SetColorByDayType(this DataGridViewCell cell, DayType dayType)
 		{
-			cell.Style.BackColor = CellsPalette.Warning;
-		}
-
-		internal static void SetWeekEndColor(this DataGridViewCell cell)
-		{
-			cell.Style.BackColor = CellsPalette.WeekEnd;
-		}
-
-		internal static void SetFreeDayColor(this DataGridViewCell cell)
-		{
-			cell.Style.BackColor = CellsPalette.FreeDay;
+			switch (dayType)
+			{
+				case DayType.WeekEnd:
+					cell.Style.BackColor = CellsPalette.WeekEnd;
+					break;
+				case DayType.Holiday:
+				case DayType.Vacations:
+					cell.Style.BackColor = CellsPalette.FreeDay;
+					break;
+			}
 		}
 
 		internal static bool IsColorForState(this DataGridViewCell cell, string state)

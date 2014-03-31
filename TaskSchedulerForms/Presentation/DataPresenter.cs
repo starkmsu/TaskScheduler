@@ -356,7 +356,7 @@ namespace TaskSchedulerForms.Presentation
 				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskFinish.Value.ToString("dd.MM");
 
 				var verificationResult = WorkItemVerifier.VerifyFinishDate(workItem);
-				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetVerificationColor(verificationResult.Result);
+				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetColorByVerification(verificationResult.Result);
 				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = verificationResult.AllMessagesString;
 
 				double? remaining = workItem.Remaining();
@@ -413,7 +413,7 @@ namespace TaskSchedulerForms.Presentation
 				if (shouldCheckEstimate)
 				{
 					var estimateCell = taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1];
-					estimateCell.SetVerificationColor(verificationResult.Result);
+					estimateCell.SetColorByVerification(verificationResult.Result);
 					estimateCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 				return viewColumnsIndexes.FirstDateColumnIndex;
@@ -484,7 +484,6 @@ namespace TaskSchedulerForms.Presentation
 			return startInd + ind;
 		}
 
-
 		private void SetVacations(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
@@ -505,7 +504,7 @@ namespace TaskSchedulerForms.Presentation
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
 				if (vacations.Any(d => d == i))
-					row.Cells[ind].SetFreeDayColor();
+					row.Cells[ind].SetColorByDayType(DayType.Vacations);
 				++ind;
 			}
 		}
@@ -517,20 +516,8 @@ namespace TaskSchedulerForms.Presentation
 			string user)
 		{
 			DayType dt = freeDaysCalculator.GetDayType(dateTime, user);
-			switch (dt)
-			{
-				case DayType.WeekEnd:
-					cell.SetWeekEndColor();
-					return true;
-				case DayType.Holiday:
-					cell.SetFreeDayColor();
-					return true;
-				case DayType.Vacations:
-					cell.SetFreeDayColor();
-					return true;
-				default:
-					return false;
-			}
+			cell.SetColorByDayType(dt);
+			return dt != DayType.WorkDay;
 		}
 	}
 }
