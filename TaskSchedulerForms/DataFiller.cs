@@ -9,7 +9,7 @@ using WorkItemType = TfsUtils.Const.WorkItemType;
 
 namespace TaskSchedulerForms
 {
-	internal class DataProcessor
+	internal class DataFiller
 	{
 		internal DataContainer ProcessLeadTasks(string tfsUrl, List<WorkItem> leadTasks)
 		{
@@ -28,8 +28,18 @@ namespace TaskSchedulerForms
 				List<int> ltChildrenIds = result.LeadTaskChildrenDict.Values.SelectMany(i => i).ToList();
 				AppendTasks(ltChildrenIds, null, result, wiqlAccessor);
 
-				CleanDict(result.LeadTaskChildrenDict, result.WiDict, false, true, wiqlAccessor);
-				CleanDict(result.BlockersDict, result.WiDict, true, false, wiqlAccessor);
+				CleanDict(
+					result.LeadTaskChildrenDict,
+					result.WiDict,
+					false,
+					true,
+					wiqlAccessor);
+				CleanDict(
+					result.BlockersDict,
+					result.WiDict,
+					true,
+					false,
+					wiqlAccessor);
 
 				InitExternalBlockers(result, wiqlAccessor);
 			}
@@ -112,10 +122,11 @@ namespace TaskSchedulerForms
 			TfsWiqlAccessor wiqlAccessor)
 		{
 			var notFoundIdsDict = new Dictionary<int, List<List<int>>>(dict.Keys.Count);
-			foreach (var pair in dict)
+			foreach (var dictKey in dict.Keys)
 			{
 				var idsToRemove = new HashSet<int>();
-				foreach (int id in pair.Value)
+				var values = dict[dictKey];
+				foreach (int id in values)
 				{
 					if (wiDict.ContainsKey(id))
 					{
@@ -125,14 +136,14 @@ namespace TaskSchedulerForms
 					else
 					{
 						if (notFoundIdsDict.ContainsKey(id))
-							notFoundIdsDict[id].Add(pair.Value);
+							notFoundIdsDict[id].Add(values);
 						else
-							notFoundIdsDict.Add(id, new List<List<int>>(1) { pair.Value });
+							notFoundIdsDict.Add(id, new List<List<int>>(1) { values });
 					}
 				}
 				foreach (int id in idsToRemove)
 				{
-					pair.Value.Remove(id);
+					values.Remove(id);
 				}
 			}
 			if (notFoundIdsDict.Keys.Count > 0)

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TaskSchedulerForms.Const;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Config
 {
 	[Serializable]
 	public class Config

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Const;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Presentation
 {
 	internal static class CellsColorExtensions
 	{

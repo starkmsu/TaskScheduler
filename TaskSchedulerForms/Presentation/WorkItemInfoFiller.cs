@@ -4,11 +4,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Presentation
 {
 	internal class WorkItemInfoFiller
 	{
@@ -180,7 +181,7 @@ namespace TaskSchedulerForms
 			var assignedCell = taskRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex];
 			string assignedTo = task.AssignedTo();
 			assignedCell.Value = assignedTo.Length > 0 ? assignedTo : Resources.Nobody;
-			if (assignedTo.StartsWith(Const.GroupPrefix))
+			if (assignedTo.IsUnassigned())
 			{
 				assignedCell.SetWarningColor();
 				assignedCell.ToolTipText = Messages.TaskIsNotAssigned();

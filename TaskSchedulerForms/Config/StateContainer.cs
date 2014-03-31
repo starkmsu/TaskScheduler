@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Const;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Config
 {
 	internal class StateContainer
 	{
@@ -34,7 +35,7 @@ namespace TaskSchedulerForms
 			LastIterationPaths = new List<string>();
 		}
 
-		internal void SaveChosenFirstToConfig(Config config, List<string> values)
+		internal void SaveChosenFirstToConfig(TaskSchedulerForms.Config.Config config, List<string> values)
 		{
 			if (WorkMode == WorkMode.AreaFirst)
 				config.AreaPaths = values;
@@ -42,7 +43,7 @@ namespace TaskSchedulerForms
 				config.IterationPaths = values;
 		}
 
-		internal void SaveAllSecondToConfig(Config config, List<string> values)
+		internal void SaveAllSecondToConfig(TaskSchedulerForms.Config.Config config, List<string> values)
 		{
 			if (WorkMode == WorkMode.AreaFirst)
 			{
@@ -56,7 +57,7 @@ namespace TaskSchedulerForms
 			}
 		}
 
-		internal void SaveChosenSecondToConfig(Config config, List<string> values)
+		internal void SaveChosenSecondToConfig(TaskSchedulerForms.Config.Config config, List<string> values)
 		{
 			if (WorkMode == WorkMode.AreaFirst)
 			{

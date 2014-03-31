@@ -5,17 +5,20 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Config;
+using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Presentation;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Parsers;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Forms
 {
 	public partial class MainForm : Form
 	{
-		private readonly Config m_config;
+		private readonly Config.Config m_config;
 
 		private static readonly DataLoader s_dataLoader = new DataLoader();
-		private static readonly DataProcessor s_dataProcessor = new DataProcessor();
+		private static readonly DataFiller s_dataFiller = new DataFiller();
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
 		private static readonly StateContainer s_stateContainer = new StateContainer();
 
@@ -277,12 +280,12 @@ namespace TaskSchedulerForms
 			{
 				List<WorkItem> leadTasks = GetLeadTasks();
 
-				var data = s_dataProcessor.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
+				var data = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 					{
 						m_viewFiltersApplier = s_dataPresenter.PresentData(data, s_viewColumnsIndexes, scheduleDataGridView);
-						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.StartsWith(Const.GroupPrefix)).ToList();
+						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
 						vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 						var users2 = new List<string>(m_viewFiltersApplier.Users);
 						users2.Insert(0, string.Empty);
@@ -376,7 +379,7 @@ namespace TaskSchedulerForms
 					}
 					leadTasks.Add(leadTask);
 				}
-				var data = s_dataProcessor.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				var data = s_dataFiller.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{

@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Const
 {
 	internal class CellsPalette
 	{

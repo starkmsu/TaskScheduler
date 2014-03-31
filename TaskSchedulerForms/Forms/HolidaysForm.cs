@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Forms
 {
 	public partial class HolidaysForm : Form
 	{

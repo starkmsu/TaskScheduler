@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Config
 {
 	[Serializable]
 	public class VacationData : IEquatable<VacationData>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Const
 {
 	[Serializable]
 	public enum WorkMode

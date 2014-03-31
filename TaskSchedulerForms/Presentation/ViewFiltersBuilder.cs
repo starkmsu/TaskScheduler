@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Presentation
 {
 	internal class ViewFiltersBuilder
 	{

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using TaskSchedulerForms.Const;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Presentation
 {
 	internal class ScheduleColumnsPresenter
 	{

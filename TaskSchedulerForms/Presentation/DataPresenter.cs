@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Config;
+using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 using WorkItemType = TfsUtils.Const.WorkItemType;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Presentation
 {
 	internal class DataPresenter
 	{
@@ -256,7 +258,7 @@ namespace TaskSchedulerForms
 				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
-			if (!assignedTo.StartsWith(Const.GroupPrefix) && tasksByUser.ContainsKey(task.AssignedTo()))
+			if (!assignedTo.IsUnassigned() && tasksByUser.ContainsKey(task.AssignedTo()))
 				nextInds.Add(tasksByUser[assignedTo]);
 
 			int maxNextInd = viewColumnsIndexes.FirstDateColumnIndex;

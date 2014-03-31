@@ -1,4 +1,4 @@
-﻿namespace TaskSchedulerForms
+﻿namespace TaskSchedulerForms.Forms
 {
 	partial class MainForm
 	{
