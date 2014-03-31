@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Data;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
@@ -9,93 +10,92 @@ namespace TaskSchedulerForms
 {
 	internal class WorkItemsScheduler
 	{
-		private const int s_lowestPriority = 999;
 		private const double s_workerFocusFactor = 0.5;
-
-		private class BlockerData
-		{
-			internal int? Start { get; set; }
-			internal int DaysCount { get; set; }
-			internal HashSet<string> BlockedUsers { get; set; }
-		}
-
-		private class TaskPriorityComparer : IComparer<Tuple<WorkItem, WorkItem>>
-		{
-			public int Compare(Tuple<WorkItem, WorkItem> x, Tuple<WorkItem, WorkItem> y)
-			{
-				if ((x.Item1.Priority() ?? s_lowestPriority) < (y.Item1.Priority() ?? s_lowestPriority))
-					return -1;
-				if ((x.Item1.Priority() ?? s_lowestPriority) > (y.Item1.Priority() ?? s_lowestPriority))
-					return 1;
-				if ((x.Item2.Priority() ?? s_lowestPriority) < (y.Item2.Priority() ?? s_lowestPriority))
-					return -1;
-				if ((x.Item2.Priority() ?? s_lowestPriority) > (y.Item2.Priority() ?? s_lowestPriority))
-					return 1;
-				return string.Compare(x.Item2.IterationPath, y.Item2.IterationPath, StringComparison.Ordinal);
-			}
-		}
 
 		internal Dictionary<int, Tuple<int?, int>> MakeSchedule(DataContainer dataContainer)
 		{
 			var usersTasksDict = SeparateByUser(dataContainer);
 			var result = new Dictionary<int, Tuple<int?, int>>();
 			var usersBlockersDict = new Dictionary<string, Dictionary<int, BlockerData>>();
-			var users = new List<string>(usersTasksDict.Keys);
-			while (users.Count > 0)
+			var usersToProcess = new List<string>(usersTasksDict.Keys);
+			while (usersToProcess.Count > 0)
 			{
-				var user = users[0];
-				var otherUsersBlockers = ScheduleUserTasks(usersTasksDict[user], dataContainer, result);
+				string user = usersToProcess[0];
+				var blockersFromOtherUsers = ScheduleUserTasks(usersTasksDict[user], dataContainer, result);
 
-				foreach (KeyValuePair<string, HashSet<int>> pair in otherUsersBlockers)
-				{
-					if (pair.Key == user)
-						continue;
+				var usersToRecalculate = ProcessBlockers(
+					blockersFromOtherUsers,
+					usersBlockersDict,
+					result,
+					user);
 
-					Dictionary<int, BlockerData> userBlockersDict;
-					if (usersBlockersDict.ContainsKey(pair.Key))
-					{
-						userBlockersDict = usersBlockersDict[pair.Key];
-					}
-					else
-					{
-						userBlockersDict = new Dictionary<int, BlockerData>();
-						usersBlockersDict.Add(pair.Key, userBlockersDict);
-					}
-					foreach (int blockerId in pair.Value)
-					{
-						if (userBlockersDict.ContainsKey(blockerId))
-							userBlockersDict[blockerId].BlockedUsers.Add(user);
-						else
-							userBlockersDict.Add(
-								blockerId,
-								new BlockerData
-								{
-									Start = result.ContainsKey(blockerId) ? result[blockerId].Item1 : null,
-									DaysCount = result.ContainsKey(blockerId) ? result[blockerId].Item2 : 0,
-									BlockedUsers = new HashSet<string> {user}
-								});
-					}
-				}
+				usersToProcess.AddRange(usersToRecalculate);
 
-				if (usersBlockersDict.ContainsKey(user))
-				{
-					var usersToRecalculate = new HashSet<string>();
-					foreach (KeyValuePair<int, BlockerData> pair in usersBlockersDict[user])
-					{
-						var currentSchedule = result[pair.Key];
-						if (currentSchedule.Item1 != pair.Value.Start || currentSchedule.Item2 != pair.Value.DaysCount)
-						{
-							foreach (string blockedUser in pair.Value.BlockedUsers)
-							{
-								usersToRecalculate.Add(blockedUser);
-							}
-						}
-					}
-					users.AddRange(usersToRecalculate);
-				}
-
-				users.RemoveAt(0);
+				usersToProcess.RemoveAt(0);
 			}
+			return result;
+		}
+
+		private HashSet<string> ProcessBlockers(
+			Dictionary<string, HashSet<int>> blockersFromOtherUsers,
+			Dictionary<string, Dictionary<int, BlockerData>> usersBlockersDict,
+			Dictionary<int, Tuple<int?, int>> taskSchedule,
+			string currentUser)
+		{
+			foreach (KeyValuePair<string, HashSet<int>> pair in blockersFromOtherUsers)
+			{
+				if (pair.Key == currentUser)
+					continue;
+
+				Dictionary<int, BlockerData> userBlockersDict;
+				if (usersBlockersDict.ContainsKey(pair.Key))
+				{
+					userBlockersDict = usersBlockersDict[pair.Key];
+				}
+				else
+				{
+					userBlockersDict = new Dictionary<int, BlockerData>();
+					usersBlockersDict.Add(pair.Key, userBlockersDict);
+				}
+				foreach (int blockerId in pair.Value)
+				{
+					if (userBlockersDict.ContainsKey(blockerId))
+						userBlockersDict[blockerId].BlockedUsers.Add(currentUser);
+					else
+						userBlockersDict.Add(
+							blockerId, new BlockerData { BlockedUsers = new HashSet<string> { currentUser } });
+
+					userBlockersDict[blockerId].Start = taskSchedule.ContainsKey(blockerId) ? taskSchedule[blockerId].Item1 : null;
+					userBlockersDict[blockerId].DaysCount = taskSchedule.ContainsKey(blockerId) ? taskSchedule[blockerId].Item2 : 0;
+				}
+			}
+
+			var result = new HashSet<string>();
+
+			if (usersBlockersDict.ContainsKey(currentUser))
+			{
+				foreach (KeyValuePair<int, BlockerData> pair in usersBlockersDict[currentUser])
+				{
+					var currentSchedule = taskSchedule[pair.Key];
+					if (currentSchedule.Item1 == null)
+						continue;
+					BlockerData bd = pair.Value;
+					if (bd.Start != null)
+					{
+						int currentScheduledFinish = currentSchedule.Item1.Value + currentSchedule.Item2;
+						int oldScheduledFinish = bd.Start.Value + bd.DaysCount;
+						if (currentScheduledFinish == oldScheduledFinish)
+							continue;
+					}
+					bd.Start = currentSchedule.Item1;
+					bd.DaysCount = currentSchedule.Item2;
+					foreach (string blockedUser in pair.Value.BlockedUsers)
+					{
+						result.Add(blockedUser);
+					}
+				}
+			}
+
 			return result;
 		}
 
@@ -154,6 +154,7 @@ namespace TaskSchedulerForms
 			int nonBlockedActiveFinish = AppendActiveNonBlockedTasks(activeNonBlockedTasks, scheduledTasksDict);
 			var schedule = AppendProposedNonBlockedTasks(proposedNonBlockedTasks);
 			var result = new Dictionary<string, HashSet<int>>();
+
 			AppendBlockedTasks(
 				proposedBlockedTasks,
 				schedule,

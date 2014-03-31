@@ -27,7 +27,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>60</ApplicationRevision>
+    <ApplicationRevision>62</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -53,7 +53,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>A25418CBB11AB9F46609E240C21AA4246A019AC7</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>DAD2B81B091B0B83AE1DAC435E1E86FE42065641</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>TaskSchedulerForms_TemporaryKey.pfx</ManifestKeyFile>
@@ -83,12 +83,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LeadTaskData.cs" />
+    <Compile Include="Data\BlockerData.cs" />
+    <Compile Include="Data\VerificationResult.cs" />
+    <Compile Include="Data\WorkItemVerificationResult.cs" />
     <Compile Include="Presentation\CellsColorExtensions.cs" />
     <Compile Include="Const\CellsPalette.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigManager.cs" />
-    <Compile Include="DataContainer.cs" />
+    <Compile Include="Data\DataContainer.cs" />
     <Compile Include="DataFiller.cs" />
     <Compile Include="DataLoader.cs" />
     <Compile Include="Presentation\DataPresenter.cs" />
@@ -116,7 +118,9 @@
     <Compile Include="Presentation\WorkItemInfoFiller.cs" />
     <Compile Include="Const\WorkMode.cs" />
     <Compile Include="AssignedToExtensions.cs" />
+    <Compile Include="TaskPriorityComparer.cs" />
     <Compile Include="WorkItemsScheduler.cs" />
+    <Compile Include="WorkItemVerifier.cs" />
     <EmbeddedResource Include="Forms\HolidaysForm.resx">
       <DependentUpon>HolidaysForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
@@ -48,33 +48,27 @@ namespace TaskSchedulerForms.Presentation
 			idCell.Value = leadTask.Id;
 			idCell.ToolTipText = leadTask.IterationPath;
 			idCell.Style.BackColor = priorityCell.Style.BackColor;
-			if (!data.LeadTaskChildrenDict.ContainsKey(leadTask.Id) || data.LeadTaskChildrenDict[leadTask.Id].Count == 0)
+			var verificationResult = WorkItemVerifier.VerifyChildrenExistance(leadTask, data);
+			if (verificationResult.Result != VerificationResult.Ok)
 			{
-				idCell.SetWarningColor();
-				idCell.ToolTipText += Environment.NewLine + Messages.LTHasNoChildren();
+				idCell.SetVerificationColor(verificationResult.Result);
+				idCell.ToolTipText += Environment.NewLine + verificationResult.AllMessagesString;
 			}
 
 			var docsCell = leadTaskRow.Cells[m_viewColumnsIndexes.DocsColumnIndex];
-			bool result = true;
-			string visionAgreementState = leadTask.VisionAgreementState();
-			string hlaAgeementState = leadTask.HlaAgreementState();
-			if (visionAgreementState == DocumentAgreementState.No || visionAgreementState == DocumentAgreementState.Waiting)
+			bool result;
+			verificationResult = WorkItemVerifier.VerifyDocumentsAgreement(leadTask);
+			if (verificationResult.Result == VerificationResult.Ok)
 			{
-				docsCell.Value = visionAgreementState;
-				docsCell.SetErrorColor();
-				docsCell.ToolTipText = Messages.BadVisionAgreemntState(visionAgreementState);
-				result = false;
-			}
-			else if (hlaAgeementState == DocumentAgreementState.No || hlaAgeementState == DocumentAgreementState.Waiting)
-			{
-				docsCell.Value = hlaAgeementState;
-				docsCell.SetErrorColor();
-				docsCell.ToolTipText = Messages.BadHlaAgreemntState(hlaAgeementState);
-				result = false;
+				docsCell.Style.BackColor = priorityCell.Style.BackColor;
+				result = true;
 			}
 			else
 			{
-				docsCell.Style.BackColor = priorityCell.Style.BackColor;
+				docsCell.Value = verificationResult.AddidtionalData;
+				docsCell.SetVerificationColor(verificationResult.Result);
+				docsCell.ToolTipText = verificationResult.AllMessagesString;
+				result = false;
 			}
 
 			var titleCell = leadTaskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];
@@ -89,18 +83,21 @@ namespace TaskSchedulerForms.Presentation
 			var blockersCell = leadTaskRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex];
 			if (blockersIds != null)
 			{
-				string blockerIdsStr = string.Join(",", blockersIds);
-				blockersCell.Value = blockerIdsStr;
-				int nonChildBlockerId = blockersIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
-				if (nonChildBlockerId > 0)
+				blockersCell.Value = string.Join(",", blockersIds);
+
+				verificationResult = WorkItemVerifier.VerifyNonChildBlockerExistance(
+					leadTask,
+					blockersIds,
+					data,
+					false);
+				if (verificationResult.Result == VerificationResult.Ok)
 				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
+					blockersCell.ToolTipText = string.Join(Environment.NewLine, blockersIds.Select(b => data.WiDict[b].Title));
 				}
 				else
 				{
-					blockerIdsStr = string.Join(Environment.NewLine, blockersIds.Select(b => data.WiDict[b].Title));
-					blockersCell.ToolTipText = blockerIdsStr;
+					blockersCell.SetVerificationColor(verificationResult.Result);
+					blockersCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 			}
 			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
@@ -117,7 +114,7 @@ namespace TaskSchedulerForms.Presentation
 			return result;
 		}
 
-		internal string FillTaskInfo(
+		internal void FillTaskInfo(
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
 			int? leadTaskPriority,
@@ -130,11 +127,12 @@ namespace TaskSchedulerForms.Presentation
 			priorityCell.SetColorByState(task);
 			priorityCell.ToolTipText = task.State;
 
-			if (leadTaskPriority.HasValue && task.Priority() > leadTaskPriority.Value)
+			var verificationResult = WorkItemVerifier.VerifyTaskPriority(task, leadTaskPriority);
+			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				var priorityWarningCell = taskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
-				priorityWarningCell.SetWarningColor();
-				priorityWarningCell.ToolTipText = Messages.TaskHasPriorityLowerThanLT();
+				priorityWarningCell.SetVerificationColor(verificationResult.Result);
+				priorityWarningCell.ToolTipText = verificationResult.AllMessagesString;
 			}
 
 			var titleCell = taskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];
@@ -152,21 +150,21 @@ namespace TaskSchedulerForms.Presentation
 			{
 				string blockerIdsStr = string.Join(",", blockerIds);
 				blockersCell.Value = blockerIdsStr;
-				int nonChildBlockerId = blockerIds.FirstOrDefault(data.NonChildBlockers.ContainsKey);
-				if (nonChildBlockerId > 0)
-				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.NonChildBlocker(nonChildBlockerId);
-				}
-				else if (task.State == WorkItemState.Active)
-				{
-					blockersCell.SetErrorColor();
-					blockersCell.ToolTipText = Messages.ActiveIsBlocked(blockerIdsStr);
-				}
-				else
+
+				verificationResult = WorkItemVerifier.VerifyNonChildBlockerExistance(
+					task,
+					blockerIds,
+					data,
+					false);
+				if (verificationResult.Result == VerificationResult.Ok)
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));
 					blockersCell.ToolTipText = blockerIdsStr;
+				}
+				else
+				{
+					blockersCell.SetVerificationColor(verificationResult.Result);
+					blockersCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 			}
 			if (!string.IsNullOrEmpty(task.BlockingReason()))
@@ -179,15 +177,14 @@ namespace TaskSchedulerForms.Presentation
 			}
 
 			var assignedCell = taskRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex];
-			string assignedTo = task.AssignedTo();
-			assignedCell.Value = assignedTo.Length > 0 ? assignedTo : Resources.Nobody;
-			if (assignedTo.IsUnassigned())
+			assignedCell.Value = task.AssignedTo();
+			verificationResult = WorkItemVerifier.VerifyAssignation(task);
+			if (verificationResult.Result != VerificationResult.Ok)
 			{
-				assignedCell.SetWarningColor();
-				assignedCell.ToolTipText = Messages.TaskIsNotAssigned();
+				
+				assignedCell.SetVerificationColor(verificationResult.Result);
+				assignedCell.ToolTipText = verificationResult.AllMessagesString;
 			}
-
-			return assignedTo;
 		}
 
 		internal void FillNotAccessibleTaskInfo(

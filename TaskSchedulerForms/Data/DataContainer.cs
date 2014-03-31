@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
-namespace TaskSchedulerForms
+namespace TaskSchedulerForms.Data
 {
 	internal class DataContainer
 	{

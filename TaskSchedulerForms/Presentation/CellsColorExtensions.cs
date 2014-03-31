@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Data;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
 
@@ -25,6 +26,19 @@ namespace TaskSchedulerForms.Presentation
 				case WorkItemState.Resolved:
 				case WorkItemState.Done:
 					cell.Style.BackColor = CellsPalette.StateResolved;
+					break;
+			}
+		}
+
+		internal static void SetVerificationColor(this DataGridViewCell cell, VerificationResult result)
+		{
+			switch (result)
+			{
+				case VerificationResult.Error:
+					cell.Style.BackColor = CellsPalette.Error;
+					break;
+				case VerificationResult.Warning:
+					cell.Style.BackColor = CellsPalette.Warning;
 					break;
 			}
 		}

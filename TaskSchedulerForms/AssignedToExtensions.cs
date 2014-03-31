@@ -9,12 +9,13 @@ namespace TaskSchedulerForms
 
 		internal static bool IsUnassigned(this WorkItem workItem)
 		{
-			return workItem.AssignedTo().StartsWith(s_groupPrefix);
+			string assignee = workItem.AssignedTo();
+			return string.IsNullOrEmpty(assignee) || assignee.StartsWith(s_groupPrefix);
 		}
 
-		internal static bool IsUnassigned(this string workItemAssignation)
+		internal static bool IsUnassigned(this string assignee)
 		{
-			return workItemAssignation.StartsWith(s_groupPrefix);
+			return string.IsNullOrEmpty(assignee) || assignee.StartsWith(s_groupPrefix);
 		}
 	}
 }

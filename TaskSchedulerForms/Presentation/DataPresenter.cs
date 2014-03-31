@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Config;
 using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
@@ -100,18 +101,18 @@ namespace TaskSchedulerForms.Presentation
 						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
 						dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
 					}
-					if (dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.Proposed)
-						|| dgv.Rows[ltRowInd].Cells[0].IsColorForState(WorkItemState.ToDo))
+					if (dgv.Rows[ltRowInd].Cells[viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.Proposed)
+						|| dgv.Rows[ltRowInd].Cells[viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.ToDo))
 					{
 						int lasttChildRowInd = dgv.Rows.Count - 1;
 						for (int i = ltRowInd + 1; i <= lasttChildRowInd; i++)
 						{
-							if (dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Active)
-								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Resolved)
-								|| dgv.Rows[i].Cells[0].IsColorForState(WorkItemState.Done))
+							if (dgv.Rows[i].Cells[viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.Active)
+								|| dgv.Rows[i].Cells[viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.Resolved)
+								|| dgv.Rows[i].Cells[viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.Done))
 							{
-								dgv.Rows[ltRowInd].Cells[0].SetErrorColor();
-								dgv.Rows[ltRowInd].Cells[0].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
+								dgv.Rows[ltRowInd].Cells[viewColumnsIndexes.PriorityColumnIndex].SetErrorColor();
+								dgv.Rows[ltRowInd].Cells[viewColumnsIndexes.PriorityColumnIndex].ToolTipText = Messages.ProposedLeadTaskHasNotProposedChild();
 							}
 						}
 					}
@@ -231,7 +232,7 @@ namespace TaskSchedulerForms.Presentation
 			dgv.Rows.Add(new DataGridViewRow());
 			var taskRow = dgv.Rows[dgv.Rows.Count - 1];
 
-			string assignedTo = workItemInfoFiller.FillTaskInfo(
+			workItemInfoFiller.FillTaskInfo(
 				viewFiltersBuilder,
 				task,
 				leadTaskPriority,
@@ -258,7 +259,8 @@ namespace TaskSchedulerForms.Presentation
 				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
-			if (!assignedTo.IsUnassigned() && tasksByUser.ContainsKey(task.AssignedTo()))
+			string assignedTo = task.AssignedTo();
+			if (!assignedTo.IsUnassigned() && tasksByUser.ContainsKey(assignedTo))
 				nextInds.Add(tasksByUser[assignedTo]);
 
 			int maxNextInd = viewColumnsIndexes.FirstDateColumnIndex;
@@ -354,11 +356,10 @@ namespace TaskSchedulerForms.Presentation
 			if (taskFinish.Value.Date < DateTime.Now.Date)
 			{
 				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskFinish.Value.ToString("dd.MM");
-				if (workItem.Type.Name == WorkItemType.LeadTask)
-					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetErrorColor();
-				else
-					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetWarningColor();
-				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = Messages.ExpiredFd();
+
+				var verificationResult = WorkItemVerifier.VerifyFinishDate(workItem);
+				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetVerificationColor(verificationResult.Result);
+				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = verificationResult.AllMessagesString;
 
 				double? remaining = workItem.Remaining();
 				if (remaining.HasValue)
@@ -402,16 +403,19 @@ namespace TaskSchedulerForms.Presentation
 			string userMark,
 			bool shouldCheckEstimate)
 		{
-			double? estimate = task.Estimate();
-			if (estimate == null)
+			var verificationResult = WorkItemVerifier.VerifyEstimatePresence(task);
+			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				if (shouldCheckEstimate)
 				{
-					taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetErrorColor();
-					taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = Messages.NoEstimate();
+					var estimateCell = taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1];
+					estimateCell.SetVerificationColor(verificationResult.Result);
+					estimateCell.ToolTipText = verificationResult.AllMessagesString;
 				}
 				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
+
+			double? estimate = task.Estimate();
 
 			var length = (int)Math.Ceiling(estimate.Value / 8 / m_focusFactor);
 
