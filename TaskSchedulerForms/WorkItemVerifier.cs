@@ -138,6 +138,27 @@ namespace TaskSchedulerForms
 			};
 		}
 
+		internal static WorkItemVerificationResult VerifyNoProposedChildTaks(WorkItem leadTask, DataContainer dataContainer)
+		{
+			if ((leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
+				&& dataContainer.LeadTaskChildrenDict.ContainsKey(leadTask.Id))
+			{
+				foreach (int childTaskId in dataContainer.LeadTaskChildrenDict[leadTask.Id])
+				{
+					if (!dataContainer.WiDict.ContainsKey(childTaskId))
+						continue;
+					WorkItem task = dataContainer.WiDict[childTaskId];
+					if (task.State != WorkItemState.Proposed && task.State != WorkItemState.ToDo)
+						return new WorkItemVerificationResult
+						{
+							Result = VerificationResult.Error,
+							Messages = new List<string>(1) {Messages.ProposedLeadTaskHasNotProposedChild()},
+						};
+				}
+			}
+			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
+		}
+
 		/*
 		private static void UpdateResult(
 			WorkItemVerificationResult result,

@@ -53,7 +53,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>DAD2B81B091B0B83AE1DAC435E1E86FE42065641</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>0EF6F6723219FC467BF68391D686CEF680C71D36</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>TaskSchedulerForms_TemporaryKey.pfx</ManifestKeyFile>
@@ -110,6 +110,8 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Const\Messages.cs" />
+    <Compile Include="Presentation\RowsAdder.cs" />
+    <Compile Include="Presentation\ScheduleFiller.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Presentation\ScheduleColumnsPresenter.cs" />

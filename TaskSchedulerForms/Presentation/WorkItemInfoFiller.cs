@@ -80,6 +80,13 @@ namespace TaskSchedulerForms.Presentation
 				FontStyle.Underline);
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
+			verificationResult = WorkItemVerifier.VerifyNoProposedChildTaks(leadTask, data);
+			if (verificationResult.Result != VerificationResult.Ok)
+			{
+				priorityCell.SetColorByVerification(verificationResult.Result);
+				priorityCell.ToolTipText = verificationResult.AllMessagesString;
+			}
+
 			var blockersCell = leadTaskRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex];
 			verificationResult = WorkItemVerifier.VerifyBlockersExistance(blockersIds);
 			if (verificationResult.Result != VerificationResult.Ok)
