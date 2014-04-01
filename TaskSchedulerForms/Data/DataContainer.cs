@@ -10,7 +10,5 @@ namespace TaskSchedulerForms.Data
 		internal Dictionary<int, WorkItem> WiDict;
 
 		internal Dictionary<int, List<int>> BlockersDict;
-
-		internal Dictionary<int, WorkItem> NonChildBlockers;
 	}
 }

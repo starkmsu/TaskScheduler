@@ -81,24 +81,11 @@ namespace TaskSchedulerForms.Presentation
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
 			var blockersCell = leadTaskRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex];
-			if (blockersIds != null)
+			verificationResult = WorkItemVerifier.VerifyBlockersExistance(blockersIds);
+			if (verificationResult.Result != VerificationResult.Ok)
 			{
-				blockersCell.Value = string.Join(",", blockersIds);
-
-				verificationResult = WorkItemVerifier.VerifyNonChildBlockerExistance(
-					leadTask,
-					blockersIds,
-					data,
-					false);
-				if (verificationResult.Result == VerificationResult.Ok)
-				{
-					blockersCell.ToolTipText = string.Join(Environment.NewLine, blockersIds.Select(b => data.WiDict[b].Title));
-				}
-				else
-				{
-					blockersCell.SetColorByVerification(verificationResult.Result);
-					blockersCell.ToolTipText = verificationResult.AllMessagesString;
-				}
+				blockersCell.SetColorByVerification(verificationResult.Result);
+				blockersCell.Value = verificationResult.AllMessagesString;
 			}
 			if (!string.IsNullOrEmpty(leadTask.BlockingReason()))
 			{
@@ -117,6 +104,7 @@ namespace TaskSchedulerForms.Presentation
 		internal void FillTaskInfo(
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
+			List<WorkItem> siblings,
 			int? leadTaskPriority,
 			DataGridViewRow taskRow,
 			DataContainer data,
@@ -151,11 +139,9 @@ namespace TaskSchedulerForms.Presentation
 				string blockerIdsStr = string.Join(",", blockerIds);
 				blockersCell.Value = blockerIdsStr;
 
-				verificationResult = WorkItemVerifier.VerifyNonChildBlockerExistance(
-					task,
-					blockerIds,
-					data,
-					false);
+				verificationResult = WorkItemVerifier.VerifyNonChildBlockerExistance(blockerIds, siblings);
+				if (verificationResult.Result == VerificationResult.Ok)
+					verificationResult = WorkItemVerifier.VerifyActiveTaskBlocking(task, blockerIds);
 				if (verificationResult.Result == VerificationResult.Ok)
 				{
 					blockerIdsStr = string.Join(Environment.NewLine, blockerIds.Select(b => data.WiDict[b].Title));

@@ -92,20 +92,32 @@ namespace TaskSchedulerForms
 			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
 		}
 
-		internal static WorkItemVerificationResult VerifyNonChildBlockerExistance(
-			WorkItem workItem,
-			List<int> blockersIds,
-			DataContainer dataContainer,
-			bool checkState)
+		internal static WorkItemVerificationResult VerifyNonChildBlockerExistance(List<int> blockersIds, List<WorkItem> siblings)
 		{
-			int nonChildBlockerId = blockersIds.FirstOrDefault(dataContainer.NonChildBlockers.ContainsKey);
+			int nonChildBlockerId = blockersIds.FirstOrDefault(i => siblings.All(s => s.Id != i));
 			if (nonChildBlockerId > 0)
 				return new WorkItemVerificationResult
 				{
 					Result = VerificationResult.Error,
 					Messages = new List<string>(1) { Messages.NonChildBlocker(nonChildBlockerId) },
 				};
-			if (checkState && workItem.State == WorkItemState.Active)
+			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
+		}
+
+		internal static WorkItemVerificationResult VerifyBlockersExistance(List<int> blockersIds)
+		{
+			if (blockersIds != null && blockersIds.Count > 0)
+				return new WorkItemVerificationResult
+				{
+					Result = VerificationResult.Error,
+					Messages = new List<string>(1) { string.Join(",", blockersIds) },
+				};
+			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
+		}
+
+		internal static WorkItemVerificationResult VerifyActiveTaskBlocking(WorkItem workItem, List<int> blockersIds)
+		{
+			if (workItem.State == WorkItemState.Active && blockersIds != null && blockersIds.Count > 0)
 				return new WorkItemVerificationResult
 				{
 					Result = VerificationResult.Error,

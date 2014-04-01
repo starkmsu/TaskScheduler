@@ -55,7 +55,7 @@ namespace TaskSchedulerForms.Presentation
 				int ltRowInd = dgv.Rows.Count - 1;
 
 				var childrenTasks = leadTaskChildren.Value
-					.Where(i => data.WiDict.ContainsKey(i))
+					//.Where(i => data.WiDict.ContainsKey(i))
 					.Select(i => data.WiDict[i])
 					.OrderBy(i => i.Priority() ?? 999)
 					.ToList();
@@ -179,9 +179,7 @@ namespace TaskSchedulerForms.Presentation
 		{
 			dgv.Rows.Add(new DataGridViewRow());
 			var blockerRow = dgv.Rows[dgv.Rows.Count - 1];
-			WorkItem blocker = data.NonChildBlockers.ContainsKey(blockerId)
-				? data.NonChildBlockers[blockerId]
-				: data.WiDict[blockerId];
+			WorkItem blocker = data.WiDict[blockerId];
 			workItemInfoFiller.FillBlockerInfo(blockerRow, blocker);
 			viewFiltersBuilder.MarkBlockerRow(blockerRow);
 		}
@@ -193,7 +191,7 @@ namespace TaskSchedulerForms.Presentation
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			WorkItem task,
-			List<WorkItem> childrenTasks,
+			List<WorkItem> siblings,
 			int? leadTaskPriority,
 			DataContainer data,
 			Dictionary<int, int> alreadyAdded,
@@ -212,7 +210,7 @@ namespace TaskSchedulerForms.Presentation
 				freeDaysCalculator,
 				data,
 				task,
-				childrenTasks,
+				siblings,
 				leadTaskPriority,
 				alreadyAdded,
 				nextInds,
@@ -224,6 +222,7 @@ namespace TaskSchedulerForms.Presentation
 			workItemInfoFiller.FillTaskInfo(
 				viewFiltersBuilder,
 				task,
+				siblings,
 				leadTaskPriority,
 				taskRow,
 				data,

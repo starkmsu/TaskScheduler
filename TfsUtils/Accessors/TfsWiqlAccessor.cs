@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
@@ -39,7 +40,7 @@ namespace TfsUtils.Accessors
 			return wiqlString + GenerateUsersConditions(users);
 		}
 
-		public WorkItemCollection QueryWorkItemsByIds(List<int> ids)
+		public WorkItemCollection QueryWorkItemsByIds(ICollection<int> ids)
 		{
 			const string queryStr = "SELECT * FROM WorkItems WHERE [System.Id] IN (@ids)";
 
@@ -47,7 +48,7 @@ namespace TfsUtils.Accessors
 
 			var complexParamValues = new Dictionary<string, List<object>>
 			{
-				{"ids", ids.ConvertAll(i => (object)i)}
+				{"ids", ids.Select(i => (object)i).ToList()}
 			};
 
 			return QueryWorkItems(

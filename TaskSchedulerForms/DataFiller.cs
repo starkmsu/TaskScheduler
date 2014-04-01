@@ -19,7 +19,6 @@ namespace TaskSchedulerForms
 				WiDict = new Dictionary<int, WorkItem>(),
 				BlockersDict = new Dictionary<int, List<int>>(),
 				LeadTaskChildrenDict = new Dictionary<int, List<int>>(),
-				NonChildBlockers = new Dictionary<int, WorkItem>()
 			};
 
 			AppendLeadTasks(result, leadTasks);
@@ -174,24 +173,23 @@ namespace TaskSchedulerForms
 			if (dataContainer.BlockersDict.Count == 0)
 				return;
 
+			var notFound = new HashSet<int>();
 			foreach (var pair in dataContainer.BlockersDict)
 			{
 				foreach (int blockerId in pair.Value.Where(i => !dataContainer.WiDict.ContainsKey(i)))
 				{
-					if (dataContainer.NonChildBlockers.ContainsKey(blockerId))
-						continue;
-					dataContainer.NonChildBlockers.Add(blockerId, null);
+					notFound.Add(blockerId);
 				}
 			}
 
-			if (dataContainer.NonChildBlockers.Keys.Count == 0)
+			if (notFound.Count == 0)
 				return;
 
-			var workItems = wiqlAccessor.QueryWorkItemsByIds(dataContainer.NonChildBlockers.Keys.ToList());
+			var workItems = wiqlAccessor.QueryWorkItemsByIds(notFound);
 			for (int i = 0; i < workItems.Count; i++)
 			{
 				WorkItem workItem = workItems[i];
-				dataContainer.NonChildBlockers[workItem.Id] = workItem;
+				dataContainer.WiDict[workItem.Id] = workItem;
 			}
 		}
 	}
