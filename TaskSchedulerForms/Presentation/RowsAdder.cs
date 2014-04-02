@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -57,6 +58,7 @@ namespace TaskSchedulerForms.Presentation
 					leadTaskRow,
 					viewColumnsIndexes.FirstDateColumnIndex,
 					m_proposedLtMark,
+					m_proposedLtMark,
 					shouldCheckEstimate);
 			return ScheduleFiller.AddDatesActive(
 				viewColumnsIndexes,
@@ -64,6 +66,7 @@ namespace TaskSchedulerForms.Presentation
 				leadTask,
 				leadTaskRow,
 				viewColumnsIndexes.FirstDateColumnIndex,
+				m_activeLtMark,
 				m_activeLtMark);
 		}
 
@@ -138,6 +141,8 @@ namespace TaskSchedulerForms.Presentation
 			if (nextInds.Count > 0)
 				maxNextInd = nextInds.Max();
 
+			string userMark = GetUserMark(assignedTo);
+
 			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? ScheduleFiller.AddDatesProposed(
 					viewColumnsIndexes,
@@ -146,6 +151,7 @@ namespace TaskSchedulerForms.Presentation
 					taskRow,
 					maxNextInd,
 					assignedTo,
+					userMark,
 					true)
 				: ScheduleFiller.AddDatesActive(
 					viewColumnsIndexes,
@@ -153,11 +159,29 @@ namespace TaskSchedulerForms.Presentation
 					task,
 					taskRow,
 					maxNextInd,
-					assignedTo);
+					assignedTo,
+					userMark);
 
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;
 			return nextInd;
+		}
+
+		private static string GetUserMark(string user)
+		{
+			if (string.IsNullOrEmpty(user))
+				return string.Empty;
+			string[] words = user.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+			if (words.Length == 0)
+				return string.Empty;
+			if (words.Length == 1)
+				return words[0].Length > 3 ? words[0].Substring(0, 3) : words[0];
+			string result = string.Empty;
+			for (int i = 0; i < words.Length && i < 3; i++)
+			{
+				result += words[i].Substring(0, 1);
+			}
+			return result;
 		}
 
 		private static void AddBlockerRow(

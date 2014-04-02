@@ -53,7 +53,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>A2E46C5A2751DB931789E5CA92DBF9A37884AEC7</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>35BB059972B3F539CCC8073199FE198596BA09DA</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>TaskSchedulerForms_TemporaryKey.pfx</ManifestKeyFile>

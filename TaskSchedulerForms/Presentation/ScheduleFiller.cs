@@ -19,7 +19,8 @@ namespace TaskSchedulerForms.Presentation
 			WorkItem workItem,
 			DataGridViewRow row,
 			int startInd,
-			string user)
+			string user,
+			string userMark)
 		{
 			var taskStart = workItem.StartDate();
 			var taskFinish = workItem.FinishDate();
@@ -45,7 +46,8 @@ namespace TaskSchedulerForms.Presentation
 						startInd,
 						length,
 						false,
-						user);
+						user,
+						userMark);
 				}
 			}
 			else if (taskStart.HasValue)
@@ -65,7 +67,8 @@ namespace TaskSchedulerForms.Presentation
 					indStart,
 					indFinish - indStart + 1,
 					true,
-					user);
+					user,
+					userMark);
 
 				return indFinish + 1;
 			}
@@ -79,6 +82,7 @@ namespace TaskSchedulerForms.Presentation
 			DataGridViewRow taskRow,
 			int startInd,
 			string user,
+			string userMark,
 			bool shouldCheckEstimate)
 		{
 			var verificationResult = WorkItemVerifier.VerifyEstimatePresence(task);
@@ -119,7 +123,8 @@ namespace TaskSchedulerForms.Presentation
 				startInd,
 				length,
 				false,
-				user);
+				user,
+				userMark);
 		}
 
 		private static int AddDates(
@@ -129,7 +134,8 @@ namespace TaskSchedulerForms.Presentation
 			int startInd,
 			int length,
 			bool byDates,
-			string user)
+			string user,
+			string userMark)
 		{
 			if (startInd - viewColumnsIndexes.FirstDateColumnIndex > m_maxInd)
 				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
@@ -141,15 +147,13 @@ namespace TaskSchedulerForms.Presentation
 					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var cell = row.Cells[startInd + ind];
 				++ind;
-				if (byDates)
-					--length;
-				if (ColorCellIfFreeDay(
+				bool isFreeDay = ColorCellIfFreeDay(
 					freeDaysCalculator,
 					cell,
 					dateIndexShift,
-					user))
-					continue;
-				if (!byDates)
+					user,
+					userMark);
+				if (byDates || !isFreeDay)
 					--length;
 			}
 			return startInd + ind;
@@ -177,15 +181,13 @@ namespace TaskSchedulerForms.Presentation
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewCell cell,
 			int dayIndex,
-			string user)
+			string user,
+			string userMark)
 		{
 			DateTime date = DateTime.Today.Date.AddDays(dayIndex);
 			DayType dt = freeDaysCalculator.GetDayType(date, user);
 			if (dt == DayType.WorkDay)
-			{
-				string userMark = user.Length > 3 ? user.Substring(0, 3) : user;
 				cell.Value = userMark;
-			}
 			cell.SetColorByDayType(dt);
 			return dt != DayType.WorkDay;
 		}
