@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Helpers;
 using TfsUtils.Parsers;
@@ -28,7 +26,6 @@ namespace TaskSchedulerForms.Presentation
 			var alreadyAdded = new Dictionary<int, int>();
 			var tasksByUser = new Dictionary<string, int>();
 
-			DateTime today = DateTime.Now.Date;
 			var resultBuilder = new ViewFiltersBuilder(dgv, viewColumnsIndexes);
 			var workItemInfoFiller = new WorkItemInfoFiller(dgv, viewColumnsIndexes);
 
@@ -69,14 +66,12 @@ namespace TaskSchedulerForms.Presentation
 								alreadyAdded,
 								tasksByUser))
 						.Max();
-					for (int i = nextLtInd; i < lastTaskInd; i++)
-					{
-						DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
-						if (freeDaysCalculator.GetDayType(date) != DayType.WorkDay)
-							continue;
-						dgv.Rows[ltRowInd].Cells[i].SetErrorColor();
-						dgv.Rows[ltRowInd].Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
-					}
+					ScheduleFiller.ColorFdOutDays(
+						viewColumnsIndexes,
+						freeDaysCalculator,
+						dgv.Rows[ltRowInd],
+						nextLtInd,
+						lastTaskInd);
 				}
 
 				var notAccessableChildren = leadTaskChildren.Value

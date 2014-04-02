@@ -138,7 +138,6 @@ namespace TaskSchedulerForms.Presentation
 			if (nextInds.Count > 0)
 				maxNextInd = nextInds.Max();
 
-			string userMark = assignedTo.Length > 0 ? assignedTo.Substring(0, 3) : assignedTo;
 			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
 				? ScheduleFiller.AddDatesProposed(
 					viewColumnsIndexes,
@@ -146,7 +145,7 @@ namespace TaskSchedulerForms.Presentation
 					task,
 					taskRow,
 					maxNextInd,
-					userMark,
+					assignedTo,
 					true)
 				: ScheduleFiller.AddDatesActive(
 					viewColumnsIndexes,
@@ -154,13 +153,7 @@ namespace TaskSchedulerForms.Presentation
 					task,
 					taskRow,
 					maxNextInd,
-					userMark);
-
-			ScheduleFiller.ColorVacations(
-				viewColumnsIndexes,
-				freeDaysCalculator,
-				taskRow,
-				userMark);
+					assignedTo);
 
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;

@@ -19,9 +19,12 @@ namespace TaskSchedulerForms.Helpers
 		internal void SetVacations(List<VacationData> vacations)
 		{
 			m_vacations = new Dictionary<string, List<DateTime>>();
+			DateTime today = DateTime.Now.Date;
 			foreach (VacationData vacation in vacations)
 			{
-				m_vacations.Add(vacation.User.Substring(0, 3), vacation.VacationDays);
+				m_vacations.Add(
+					vacation.User,
+					vacation.VacationDays.Where(h => h.Date >= today).ToList());
 			}
 		}
 

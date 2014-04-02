@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Helpers;
 using TfsUtils.Parsers;
@@ -20,7 +19,7 @@ namespace TaskSchedulerForms.Presentation
 			WorkItem workItem,
 			DataGridViewRow row,
 			int startInd,
-			string userMark)
+			string user)
 		{
 			var taskStart = workItem.StartDate();
 			var taskFinish = workItem.FinishDate();
@@ -45,7 +44,8 @@ namespace TaskSchedulerForms.Presentation
 						row,
 						startInd,
 						length,
-						userMark);
+						false,
+						user);
 				}
 			}
 			else if (taskStart.HasValue)
@@ -53,22 +53,20 @@ namespace TaskSchedulerForms.Presentation
 				var indStart = (int)taskStart.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
 				if (indStart < 0)
 					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskStart.Value.ToString("dd.MM");
-				indStart = Math.Min(Math.Max(0, indStart), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
+				indStart = Math.Min(Math.Max(1, indStart), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
 				var indFinish = (int)taskFinish.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
-				indFinish = Math.Min(Math.Max(0, indFinish), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
-				DateTime today = DateTime.Now.Date;
-				for (int i = indStart; i <= indFinish; i++)
-				{
-					DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
-					if (ColorCellIfFreeDay(
-						freeDaysCalculator,
-						row.Cells[i],
-						date,
-						userMark))
-						continue;
-					row.Cells[i].Value = userMark;
-				}
+				indFinish = Math.Min(Math.Max(1, indFinish), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
+
+				AddDates(
+					viewColumnsIndexes,
+					freeDaysCalculator,
+					row,
+					indStart,
+					indFinish - indStart + 1,
+					true,
+					user);
+
 				return indFinish + 1;
 			}
 			return viewColumnsIndexes.FirstDateColumnIndex;
@@ -80,7 +78,7 @@ namespace TaskSchedulerForms.Presentation
 			WorkItem task,
 			DataGridViewRow taskRow,
 			int startInd,
-			string userMark,
+			string user,
 			bool shouldCheckEstimate)
 		{
 			var verificationResult = WorkItemVerifier.VerifyEstimatePresence(task);
@@ -107,7 +105,7 @@ namespace TaskSchedulerForms.Presentation
 				while (finishShift > 0 && startDate >= today)
 				{
 					startDate = startDate.AddDays(-1);
-					if (freeDaysCalculator.GetDayType(startDate, userMark) == DayType.WorkDay)
+					if (freeDaysCalculator.GetDayType(startDate, user) == DayType.WorkDay)
 						--finishShift;
 				}
 				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
@@ -120,7 +118,8 @@ namespace TaskSchedulerForms.Presentation
 				taskRow,
 				startInd,
 				length,
-				userMark);
+				false,
+				user);
 		}
 
 		private static int AddDates(
@@ -129,7 +128,8 @@ namespace TaskSchedulerForms.Presentation
 			DataGridViewRow row,
 			int startInd,
 			int length,
-			string userMark)
+			bool byDates,
+			string user)
 		{
 			if (startInd - viewColumnsIndexes.FirstDateColumnIndex > m_maxInd)
 				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
@@ -139,59 +139,53 @@ namespace TaskSchedulerForms.Presentation
 				int dateIndexShift = startInd - viewColumnsIndexes.FirstDateColumnIndex + ind;
 				if (dateIndexShift > m_maxInd)
 					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
-				var date = DateTime.Now.AddDays(dateIndexShift);
 				var cell = row.Cells[startInd + ind];
+				++ind;
+				if (byDates)
+					--length;
 				if (ColorCellIfFreeDay(
 					freeDaysCalculator,
 					cell,
-					date,
-					userMark))
-				{
-					++ind;
+					dateIndexShift,
+					user))
 					continue;
-				}
-				if (cell.Value == null)
-					cell.Value = userMark;
-				else
-					cell.Value = cell.Value + userMark;
-				++ind;
-				--length;
+				if (!byDates)
+					--length;
 			}
 			return startInd + ind;
 		}
 
-		internal static void ColorVacations(
+		internal static void ColorFdOutDays(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewRow row,
-			string user)
+			int startIndex,
+			int finishIndex)
 		{
-			List<DateTime> vacations = freeDaysCalculator.GetVacations(user);
-			if (vacations == null || vacations.Count == 0)
-				return;
-
-			DateTime start = DateTime.Now.Date;
-			DateTime finish = DateTime.Now.AddMonths(1).Date;
-			if (finish < vacations[0])
-				return;
-			if (start > vacations[vacations.Count - 1])
-				return;
-			int ind = viewColumnsIndexes.FirstDateColumnIndex;
-			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
+			DateTime today = DateTime.Now.Date;
+			for (int i = startIndex; i < finishIndex; i++)
 			{
-				if (vacations.Any(d => d == i))
-					row.Cells[ind].SetColorByDayType(DayType.Vacations);
-				++ind;
+				DateTime date = today.AddDays(i - viewColumnsIndexes.FirstDateColumnIndex);
+				if (freeDaysCalculator.GetDayType(date) != DayType.WorkDay)
+					continue;
+				row.Cells[i].SetErrorColor();
+				row.Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
 			}
 		}
 
 		private static bool ColorCellIfFreeDay(
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewCell cell,
-			DateTime dateTime,
+			int dayIndex,
 			string user)
 		{
-			DayType dt = freeDaysCalculator.GetDayType(dateTime, user);
+			DateTime date = DateTime.Today.Date.AddDays(dayIndex);
+			DayType dt = freeDaysCalculator.GetDayType(date, user);
+			if (dt == DayType.WorkDay)
+			{
+				string userMark = user.Length > 3 ? user.Substring(0, 3) : user;
+				cell.Value = userMark;
+			}
 			cell.SetColorByDayType(dt);
 			return dt != DayType.WorkDay;
 		}
