@@ -81,7 +81,8 @@ namespace TaskSchedulerForms.Presentation
 			int? leadTaskPriority,
 			DataContainer data,
 			Dictionary<int, int> alreadyAdded,
-			Dictionary<string, int> tasksByUser)
+			Dictionary<string, int> tasksByUser,
+			Dictionary<int, Tuple<int?, int>> tasksSchedule)
 		{
 			if (alreadyAdded.ContainsKey(task.Id))
 				return viewColumnsIndexes.FirstDateColumnIndex;
@@ -100,7 +101,8 @@ namespace TaskSchedulerForms.Presentation
 				leadTaskPriority,
 				alreadyAdded,
 				nextInds,
-				tasksByUser);
+				tasksByUser,
+				tasksSchedule);
 
 			dgv.Rows.Add(new DataGridViewRow());
 			var taskRow = dgv.Rows[dgv.Rows.Count - 1];
@@ -143,25 +145,45 @@ namespace TaskSchedulerForms.Presentation
 
 			string userMark = GetUserMark(assignedTo);
 
-			int nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
-				? ScheduleFiller.AddDatesProposed(
+			Tuple<int?, int> taskSchedule = null;
+			int nextInd;
+
+			if (tasksSchedule != null && tasksSchedule.ContainsKey(task.Id))
+				taskSchedule = tasksSchedule[task.Id];
+
+			if (taskSchedule != null && taskSchedule.Item1 != null)
+			{
+				nextInd = ScheduleFiller.AddDates(
 					viewColumnsIndexes,
 					freeDaysCalculator,
-					task,
 					taskRow,
-					maxNextInd,
-					assignedTo,
-					userMark,
-					true)
-				: ScheduleFiller.AddDatesActive(
-					viewColumnsIndexes,
-					freeDaysCalculator,
-					task,
-					taskRow,
-					maxNextInd,
+					taskSchedule.Item1.Value,
+					taskSchedule.Item2,
+					false,
 					assignedTo,
 					userMark);
-
+			}
+			else
+			{
+				nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
+					? ScheduleFiller.AddDatesProposed(
+						viewColumnsIndexes,
+						freeDaysCalculator,
+						task,
+						taskRow,
+						maxNextInd,
+						assignedTo,
+						userMark,
+						true)
+					: ScheduleFiller.AddDatesActive(
+						viewColumnsIndexes,
+						freeDaysCalculator,
+						task,
+						taskRow,
+						maxNextInd,
+						assignedTo,
+						userMark);
+			}
 			alreadyAdded.Add(task.Id, nextInd);
 			tasksByUser[assignedTo] = nextInd;
 			return nextInd;
@@ -210,7 +232,8 @@ namespace TaskSchedulerForms.Presentation
 			int? leadTaskPriority,
 			Dictionary<int, int> alreadyAdded,
 			List<int> nextInds,
-			Dictionary<string, int> tasksByUser)
+			Dictionary<string, int> tasksByUser,
+			Dictionary<int, Tuple<int?, int>> tasksSchedule)
 		{
 			if (!data.BlockersDict.ContainsKey(task.Id))
 				return null;
@@ -243,7 +266,8 @@ namespace TaskSchedulerForms.Presentation
 						leadTaskPriority,
 						data,
 						alreadyAdded,
-						tasksByUser);
+						tasksByUser,
+						tasksSchedule);
 					nextInds.Add(blockerNextInd);
 				}
 			}

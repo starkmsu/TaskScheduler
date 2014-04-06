@@ -24,19 +24,18 @@ namespace TaskSchedulerForms.Presentation
 		{
 			var taskStart = workItem.StartDate();
 			var taskFinish = workItem.FinishDate();
-			if (taskFinish == null)
-				return viewColumnsIndexes.FirstDateColumnIndex;
-
-			if (taskFinish.Value.Date < DateTime.Now.Date)
+			DateTime today = DateTime.Now.Date;
+			if (taskFinish == null || taskFinish.Value.Date < today)
 			{
-				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskFinish.Value.ToString("dd.MM");
+				if (taskFinish != null)
+					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskFinish.Value.ToString("dd.MM");
 
 				var verificationResult = WorkItemVerifier.VerifyFinishDate(workItem);
 				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].SetColorByVerification(verificationResult.Result);
 				row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].ToolTipText = verificationResult.AllMessagesString;
 
 				double? remaining = workItem.Remaining();
-				if (remaining.HasValue)
+				if (remaining != null)
 				{
 					var length = (int)Math.Ceiling(remaining.Value / 8 / m_focusFactor);
 					return AddDates(
@@ -52,12 +51,12 @@ namespace TaskSchedulerForms.Presentation
 			}
 			else if (taskStart.HasValue)
 			{
-				var indStart = (int)taskStart.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
+				var indStart = (int)taskStart.Value.Date.Subtract(today).TotalDays;
 				if (indStart < 0)
 					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskStart.Value.ToString("dd.MM");
 				indStart = Math.Min(Math.Max(1, indStart), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
-				var indFinish = (int)taskFinish.Value.Date.Subtract(DateTime.Now.Date).TotalDays;
+				var indFinish = (int)taskFinish.Value.Date.Subtract(today).TotalDays;
 				indFinish = Math.Min(Math.Max(1, indFinish), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
 				AddDates(
@@ -100,11 +99,11 @@ namespace TaskSchedulerForms.Presentation
 			double? estimate = task.Estimate();
 
 			var length = (int)Math.Ceiling(estimate.Value / 8 / m_focusFactor);
-
-			if (task.FinishDate() != null)
+			DateTime? finish = task.FinishDate();
+			if (finish != null)
 			{
 				int finishShift = length - 1;
-				DateTime startDate = task.FinishDate().Value.Date;
+				DateTime startDate = finish.Value.Date;
 				DateTime today = DateTime.Now.Date;
 				while (finishShift > 0 && startDate >= today)
 				{
@@ -112,7 +111,7 @@ namespace TaskSchedulerForms.Presentation
 					if (freeDaysCalculator.GetDayType(startDate, user) == DayType.WorkDay)
 						--finishShift;
 				}
-				var startShift = (int)startDate.Subtract(DateTime.Now.Date).TotalDays;
+				var startShift = (int)startDate.Subtract(today).TotalDays;
 				startInd = Math.Max(startInd, startShift + viewColumnsIndexes.FirstDateColumnIndex);
 			}
 
@@ -127,7 +126,7 @@ namespace TaskSchedulerForms.Presentation
 				userMark);
 		}
 
-		private static int AddDates(
+		internal static int AddDates(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewRow row,

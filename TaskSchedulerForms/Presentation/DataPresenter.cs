@@ -23,6 +23,8 @@ namespace TaskSchedulerForms.Presentation
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridView dgv)
 		{
+			var tasksSchedule = WorkItemsScheduler.MakeSchedule(data, freeDaysCalculator);
+
 			var alreadyAdded = new Dictionary<int, int>();
 			var tasksByUser = new Dictionary<string, int>();
 
@@ -64,7 +66,8 @@ namespace TaskSchedulerForms.Presentation
 								leadTask.Priority(),
 								data,
 								alreadyAdded,
-								tasksByUser))
+								tasksByUser,
+								tasksSchedule))
 						.Max();
 					ScheduleFiller.ColorFdOutDays(
 						viewColumnsIndexes,
