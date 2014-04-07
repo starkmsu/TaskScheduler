@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Helpers;
-using TfsUtils.Const;
 using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms.Presentation
@@ -50,7 +49,7 @@ namespace TaskSchedulerForms.Presentation
 						blockerId);
 				}
 
-			if (leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
+			if (leadTask.IsProposed())
 				return ScheduleFiller.AddDatesProposed(
 					viewColumnsIndexes,
 					freeDaysCalculator,
@@ -129,7 +128,7 @@ namespace TaskSchedulerForms.Presentation
 						blockerId);
 				}
 
-			if (task.State == WorkItemState.Resolved || task.State == WorkItemState.Done)
+			if (task.IsResolved())
 			{
 				alreadyAdded.Add(task.Id, viewColumnsIndexes.FirstDateColumnIndex);
 				return viewColumnsIndexes.FirstDateColumnIndex;
@@ -165,7 +164,7 @@ namespace TaskSchedulerForms.Presentation
 			}
 			else
 			{
-				nextInd = task.State == WorkItemState.Proposed || task.State == WorkItemState.ToDo
+				nextInd = task.IsProposed()
 					? ScheduleFiller.AddDatesProposed(
 						viewColumnsIndexes,
 						freeDaysCalculator,

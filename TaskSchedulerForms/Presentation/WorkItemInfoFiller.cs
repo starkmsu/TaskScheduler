@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Data;
+using TaskSchedulerForms.Helpers;
 using TaskSchedulerForms.Properties;
 using TfsUtils.Const;
 using TfsUtils.Parsers;
@@ -135,7 +136,7 @@ namespace TaskSchedulerForms.Presentation
 			titleCell.ToolTipText =
 				task.Discipline() + " "
 				+ task.Title + " "
-				+ (task.State == WorkItemState.Active
+				+ (task.IsActive()
 					? "Remaining " + task.Remaining()
 					: "Estimate " + task.Estimate());
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;

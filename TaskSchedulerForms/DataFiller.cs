@@ -2,8 +2,8 @@
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Data;
+using TaskSchedulerForms.Helpers;
 using TfsUtils.Accessors;
-using TfsUtils.Const;
 using TfsUtils.Parsers;
 using WorkItemLinkType = TfsUtils.Const.WorkItemLinkType;
 using WorkItemType = TfsUtils.Const.WorkItemType;
@@ -81,7 +81,7 @@ namespace TaskSchedulerForms
 				WorkItem task = childrenTasks[i];
 				if (!dataContainer.WiDict.ContainsKey(task.Id))
 					dataContainer.WiDict.Add(task.Id, task);
-				if (task.State == WorkItemState.Closed)
+				if (task.IsClosed())
 					continue;
 				if (task.Type.Name != WorkItemType.Task)
 					continue;
@@ -130,7 +130,7 @@ namespace TaskSchedulerForms
 				{
 					if (wiDict.ContainsKey(id))
 					{
-						if (wiDict[id].State == WorkItemState.Closed)
+						if (wiDict[id].IsClosed())
 							idsToRemove.Add(id);
 					}
 					else
@@ -152,8 +152,7 @@ namespace TaskSchedulerForms
 				for (int i = 0; i < workItems.Count; i++)
 				{
 					WorkItem workItem = workItems[i];
-					if (workItem.State != WorkItemState.Closed
-						&& (useResolvedLinkedfWorkItems || workItem.State != WorkItemState.Resolved))
+					if (!workItem.IsClosed() && (useResolvedLinkedfWorkItems || !workItem.IsResolved()))
 						continue;
 					foreach (List<int> ids in notFoundIdsDict[workItem.Id])
 					{

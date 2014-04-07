@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Helpers;
-using TfsUtils.Const;
 using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms
@@ -148,14 +147,14 @@ namespace TaskSchedulerForms
 			var proposedBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
 			foreach (Tuple<WorkItem, WorkItem> tuple in userTasks)
 			{
-				if (tuple.Item1.State == WorkItemState.Active)
+				if (tuple.Item1.IsActive())
 				{
 					if (!dataContainer.BlockersDict.ContainsKey(tuple.Item1.Id))
 						activeNonBlockedTasks.Add(tuple.Item1);
 					else
 						activeBlockedTasks.Add(tuple);
 				}
-				else if (tuple.Item1.State == WorkItemState.Proposed)
+				else if (tuple.Item1.IsProposed())
 				{
 					if (!dataContainer.BlockersDict.ContainsKey(tuple.Item1.Id))
 						proposedNonBlockedTasks.Add(tuple);
@@ -218,7 +217,7 @@ namespace TaskSchedulerForms
 			}
 			else
 			{
-				double? remaining = task.State == WorkItemState.Proposed
+				double? remaining = task.IsProposed()
 					? task.Estimate()
 					: task.Remaining();
 				if (remaining != null)
@@ -300,7 +299,7 @@ namespace TaskSchedulerForms
 				}
 				else
 				{
-					double? remaining = tuple.Item1.State == WorkItemState.Active
+					double? remaining = tuple.Item1.IsActive()
 						? blockedTask.Remaining()
 						: blockedTask.Estimate();
 					int taskDaysCount = remaining == null ? 0 : CalculateDaysByRemaining(remaining.Value);

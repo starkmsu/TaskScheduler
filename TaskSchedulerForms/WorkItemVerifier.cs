@@ -117,7 +117,7 @@ namespace TaskSchedulerForms
 
 		internal static WorkItemVerificationResult VerifyActiveTaskBlocking(WorkItem workItem, List<int> blockersIds)
 		{
-			if (workItem.State == WorkItemState.Active && blockersIds != null && blockersIds.Count > 0)
+			if (workItem.IsActive() && blockersIds != null && blockersIds.Count > 0)
 				return new WorkItemVerificationResult
 				{
 					Result = VerificationResult.Error,
@@ -140,7 +140,7 @@ namespace TaskSchedulerForms
 
 		internal static WorkItemVerificationResult VerifyNoProposedChildTaks(WorkItem leadTask, DataContainer dataContainer)
 		{
-			if ((leadTask.State == WorkItemState.Proposed || leadTask.State == WorkItemState.ToDo)
+			if ((leadTask.IsProposed())
 				&& dataContainer.LeadTaskChildrenDict.ContainsKey(leadTask.Id))
 			{
 				foreach (int childTaskId in dataContainer.LeadTaskChildrenDict[leadTask.Id])
@@ -148,7 +148,7 @@ namespace TaskSchedulerForms
 					if (!dataContainer.WiDict.ContainsKey(childTaskId))
 						continue;
 					WorkItem task = dataContainer.WiDict[childTaskId];
-					if (task.State != WorkItemState.Proposed && task.State != WorkItemState.ToDo)
+					if (!task.IsProposed())
 						return new WorkItemVerificationResult
 						{
 							Result = VerificationResult.Error,

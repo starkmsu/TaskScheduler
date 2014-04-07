@@ -88,6 +88,7 @@
     <Compile Include="Data\VerificationResult.cs" />
     <Compile Include="Data\WorkItemVerificationResult.cs" />
     <Compile Include="Helpers\FreeDaysCalculator.cs" />
+    <Compile Include="Helpers\StateExtensions.cs" />
     <Compile Include="Presentation\CellsColorExtensions.cs" />
     <Compile Include="Const\CellsPalette.cs" />
     <Compile Include="Config\Config.cs" />
