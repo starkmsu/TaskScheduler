@@ -156,7 +156,7 @@ namespace TaskSchedulerForms.Presentation
 					viewColumnsIndexes,
 					freeDaysCalculator,
 					taskRow,
-					taskSchedule.Item1.Value,
+					taskSchedule.Item1.Value + viewColumnsIndexes.FirstDateColumnIndex,
 					taskSchedule.Item2,
 					false,
 					assignedTo,

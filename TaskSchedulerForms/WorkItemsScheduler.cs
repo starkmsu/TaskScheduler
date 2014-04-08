@@ -86,6 +86,9 @@ namespace TaskSchedulerForms
 			{
 				foreach (KeyValuePair<int, BlockerData> pair in usersBlockersDict[currentUser])
 				{
+					// not a task assigned to this user
+					if (!taskSchedule.ContainsKey(pair.Key))
+						continue;
 					var currentSchedule = taskSchedule[pair.Key];
 					if (currentSchedule.Item1 == null)
 						continue;
@@ -305,16 +308,20 @@ namespace TaskSchedulerForms
 					int taskDaysCount = remaining == null ? 0 : CalculateDaysByRemaining(remaining.Value);
 					int startDay = start;
 					var comparer = new TaskPriorityComparer();
+					bool added = false;
 					for (int i = 0; i < schedule.Count; i++)
 					{
 						var taskData = schedule[i];
 						if (startDay > finishData.Item1.Value && comparer.Compare(tuple, taskData.Item1) < 0)
 						{
 							schedule.Insert(i, new Tuple<Tuple<WorkItem, WorkItem>, int>(tuple, taskDaysCount));
+							added = true;
 							break;
 						}
 						startDay += taskData.Item2;
 					}
+					if (!added)
+						schedule.Add(new Tuple<Tuple<WorkItem, WorkItem>, int>(tuple, taskDaysCount));
 				}
 
 				foreach (var userBlockersPair in finishData.Item2)
@@ -376,7 +383,7 @@ namespace TaskSchedulerForms
 				}
 				if (finish > result)
 					result = finish;
-				scheduledTasksDict.Add(activeTask.Id, new Tuple<int?, int>(0, finish));
+				scheduledTasksDict[activeTask.Id] = new Tuple<int?, int>(0, finish);
 			}
 			return result;
 		}
