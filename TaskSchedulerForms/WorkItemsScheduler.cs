@@ -144,56 +144,52 @@ namespace TaskSchedulerForms
 			DataContainer dataContainer,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
-			var activeNonBlockedTasks = new List<WorkItem>();
+			var nonBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
 			var activeBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
-			var proposedNonBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
 			var proposedBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
 			foreach (Tuple<WorkItem, WorkItem> tuple in userTasks)
 			{
 				if (tuple.Item1.IsActive())
 				{
 					if (!dataContainer.BlockersDict.ContainsKey(tuple.Item1.Id))
-						activeNonBlockedTasks.Add(tuple.Item1);
+						nonBlockedTasks.Add(tuple);
 					else
 						activeBlockedTasks.Add(tuple);
 				}
 				else if (tuple.Item1.IsProposed())
 				{
 					if (!dataContainer.BlockersDict.ContainsKey(tuple.Item1.Id))
-						proposedNonBlockedTasks.Add(tuple);
+						nonBlockedTasks.Add(tuple);
 					else
 						proposedBlockedTasks.Add(tuple);
 				}
 			}
 
-			int nonBlockedActiveFinish = AppendActiveNonBlockedTasks(
-				activeNonBlockedTasks,
-				scheduledTasksDict,
+			var schedule = AppendNonBlockedTasks(
+				nonBlockedTasks,
 				user,
+				scheduledTasksDict,
 				freeDaysCalculator);
-			var schedule = AppendProposedNonBlockedTasks(proposedNonBlockedTasks);
 
 			var result = new Dictionary<string, HashSet<int>>();
 
 			AppendBlockedTasks(
 				proposedBlockedTasks,
 				schedule,
-				nonBlockedActiveFinish + 1,
 				dataContainer,
 				scheduledTasksDict,
 				result);
 			AppendBlockedTasks(
 				activeBlockedTasks,
 				schedule,
-				nonBlockedActiveFinish + 1,
 				dataContainer,
 				scheduledTasksDict,
 				result);
 
-			int currentDay = nonBlockedActiveFinish + 1;
+			int currentDay = 0;
 			foreach (var pair in schedule)
 			{
-				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(currentDay, pair.Item2);
+				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(pair.Item1.Item1.IsActive() ? 0 : currentDay, pair.Item2);
 				currentDay += pair.Item2;
 			}
 
@@ -284,11 +280,11 @@ namespace TaskSchedulerForms
 		private static void AppendBlockedTasks(
 			IEnumerable<Tuple<WorkItem, WorkItem>> blockedTasks,
 			List<Tuple<Tuple<WorkItem, WorkItem>, int>> schedule,
-			int start,
 			DataContainer dataContainer,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
 			Dictionary<string, HashSet<int>> usersBlockers)
 		{
+			var comparer = new TaskPriorityComparer();
 			foreach (var tuple in blockedTasks)
 			{
 				WorkItem blockedTask = tuple.Item1;
@@ -306,19 +302,22 @@ namespace TaskSchedulerForms
 						? blockedTask.Remaining()
 						: blockedTask.Estimate();
 					int taskDaysCount = remaining == null ? 0 : CalculateDaysByRemaining(remaining.Value);
-					int startDay = start;
-					var comparer = new TaskPriorityComparer();
+					int startDay = 0;
 					bool added = false;
 					for (int i = 0; i < schedule.Count; i++)
 					{
 						var taskData = schedule[i];
+						if (taskData.Item1.Item1.IsActive())
+							continue;
 						if (startDay > finishData.Item1.Value && comparer.Compare(tuple, taskData.Item1) < 0)
 						{
 							schedule.Insert(i, new Tuple<Tuple<WorkItem, WorkItem>, int>(tuple, taskDaysCount));
 							added = true;
 							break;
 						}
-						startDay += taskData.Item2;
+						startDay += taskData.Item1.Item1.IsActive()
+							? Math.Max(taskData.Item2 - startDay, 0)
+							: taskData.Item2;
 					}
 					if (!added)
 						schedule.Add(new Tuple<Tuple<WorkItem, WorkItem>, int>(tuple, taskDaysCount));
@@ -344,48 +343,55 @@ namespace TaskSchedulerForms
 			}
 		}
 
-		private static List<Tuple<Tuple<WorkItem, WorkItem>, int>> AppendProposedNonBlockedTasks(
-			ICollection<Tuple<WorkItem, WorkItem>> proposedNonBlockedTasks)
+		private static List<Tuple<Tuple<WorkItem, WorkItem>, int>> AppendNonBlockedTasks(
+			ICollection<Tuple<WorkItem, WorkItem>> nonBlockedTasks,
+			string user,
+			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
+			FreeDaysCalculator freeDaysCalculator)
 		{
-			var result = new List<Tuple<Tuple<WorkItem, WorkItem>, int>>(proposedNonBlockedTasks.Count);
-			foreach (var tuple in proposedNonBlockedTasks.OrderBy(i => i, new TaskPriorityComparer()))
-			{
-				double? estimate = tuple.Item1.Estimate();
-				int taskDaysCount = estimate == null
-					? 0
-					: CalculateDaysByRemaining(estimate.Value);
-				result.Add(new Tuple<Tuple<WorkItem, WorkItem>, int>(tuple, taskDaysCount));
-			}
+			var result = new List<Tuple<Tuple<WorkItem, WorkItem>, int>>(nonBlockedTasks.Count);
+			result.AddRange(
+				nonBlockedTasks
+					.OrderBy(i =>
+						i, new TaskPriorityComparer())
+					.Select(pair =>
+						new Tuple<Tuple<WorkItem, WorkItem>, int>(
+							pair,
+							GetDaysCount(
+								pair.Item1,
+								user,
+								scheduledTasksDict,
+								freeDaysCalculator))));
 			return result;
 		}
 
-		private static int AppendActiveNonBlockedTasks(
-			IEnumerable<WorkItem> activeNonBlockedTasks,
-			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
+		private static int GetDaysCount(
+			WorkItem task,
 			string user,
+			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
 			FreeDaysCalculator freeDaysCalculator)
 		{
-			int result = 0;
-			foreach (var activeTask in activeNonBlockedTasks)
+			if (task.IsActive())
 			{
-				DateTime? finishDate = activeTask.FinishDate();
-				int finish = scheduledTasksDict.ContainsKey(activeTask.Id)
-					? scheduledTasksDict[activeTask.Id].Item2
+				DateTime? finishDate = task.FinishDate();
+				int finish = scheduledTasksDict.ContainsKey(task.Id)
+					? scheduledTasksDict[task.Id].Item2
 					: (finishDate == null
 						? 0
 						: freeDaysCalculator.GetDaysCount(finishDate.Value, user));
-				double? remaining = activeTask.Remaining();
+				double? remaining = task.Remaining();
 				if (remaining != null && remaining > 0)
 				{
 					int finishByRemaining = CalculateDaysByRemaining(remaining.Value);
 					if (finish < finishByRemaining)
 						finish = finishByRemaining;
 				}
-				if (finish > result)
-					result = finish;
-				scheduledTasksDict[activeTask.Id] = new Tuple<int?, int>(0, finish);
+				return finish;
 			}
-			return result;
+			double? estimate = task.Estimate();
+			return estimate == null
+				? 0
+				: CalculateDaysByRemaining(estimate.Value);
 		}
 	}
 }
