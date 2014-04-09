@@ -27,7 +27,8 @@ namespace TaskSchedulerForms
 				values,
 				withSubTrees,
 				byArea ? "System.AreaPath" : "System.IterationPath",
-				byArea ? "areaPath" : "iteration");
+				byArea ? "areaPath" : "iteration",
+				byArea ? "System.IterationPath" : "System.AreaPath");
 		}
 
 		private WorkItemCollection GetLeadTasks(
@@ -35,7 +36,8 @@ namespace TaskSchedulerForms
 			List<string> values,
 			bool withSubTrees,
 			string systemFieldName,
-			string fieldAlias)
+			string fieldAlias,
+			string additionalOrderField)
 		{
 			var paramValues = new Dictionary<string, object>
 			{
@@ -73,7 +75,8 @@ namespace TaskSchedulerForms
 				strBuilder.Append(" AND [" + systemFieldName + "] IN (@" + fieldAlias + ")");
 				complexParamValues.Add(fieldAlias, values.Cast<object>().ToList());
 			}
-			strBuilder.Append(" ORDER BY [Priority]");
+			strBuilder.Append(" ORDER BY [Priority], [");
+			strBuilder.Append(additionalOrderField + "]");
 
 			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
