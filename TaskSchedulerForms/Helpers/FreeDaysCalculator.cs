@@ -71,9 +71,9 @@ namespace TaskSchedulerForms.Helpers
 			date = date.Date;
 			DateTime day = DateTime.Now.Date;
 			int result = 0;
-			while (day < date)
+			while (day <= date)
 			{
-				var dayOfWeek = date.DayOfWeek;
+				var dayOfWeek = day.DayOfWeek;
 				if (dayOfWeek != DayOfWeek.Saturday
 					&& dayOfWeek != DayOfWeek.Sunday
 					&& !m_holidays.Contains(day)

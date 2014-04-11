@@ -38,22 +38,37 @@ namespace TaskSchedulerForms.Config
 		internal void SaveChosenFirstToConfig(Config config, List<string> values)
 		{
 			if (WorkMode == WorkMode.AreaFirst)
-				config.AreaPaths = values;
+			{
+				config.AreaPathsByArea = values;
+				foreach (string value in values)
+				{
+					if (config.AllAreaPaths.Contains(value))
+						config.AllAreaPaths.Add(value);
+				}
+				
+			}
 			else if (WorkMode == WorkMode.IterationFirst)
-				config.IterationPaths = values;
+			{
+				config.IterationPathsByIteration = values;
+				foreach (string value in values)
+				{
+					if (config.AllIterationPaths.Contains(value))
+						config.AllIterationPaths.Add(value);
+				}
+			}
 		}
 
 		internal void SaveAllSecondToConfig(Config config, List<string> values)
 		{
 			if (WorkMode == WorkMode.AreaFirst)
 			{
-				config.AllIterationPaths = values;
-				config.AllAreaPaths = null;
+				config.LastIterationPaths = values;
+				config.LastAreaPaths = null;
 			}
 			else if (WorkMode == WorkMode.IterationFirst)
 			{
-				config.AllAreaPaths = values;
-				config.AllIterationPaths = null;
+				config.LastAreaPaths = values;
+				config.LastIterationPaths = null;
 			}
 		}
 
@@ -61,13 +76,13 @@ namespace TaskSchedulerForms.Config
 		{
 			if (WorkMode == WorkMode.AreaFirst)
 			{
-				config.IterationPaths = values;
+				config.IterationPathsByArea = values;
 				config.WorkMode = WorkMode.AreaFirst;
 				config.ByArea = true;
 			}
 			else if (WorkMode == WorkMode.IterationFirst)
 			{
-				config.AreaPaths = values;
+				config.AreaPathsByIteration = values;
 				config.WorkMode = WorkMode.IterationFirst;
 				config.ByArea = false;
 			}

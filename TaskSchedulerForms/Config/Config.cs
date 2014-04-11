@@ -10,13 +10,21 @@ namespace TaskSchedulerForms.Config
 	{
 		public string TfsUrl { get; set; }
 
-		public List<string> AreaPaths { get; set; }
+		public List<string> AreaPathsByArea { get; set; }
 
-		public List<string> IterationPaths { get; set; }
+		public List<string> IterationPathsByArea { get; set; }
 
-		public List<string> AllIterationPaths { get; set; }
+		public List<string> AreaPathsByIteration { get; set; }
 
-		public List<string> AllAreaPaths { get; set; }
+		public List<string> IterationPathsByIteration { get; set; }
+
+		public List<string> LastAreaPaths { get; set; }
+
+		public List<string> LastIterationPaths { get; set; }
+
+		public List<string> AllAreaPaths { get; private set; }
+
+		public List<string> AllIterationPaths { get; private set; }
 
 		public List<DateTime> Holidays { get; set; }
 
@@ -37,6 +45,8 @@ namespace TaskSchedulerForms.Config
 			Vacations = new List<VacationData>();
 			WorkMode = WorkMode.AreaFirst;
 			ByArea = true;
+			AllAreaPaths = new List<string>();
+			AllIterationPaths = new List<string>();
 		}
 
 		public Config Copy()
@@ -49,10 +59,14 @@ namespace TaskSchedulerForms.Config
 				ByArea = ByArea,
 				QueryPath = QueryPath,
 
-				AreaPaths = CopyIfNotNull(AreaPaths),
-				IterationPaths = CopyIfNotNull(IterationPaths),
-				AllIterationPaths = CopyIfNotNull(AllIterationPaths),
+				AreaPathsByArea = CopyIfNotNull(AreaPathsByArea),
+				IterationPathsByArea = CopyIfNotNull(IterationPathsByArea),
+				AreaPathsByIteration = CopyIfNotNull(AreaPathsByIteration),
+				IterationPathsByIteration = CopyIfNotNull(IterationPathsByIteration),
+				LastAreaPaths = CopyIfNotNull(LastAreaPaths),
+				LastIterationPaths = CopyIfNotNull(LastIterationPaths),
 				AllAreaPaths = CopyIfNotNull(AllAreaPaths),
+				AllIterationPaths = CopyIfNotNull(AllIterationPaths),
 				Holidays = CopyIfNotNull(Holidays),
 				Vacations = CopyIfNotNull(Vacations),
 			};
@@ -67,10 +81,14 @@ namespace TaskSchedulerForms.Config
 				&& WithSubAreaPaths == other.WithSubAreaPaths
 				&& ByArea == other.ByArea
 				&& QueryPath == other.QueryPath
-				&& CollectionsEquals(AreaPaths, other.AreaPaths)
-				&& CollectionsEquals(IterationPaths, other.IterationPaths)
-				&& CollectionsEquals(AllIterationPaths, other.AllIterationPaths)
+				&& CollectionsEquals(AreaPathsByArea, other.AreaPathsByArea)
+				&& CollectionsEquals(IterationPathsByArea, other.IterationPathsByArea)
+				&& CollectionsEquals(AreaPathsByIteration, other.AreaPathsByIteration)
+				&& CollectionsEquals(IterationPathsByIteration, other.IterationPathsByIteration)
+				&& CollectionsEquals(LastIterationPaths, other.LastIterationPaths)
+				&& CollectionsEquals(LastAreaPaths, other.LastAreaPaths)
 				&& CollectionsEquals(AllAreaPaths, other.AllAreaPaths)
+				&& CollectionsEquals(AllIterationPaths, other.AllIterationPaths)
 				&& CollectionsEquals(Holidays, other.Holidays)
 				&& CollectionsEquals(Vacations, other.Vacations);
 		}

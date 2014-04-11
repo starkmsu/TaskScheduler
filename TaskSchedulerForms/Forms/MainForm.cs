@@ -76,10 +76,14 @@ namespace TaskSchedulerForms.Forms
 		private void InitFirst()
 		{
 			subTreesCheckBox.Checked = m_config.WithSubAreaPaths;
-			List<string> firstList = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AreaPaths : m_config.IterationPaths;
+			List<string> firstList = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AreaPathsByArea : m_config.IterationPathsByIteration;
 			if (firstList != null && firstList.Count > 0)
 			{
-				firstTextBox.Text = firstList[0];
+				var list = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AllAreaPaths : m_config.AllIterationPaths;
+				if (!list.Contains(firstList[0]))
+					list.Add(firstList[0]);
+				firstComboBox.DataSource = list;
+				firstComboBox.Text = firstList[0];
 				firstList.ForEach(i => firstListBox.Items.Add(i));
 			}
 			if (s_stateContainer.WorkMode == WorkMode.IterationFirst)
@@ -156,7 +160,7 @@ namespace TaskSchedulerForms.Forms
 			secondList.Sort();
 
 			var newSecond = new List<string>(secondList.Count);
-			var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+			var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.LastIterationPaths : m_config.LastAreaPaths;
 			if (oldSecond != null && oldSecond.Count > 0)
 				newSecond.AddRange(secondList.Where(i => !oldSecond.Contains(i)));
 
@@ -174,7 +178,7 @@ namespace TaskSchedulerForms.Forms
 			s_stateContainer.SaveAllSecondToConfig(m_config, secondList);
 
 			var validSecond = new List<string>();
-			var configSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.IterationPaths : m_config.AreaPaths;
+			var configSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.IterationPathsByArea : m_config.AreaPathsByIteration;
 			if (configSecond != null && configSecond.Count > 0)
 				validSecond = configSecond.Where(secondList.Contains).ToList();
 			validSecond.Sort();
@@ -371,7 +375,7 @@ namespace TaskSchedulerForms.Forms
 				var leadTasksCollection = GetLastLeadTasks();
 
 				var leadTasks = new List<WorkItem>(leadTasksCollection.Count);
-				var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.AllIterationPaths : m_config.AllAreaPaths;
+				var oldSecond = s_stateContainer.WorkMode == WorkMode.AreaFirst ? m_config.LastIterationPaths : m_config.LastAreaPaths;
 				var newSecond = new List<string>();
 				foreach (WorkItem leadTask in leadTasksCollection)
 				{
@@ -457,7 +461,15 @@ namespace TaskSchedulerForms.Forms
 
 		private void FirstAddButtonClick(object sender, EventArgs e)
 		{
-			string first = firstTextBox.Text;
+			string first = firstComboBox.Text;
+			List<string> list = s_stateContainer.WorkMode == WorkMode.AreaFirst
+				? m_config.AllAreaPaths
+				: m_config.AllIterationPaths;
+			if (!list.Contains(first))
+			{
+				list.Add(first);
+				firstComboBox.DataSource = list;
+			}
 			if (firstListBox.Items.Contains(first))
 				return;
 			firstListBox.Items.Add(first);
@@ -544,7 +556,7 @@ namespace TaskSchedulerForms.Forms
 
 			ExchangeNames();
 			var itemsCopy = new object[firstListBox.Items.Count];
-			firstTextBox.Text = secondListBox.Items.Count > 0
+			firstComboBox.Text = secondListBox.Items.Count > 0
 				? secondListBox.Items[0].ToString()
 				: string.Empty;
 			firstListBox.Items.CopyTo(itemsCopy, 0);

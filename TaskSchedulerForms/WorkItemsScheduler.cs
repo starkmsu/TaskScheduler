@@ -189,8 +189,9 @@ namespace TaskSchedulerForms
 			int currentDay = 0;
 			foreach (var pair in schedule)
 			{
-				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(pair.Item1.Item1.IsActive() ? 0 : currentDay, pair.Item2);
-				currentDay += pair.Item2;
+				bool isTaskActive = pair.Item1.Item1.IsActive();
+				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(isTaskActive ? 0 : currentDay, pair.Item2);
+				currentDay += isTaskActive ? Math.Max(pair.Item2 - currentDay, 0) : pair.Item2;
 			}
 
 			return result;
