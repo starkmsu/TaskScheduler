@@ -253,8 +253,10 @@ namespace TaskSchedulerForms.Forms
 				for (int i = 0; i < m_leadTasks.Count; i++)
 				{
 					var leadTask = m_leadTasks[i];
-					if (!firstList.Contains(s_stateContainer.GetParamForFirst(leadTask))
-						|| !secondList.Contains(s_stateContainer.GetParamForSecond(leadTask)))
+					string first = s_stateContainer.GetParamForFirst(leadTask);
+					string second = s_stateContainer.GetParamForSecond(leadTask);
+					if (firstList.All(f => first.IndexOf(first, StringComparison.Ordinal) == -1)
+						|| secondList.All(s => second.IndexOf(s, StringComparison.Ordinal) == -1))
 						continue;
 					result.Add(leadTask);
 				}

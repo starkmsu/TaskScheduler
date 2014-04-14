@@ -102,6 +102,12 @@ namespace TaskSchedulerForms.Presentation
 			DateTime? finish = task.FinishDate();
 			if (finish != null)
 			{
+				verificationResult = WorkItemVerifier.VerifyFinishDate(task);
+				var estimateCell = taskRow.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1];
+				estimateCell.SetColorByVerification(verificationResult.Result);
+				estimateCell.ToolTipText = verificationResult.AllMessagesString;
+				estimateCell.Value = finish.Value.ToString("dd.MM");
+
 				int finishShift = length - 1;
 				DateTime startDate = finish.Value.Date;
 				DateTime today = DateTime.Now.Date;
@@ -111,8 +117,15 @@ namespace TaskSchedulerForms.Presentation
 					if (freeDaysCalculator.GetDayType(startDate, user) == DayType.WorkDay)
 						--finishShift;
 				}
-				var startShift = (int)startDate.Subtract(today).TotalDays;
-				startInd = Math.Max(startInd, startShift + viewColumnsIndexes.FirstDateColumnIndex);
+				if (finishShift == 0)
+				{
+					var startShift = (int) startDate.Subtract(today).TotalDays;
+					startInd = Math.Max(startInd, startShift + viewColumnsIndexes.FirstDateColumnIndex);
+				}
+				else
+				{
+					length -= finishShift;
+				}
 			}
 
 			return AddDates(
