@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Config;
 using TaskSchedulerForms.Const;
+using TaskSchedulerForms.Data;
 using TaskSchedulerForms.Helpers;
 using TaskSchedulerForms.Presentation;
 using TaskSchedulerForms.Properties;
@@ -284,44 +286,69 @@ namespace TaskSchedulerForms.Forms
 		{
 			s_stateContainer.LastTfsUrl = tfsUrlTextBox.Text;
 
+			DataContainer data;
 			try
 			{
 				List<WorkItem> leadTasks = GetLeadTasks();
 
-				var data = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
+				data = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
+			}
+			catch (Exception exc)
+			{
+				HandleException(exc);
+				return;
+			}
 
-				scheduleDataGridView.Invoke(new Action(() =>
+			scheduleDataGridView.Invoke(new Action(() =>
+				{
+					try
 					{
 						m_viewFiltersApplier = s_dataPresenter.PresentData(
 							data,
 							s_viewColumnsIndexes,
 							s_freeDaysCalculator,
 							scheduleDataGridView);
-						usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
-						vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
-						var users2 = new List<string>(m_viewFiltersApplier.Users);
-						users2.Insert(0, string.Empty);
-						usersFilterСomboBox.DataSource = users2;
-						usersFilterСomboBox.Enabled = true;
-						usersLabel.Enabled = true;
-						makeScheduleButton.Enabled = true;
-						loadLeadTasksButton.Enabled = true;
-						holidaysButton.Enabled = true;
-						queryTextBox.Enabled = true;
-						refreshButton.Enabled = true;
-						mainTabControl.SelectTab(dataTabPage);
-					}));
-			}
-			catch (Exception exc)
-			{
-				scheduleDataGridView.Invoke(new Action(() =>
+					}
+					catch (Exception exc)
 					{
-						MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
-						makeScheduleButton.Enabled = true;
-						loadLeadTasksButton.Enabled = true;
-						queryTextBox.Enabled = true;
-					}));
-			}
+						HandleException(exc);
+						return;
+					}
+					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
+					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
+					var users2 = new List<string>(m_viewFiltersApplier.Users);
+					users2.Insert(0, string.Empty);
+					usersFilterСomboBox.DataSource = users2;
+					usersFilterСomboBox.Enabled = true;
+					usersLabel.Enabled = true;
+					makeScheduleButton.Enabled = true;
+					loadLeadTasksButton.Enabled = true;
+					holidaysButton.Enabled = true;
+					queryTextBox.Enabled = true;
+					refreshButton.Enabled = true;
+					mainTabControl.SelectTab(dataTabPage);
+				}));
+		}
+
+		private void HandleException(Exception exc)
+		{
+			scheduleDataGridView.Invoke(new Action(() =>
+			{
+				var strBuilder = new StringBuilder();
+				AppendExceptionString(exc, strBuilder);
+				MessageBox.Show(strBuilder.ToString(), Resources.LeadTasksParsingError);
+				makeScheduleButton.Enabled = true;
+				loadLeadTasksButton.Enabled = true;
+				queryTextBox.Enabled = true;
+			}));
+		}
+
+		private void AppendExceptionString(Exception exc, StringBuilder stringBuilder)
+		{
+			if (exc.InnerException != null)
+				AppendExceptionString(exc.InnerException, stringBuilder);
+			stringBuilder.AppendLine(exc.Message);
+			stringBuilder.AppendLine(exc.StackTrace);
 		}
 
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)

@@ -11,18 +11,24 @@ namespace TaskSchedulerForms
 	internal class WorkItemsScheduler
 	{
 		private const double s_workerFocusFactor = 0.5;
-		private const int s_maxUserReferenceCount = 16;
 
 		internal static Dictionary<int, Tuple<int?, int>> MakeSchedule(DataContainer dataContainer, FreeDaysCalculator freeDaysCalculator)
 		{
-			var usersTasksDict = SeparateByUser(dataContainer);
 			var result = new Dictionary<int, Tuple<int?, int>>();
 			var usersBlockersDict = new Dictionary<string, Dictionary<int, BlockerData>>();
-			var usersToProcess = new List<string>(usersTasksDict.Keys);
+
+			var usersTasksDict = SeparateByUser(dataContainer);
+			short i = 0;
+			var numbersToUsersMapping = usersTasksDict.ToDictionary(u => ++i, u => u.Key);
+			i = 0;
+			var usersToNumbersMapping = usersTasksDict.Keys.ToDictionary(u => u, u => ++i);
+
+			var usersToProcess = new List<short>(numbersToUsersMapping.Keys);
+			var processedUsers = new List<short>(2*numbersToUsersMapping.Keys.Count);
 
 			while (usersToProcess.Count > 0)
 			{
-				string user = usersToProcess[0];
+				string user = numbersToUsersMapping[usersToProcess[0]];
 				var blockersFromOtherUsers = ScheduleUserTasks(
 					usersTasksDict[user],
 					user,
@@ -36,14 +42,41 @@ namespace TaskSchedulerForms
 					result,
 					user);
 
+				foreach (short userNumber in usersToRecalculate
+					.Where(usersToNumbersMapping.ContainsKey)
+					.Select(u => usersToNumbersMapping[u]))
+				{
+					if (usersToProcess.Count > 0 && usersToProcess[usersToProcess.Count - 1] == userNumber)
+						continue;
+					usersToProcess.Add(userNumber);
+				}
+				if (usersToProcess.Count == 2*numbersToUsersMapping.Keys.Count)
+					processedUsers.RemoveAt(0);
+				processedUsers.Add(usersToProcess[0]);
 				usersToProcess.RemoveAt(0);
 
-				usersToProcess.AddRange(usersToRecalculate);
-
-				if (usersToProcess.Count > s_maxUserReferenceCount)
+				if (CheckCycle(processedUsers))
 					throw new InvalidOperationException("Cycle blockers collision!");
 			}
 			return result;
+		}
+
+		private static bool CheckCycle(List<short> userNumbers)
+		{
+			if (userNumbers.Count < 4)
+				return false;
+			var usersHash = new HashSet<short>();
+			userNumbers.ForEach(n => usersHash.Add(n));
+			int usersCount = usersHash.Count;
+			if (userNumbers.Count < usersCount*2)
+				return false;
+			for (int i = 0; i < usersCount; i++)
+			{
+				int pos = userNumbers.Count - 1 - i;
+				if (userNumbers[pos] != userNumbers[pos - usersCount])
+					return false;
+			}
+			return true;
 		}
 
 		private static HashSet<string> ProcessBlockers(
