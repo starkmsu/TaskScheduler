@@ -186,10 +186,9 @@ namespace TaskSchedulerForms.Presentation
 			DateTime today = DateTime.Now.Date;
 			while (length > 0)
 			{
-				int dateIndexShift = startInd + ind;
-				if (dateIndexShift > m_maxInd)
-					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var dayIndex =  (int) Math.Ceiling(date.Subtract(today).TotalDays);
+				if (dayIndex > m_maxInd)
+					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var cell = row.Cells[dayIndex + viewColumnsIndexes.FirstDateColumnIndex];
 				DayType dt = freeDaysCalculator.GetDayType(date, user);
 				if (dt == DayType.WorkDay)
