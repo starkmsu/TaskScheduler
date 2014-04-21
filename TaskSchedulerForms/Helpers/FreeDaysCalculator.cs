@@ -84,5 +84,47 @@ namespace TaskSchedulerForms.Helpers
 
 			return result;
 		}
+
+		internal int GetVacationsDaysCount(
+			string user,
+			int start,
+			int count)
+		{
+			List<DateTime> vacations;
+			if (!m_vacations.TryGetValue(user, out vacations))
+				return 0;
+
+			DateTime day = DateTime.Now.Date.AddDays(start);
+			int result = 0;
+			while (count > 0)
+			{
+				var dayOfWeek = day.DayOfWeek;
+				if (dayOfWeek != DayOfWeek.Saturday
+					&& dayOfWeek != DayOfWeek.Sunday
+					&& !m_holidays.Contains(day))
+				{
+					if (vacations.Contains(day))
+						++result;
+					else
+						--count;
+				}
+				day = day.AddDays(1);
+			}
+
+			return result;
+		}
+
+		internal DateTime GetWorkDayFromCount(int workDayCount)
+		{
+			DateTime day = DateTime.Today.Date;
+			while (workDayCount > 0)
+			{
+				DayType dt = GetDayType(day);
+				if (dt == DayType.WorkDay)
+					--workDayCount;
+				day = day.AddDays(1);
+			}
+			return day;
+		}
 	}
 }

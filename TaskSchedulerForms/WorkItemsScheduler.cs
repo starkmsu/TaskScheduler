@@ -223,7 +223,13 @@ namespace TaskSchedulerForms
 			foreach (var pair in schedule)
 			{
 				bool isTaskActive = pair.Item1.Item1.IsActive();
-				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(isTaskActive ? 0 : currentDay, pair.Item2);
+				int startDayIndex = isTaskActive ? 0 : currentDay;
+				int vacationDaysCount = freeDaysCalculator.GetVacationsDaysCount(
+					user,
+					startDayIndex,
+					pair.Item2);
+				scheduledTasksDict[pair.Item1.Item1.Id] = new Tuple<int?, int>(startDayIndex, pair.Item2 + vacationDaysCount);
+				currentDay += vacationDaysCount;
 				currentDay += isTaskActive ? Math.Max(pair.Item2 - currentDay, 0) : pair.Item2;
 			}
 

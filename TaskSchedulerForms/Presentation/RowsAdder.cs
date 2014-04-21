@@ -152,13 +152,12 @@ namespace TaskSchedulerForms.Presentation
 
 			if (taskSchedule != null && taskSchedule.Item1 != null)
 			{
-				nextInd = ScheduleFiller.AddDates(
+				nextInd = ScheduleFiller.AddDatesFromSchedule(
 					viewColumnsIndexes,
 					freeDaysCalculator,
 					taskRow,
-					taskSchedule.Item1.Value + viewColumnsIndexes.FirstDateColumnIndex,
+					taskSchedule.Item1.Value,
 					taskSchedule.Item2,
-					false,
 					assignedTo,
 					userMark);
 			}

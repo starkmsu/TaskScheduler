@@ -159,14 +159,47 @@ namespace TaskSchedulerForms.Presentation
 					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
 				var cell = row.Cells[startInd + ind];
 				++ind;
-				bool isFreeDay = ColorCellIfFreeDay(
-					freeDaysCalculator,
-					cell,
-					dateIndexShift,
-					user,
-					userMark);
-				if (byDates || !isFreeDay)
+				DateTime date = DateTime.Today.Date.AddDays(dateIndexShift);
+				DayType dt = freeDaysCalculator.GetDayType(date, user);
+				if (dt == DayType.WorkDay)
+					cell.Value = userMark;
+				cell.SetColorByDayType(dt);
+				if (byDates || dt == DayType.WorkDay || dt == DayType.Vacations)
 					--length;
+			}
+			return startInd + ind;
+		}
+
+		internal static int AddDatesFromSchedule(
+			ViewColumnsIndexes viewColumnsIndexes,
+			FreeDaysCalculator freeDaysCalculator,
+			DataGridViewRow row,
+			int startInd,
+			int length,
+			string user,
+			string userMark)
+		{
+			if (startInd > m_maxInd)
+				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+			int ind = 0;
+			DateTime date = freeDaysCalculator.GetWorkDayFromCount(startInd);
+			DateTime today = DateTime.Now.Date;
+			while (length > 0)
+			{
+				int dateIndexShift = startInd + ind;
+				if (dateIndexShift > m_maxInd)
+					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+				var dayIndex =  (int) Math.Ceiling(date.Subtract(today).TotalDays);
+				var cell = row.Cells[dayIndex + viewColumnsIndexes.FirstDateColumnIndex];
+				DayType dt = freeDaysCalculator.GetDayType(date, user);
+				if (dt == DayType.WorkDay)
+					cell.Value = userMark;
+				cell.SetColorByDayType(dt);
+				if (dt == DayType.WorkDay || dt == DayType.Vacations)
+					--length;
+
+				++ind;
+				date = date.AddDays(1);
 			}
 			return startInd + ind;
 		}
@@ -187,21 +220,6 @@ namespace TaskSchedulerForms.Presentation
 				row.Cells[i].SetErrorColor();
 				row.Cells[i].ToolTipText = Messages.ChildTaskHasLaterFd();
 			}
-		}
-
-		private static bool ColorCellIfFreeDay(
-			FreeDaysCalculator freeDaysCalculator,
-			DataGridViewCell cell,
-			int dayIndex,
-			string user,
-			string userMark)
-		{
-			DateTime date = DateTime.Today.Date.AddDays(dayIndex);
-			DayType dt = freeDaysCalculator.GetDayType(date, user);
-			if (dt == DayType.WorkDay)
-				cell.Value = userMark;
-			cell.SetColorByDayType(dt);
-			return dt != DayType.WorkDay;
 		}
 	}
 }
