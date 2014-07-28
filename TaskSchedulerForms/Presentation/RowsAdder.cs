@@ -9,7 +9,7 @@ using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms.Presentation
 {
-	internal class RowsAdder
+	internal static class RowsAdder
 	{
 		private const string m_proposedLtMark = "O";
 		private const string m_activeLtMark = "X";
@@ -20,6 +20,7 @@ namespace TaskSchedulerForms.Presentation
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			WorkItem leadTask,
 			DataContainer data)
 		{
@@ -53,6 +54,7 @@ namespace TaskSchedulerForms.Presentation
 				return ScheduleFiller.AddDatesProposed(
 					viewColumnsIndexes,
 					freeDaysCalculator,
+					focusFactorCalculator,
 					leadTask,
 					leadTaskRow,
 					viewColumnsIndexes.FirstDateColumnIndex,
@@ -62,6 +64,7 @@ namespace TaskSchedulerForms.Presentation
 			return ScheduleFiller.AddDatesActive(
 				viewColumnsIndexes,
 				freeDaysCalculator,
+				focusFactorCalculator,
 				leadTask,
 				leadTaskRow,
 				viewColumnsIndexes.FirstDateColumnIndex,
@@ -75,6 +78,7 @@ namespace TaskSchedulerForms.Presentation
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			WorkItem task,
 			List<WorkItem> siblings,
 			int? leadTaskPriority,
@@ -94,6 +98,7 @@ namespace TaskSchedulerForms.Presentation
 				workItemInfoFiller,
 				viewColumnsIndexes,
 				freeDaysCalculator,
+				focusFactorCalculator,
 				data,
 				task,
 				siblings,
@@ -167,6 +172,7 @@ namespace TaskSchedulerForms.Presentation
 					? ScheduleFiller.AddDatesProposed(
 						viewColumnsIndexes,
 						freeDaysCalculator,
+						focusFactorCalculator,
 						task,
 						taskRow,
 						maxNextInd,
@@ -176,6 +182,7 @@ namespace TaskSchedulerForms.Presentation
 					: ScheduleFiller.AddDatesActive(
 						viewColumnsIndexes,
 						freeDaysCalculator,
+						focusFactorCalculator,
 						task,
 						taskRow,
 						maxNextInd,
@@ -224,6 +231,7 @@ namespace TaskSchedulerForms.Presentation
 			WorkItemInfoFiller workItemInfoFiller,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			DataContainer data,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
@@ -259,6 +267,7 @@ namespace TaskSchedulerForms.Presentation
 						workItemInfoFiller,
 						viewColumnsIndexes,
 						freeDaysCalculator,
+						focusFactorCalculator,
 						blockerSiblingTask,
 						childrenTasks,
 						leadTaskPriority,

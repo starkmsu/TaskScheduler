@@ -3,19 +3,18 @@ using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Const;
 using TaskSchedulerForms.Data;
-using TaskSchedulerForms.Helpers;
 using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms.Presentation
 {
-	internal class ScheduleFiller
+	internal static class ScheduleFiller
 	{
 		private static readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
-		private const double m_focusFactor = 0.5f;
 
 		internal static int AddDatesActive(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			WorkItem workItem,
 			DataGridViewRow row,
 			int startInd,
@@ -37,7 +36,7 @@ namespace TaskSchedulerForms.Presentation
 				double? remaining = workItem.Remaining();
 				if (remaining != null)
 				{
-					var length = (int)Math.Ceiling(remaining.Value / 8 / m_focusFactor);
+					var length = focusFactorCalculator.CalculateDaysByTime(remaining.Value, user);
 					return AddDates(
 						viewColumnsIndexes,
 						freeDaysCalculator,
@@ -77,6 +76,7 @@ namespace TaskSchedulerForms.Presentation
 		internal static int AddDatesProposed(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			WorkItem task,
 			DataGridViewRow taskRow,
 			int startInd,
@@ -98,7 +98,7 @@ namespace TaskSchedulerForms.Presentation
 
 			double? estimate = task.Estimate();
 
-			var length = (int)Math.Ceiling(estimate.Value / 8 / m_focusFactor);
+			var length = focusFactorCalculator.CalculateDaysByTime(estimate.Value, user);
 			DateTime? finish = task.FinishDate();
 			if (finish != null)
 			{
@@ -139,7 +139,7 @@ namespace TaskSchedulerForms.Presentation
 				userMark);
 		}
 
-		internal static int AddDates(
+		private static int AddDates(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			DataGridViewRow row,

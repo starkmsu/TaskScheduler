@@ -4,7 +4,7 @@ using System.Linq;
 using TaskSchedulerForms.Config;
 using TaskSchedulerForms.Data;
 
-namespace TaskSchedulerForms.Helpers
+namespace TaskSchedulerForms
 {
 	internal class FreeDaysCalculator
 	{
@@ -16,7 +16,7 @@ namespace TaskSchedulerForms.Helpers
 			m_holidays = holidays ?? new List<DateTime>(0);
 		}
 
-		internal void SetVacations(List<VacationData> vacations)
+		internal void SetVacations(IEnumerable<VacationData> vacations)
 		{
 			m_vacations = new Dictionary<string, List<DateTime>>();
 			DateTime today = DateTime.Now.Date;
@@ -26,14 +26,6 @@ namespace TaskSchedulerForms.Helpers
 					vacation.User,
 					vacation.VacationDays.Where(h => h.Date >= today).ToList());
 			}
-		}
-
-		internal List<DateTime> GetVacations(string user)
-		{
-			List<DateTime> result;
-			if (m_vacations.TryGetValue(user, out result))
-				return result;
-			return null;
 		}
 
 		internal DayType GetDayType(DateTime dateTime)

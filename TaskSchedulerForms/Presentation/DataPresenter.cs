@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows.Forms;
 using TaskSchedulerForms.Data;
-using TaskSchedulerForms.Helpers;
 using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms.Presentation
@@ -21,9 +20,13 @@ namespace TaskSchedulerForms.Presentation
 			DataContainer data,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			DataGridView dgv)
 		{
-			var tasksSchedule = WorkItemsScheduler.MakeSchedule(data, freeDaysCalculator);
+			var tasksSchedule = WorkItemsScheduler.MakeSchedule(
+				data,
+				freeDaysCalculator,
+				focusFactorCalculator);
 
 			var alreadyAdded = new Dictionary<int, int>();
 			var tasksByUser = new Dictionary<string, int>();
@@ -41,6 +44,7 @@ namespace TaskSchedulerForms.Presentation
 					workItemInfoFiller,
 					viewColumnsIndexes,
 					freeDaysCalculator,
+					focusFactorCalculator,
 					leadTask,
 					data);
 				int ltRowInd = dgv.Rows.Count - 1;
@@ -61,6 +65,7 @@ namespace TaskSchedulerForms.Presentation
 								workItemInfoFiller,
 								viewColumnsIndexes,
 								freeDaysCalculator,
+								focusFactorCalculator,
 								task,
 								childrenTasks,
 								leadTask.Priority(),

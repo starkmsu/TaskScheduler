@@ -8,11 +8,12 @@ using TfsUtils.Parsers;
 
 namespace TaskSchedulerForms
 {
-	internal class WorkItemsScheduler
+	internal static class WorkItemsScheduler
 	{
-		private const double s_workerFocusFactor = 0.5;
-
-		internal static Dictionary<int, Tuple<int?, int>> MakeSchedule(DataContainer dataContainer, FreeDaysCalculator freeDaysCalculator)
+		internal static Dictionary<int, Tuple<int?, int>> MakeSchedule(
+			DataContainer dataContainer,
+			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator)
 		{
 			var result = new Dictionary<int, Tuple<int?, int>>();
 			var usersBlockersDict = new Dictionary<string, Dictionary<int, BlockerData>>();
@@ -33,6 +34,7 @@ namespace TaskSchedulerForms
 					usersTasksDict[user],
 					user,
 					freeDaysCalculator,
+					focusFactorCalculator,
 					dataContainer,
 					result);
 
@@ -145,11 +147,6 @@ namespace TaskSchedulerForms
 			return result;
 		}
 
-		private static int CalculateDaysByRemaining(double remaining)
-		{
-			return (int)Math.Ceiling(remaining/8/s_workerFocusFactor);
-		}
-
 		private static Dictionary<string, List<Tuple<WorkItem, WorkItem>>> SeparateByUser(DataContainer dataContainer)
 		{
 			var result = new Dictionary<string, List<Tuple<WorkItem, WorkItem>>>();
@@ -174,6 +171,7 @@ namespace TaskSchedulerForms
 			IEnumerable<Tuple<WorkItem, WorkItem>> userTasks,
 			string user,
 			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator,
 			DataContainer dataContainer,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
@@ -202,7 +200,8 @@ namespace TaskSchedulerForms
 				nonBlockedTasks,
 				user,
 				scheduledTasksDict,
-				freeDaysCalculator);
+				freeDaysCalculator,
+				focusFactorCalculator);
 
 			var result = new Dictionary<string, HashSet<int>>();
 
@@ -210,12 +209,14 @@ namespace TaskSchedulerForms
 				proposedBlockedTasks,
 				schedule,
 				dataContainer,
+				focusFactorCalculator,
 				scheduledTasksDict,
 				result);
 			AppendBlockedTasks(
 				activeBlockedTasks,
 				schedule,
 				dataContainer,
+				focusFactorCalculator,
 				scheduledTasksDict,
 				result);
 
@@ -245,7 +246,10 @@ namespace TaskSchedulerForms
 			return first.Value >= second.Value ? first : second;
 		}
 
-		private static int? GetFinishDay(WorkItem task, Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
+		private static int? GetFinishDay(
+			WorkItem task,
+			FocusFactorCalculator focusFactorCalculator,
+			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
 			int? result = null;
 			if (scheduledTasksDict.ContainsKey(task.Id))
@@ -260,7 +264,7 @@ namespace TaskSchedulerForms
 					? task.Estimate()
 					: task.Remaining();
 				if (remaining != null)
-					result = CalculateDaysByRemaining(remaining.Value);
+					result = focusFactorCalculator.CalculateDaysByTime(remaining.Value, task.AssignedTo());
 			}
 			return result;
 		}
@@ -268,9 +272,13 @@ namespace TaskSchedulerForms
 		private static Tuple<int?, Dictionary<string, HashSet<int>>> GetFinishDateForBlockedTask(
 			WorkItem blockedTask,
 			DataContainer dataContainer,
+			FocusFactorCalculator focusFactorCalculator,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
-			int? finish = GetFinishDay(blockedTask, scheduledTasksDict);
+			int? finish = GetFinishDay(
+				blockedTask,
+				focusFactorCalculator,
+				scheduledTasksDict);
 
 			Dictionary<string, HashSet<int>> userBlockersDict;
 
@@ -283,9 +291,13 @@ namespace TaskSchedulerForms
 					var blockerData = GetFinishDateForBlockedTask(
 						blocker,
 						dataContainer,
+						focusFactorCalculator,
 						scheduledTasksDict);
 
-					int? currentFinish = GetFinishDay(blocker, scheduledTasksDict);
+					int? currentFinish = GetFinishDay(
+						blocker,
+						focusFactorCalculator,
+						scheduledTasksDict);
 					currentFinish = MaxDay(currentFinish, blockerData.Item1);
 					finish = MaxDay(finish, currentFinish);
 
@@ -321,6 +333,7 @@ namespace TaskSchedulerForms
 			IEnumerable<Tuple<WorkItem, WorkItem>> blockedTasks,
 			List<Tuple<Tuple<WorkItem, WorkItem>, int>> schedule,
 			DataContainer dataContainer,
+			FocusFactorCalculator focusFactorCalculator,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
 			Dictionary<string, HashSet<int>> usersBlockers)
 		{
@@ -331,6 +344,7 @@ namespace TaskSchedulerForms
 				var finishData = GetFinishDateForBlockedTask(
 					blockedTask,
 					dataContainer,
+					focusFactorCalculator,
 					scheduledTasksDict);
 				if (finishData.Item1 == null)
 				{
@@ -341,7 +355,9 @@ namespace TaskSchedulerForms
 					double? remaining = tuple.Item1.IsActive()
 						? blockedTask.Remaining()
 						: blockedTask.Estimate();
-					int taskDaysCount = remaining == null ? 0 : CalculateDaysByRemaining(remaining.Value);
+					int taskDaysCount = remaining == null
+						? 0
+						: focusFactorCalculator.CalculateDaysByTime(remaining.Value, tuple.Item1.AssignedTo());
 					int startDay = 0;
 					bool added = false;
 					for (int i = 0; i < schedule.Count; i++)
@@ -387,7 +403,8 @@ namespace TaskSchedulerForms
 			ICollection<Tuple<WorkItem, WorkItem>> nonBlockedTasks,
 			string user,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
-			FreeDaysCalculator freeDaysCalculator)
+			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator)
 		{
 			var result = new List<Tuple<Tuple<WorkItem, WorkItem>, int>>(nonBlockedTasks.Count);
 			result.AddRange(
@@ -401,7 +418,8 @@ namespace TaskSchedulerForms
 								pair.Item1,
 								user,
 								scheduledTasksDict,
-								freeDaysCalculator))));
+								freeDaysCalculator,
+								focusFactorCalculator))));
 			return result;
 		}
 
@@ -409,7 +427,8 @@ namespace TaskSchedulerForms
 			WorkItem task,
 			string user,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
-			FreeDaysCalculator freeDaysCalculator)
+			FreeDaysCalculator freeDaysCalculator,
+			FocusFactorCalculator focusFactorCalculator)
 		{
 			if (task.IsActive())
 			{
@@ -422,7 +441,7 @@ namespace TaskSchedulerForms
 				double? remaining = task.Remaining();
 				if (remaining != null && remaining > 0)
 				{
-					int finishByRemaining = CalculateDaysByRemaining(remaining.Value);
+					int finishByRemaining = focusFactorCalculator.CalculateDaysByTime(remaining.Value, task.AssignedTo());
 					if (finish < finishByRemaining)
 						finish = finishByRemaining;
 				}
@@ -431,7 +450,7 @@ namespace TaskSchedulerForms
 			double? estimate = task.Estimate();
 			return estimate == null
 				? 0
-				: CalculateDaysByRemaining(estimate.Value);
+				: focusFactorCalculator.CalculateDaysByTime(estimate.Value, task.AssignedTo());
 		}
 	}
 }

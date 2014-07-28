@@ -25,6 +25,7 @@ namespace TaskSchedulerForms.Forms
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
 		private static readonly StateContainer s_stateContainer = new StateContainer();
 		private static readonly FreeDaysCalculator s_freeDaysCalculator = new FreeDaysCalculator();
+		private static readonly FocusFactorCalculator s_focusFactorCalculator = new FocusFactorCalculator();
 
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
 		private static ScheduleColumnsPresenter s_columnsPresenter;
@@ -307,6 +308,7 @@ namespace TaskSchedulerForms.Forms
 							data,
 							s_viewColumnsIndexes,
 							s_freeDaysCalculator,
+							s_focusFactorCalculator,
 							scheduleDataGridView);
 					}
 					catch (Exception exc)
@@ -429,6 +431,7 @@ namespace TaskSchedulerForms.Forms
 						data,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
+						s_focusFactorCalculator,
 						scheduleDataGridView);
 					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
 					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
