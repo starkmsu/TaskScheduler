@@ -36,6 +36,7 @@
 			this.ParamsGroupBox = new System.Windows.Forms.GroupBox();
 			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.firstGroupBox = new System.Windows.Forms.GroupBox();
+			this.firstComboBox = new System.Windows.Forms.ComboBox();
 			this.firstRemoveButton = new System.Windows.Forms.Button();
 			this.firstAddButton = new System.Windows.Forms.Button();
 			this.firstListBox = new System.Windows.Forms.ListBox();
@@ -50,6 +51,7 @@
 			this.queryLabel = new System.Windows.Forms.Label();
 			this.queryTextBox = new System.Windows.Forms.TextBox();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.showSprintCheckBox = new System.Windows.Forms.CheckBox();
 			this.showIterationCheckBox = new System.Windows.Forms.CheckBox();
 			this.expandBlockersCheckBox = new System.Windows.Forms.CheckBox();
 			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
@@ -60,6 +62,7 @@
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
 			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Iteration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Sprint = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,7 +76,7 @@
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.firstComboBox = new System.Windows.Forms.ComboBox();
+			this.sprintCheckBox = new System.Windows.Forms.CheckBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -141,6 +144,7 @@
 			this.ParamsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.ParamsGroupBox.Controls.Add(this.sprintCheckBox);
 			this.ParamsGroupBox.Controls.Add(this.loadLeadTasksButton);
 			this.ParamsGroupBox.Controls.Add(this.firstGroupBox);
 			this.ParamsGroupBox.Controls.Add(this.secondGroupBox);
@@ -177,6 +181,16 @@
 			this.firstGroupBox.TabIndex = 14;
 			this.firstGroupBox.TabStop = false;
 			this.firstGroupBox.Text = "Area";
+			// 
+			// firstComboBox
+			// 
+			this.firstComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.firstComboBox.FormattingEnabled = true;
+			this.firstComboBox.Location = new System.Drawing.Point(6, 18);
+			this.firstComboBox.Name = "firstComboBox";
+			this.firstComboBox.Size = new System.Drawing.Size(699, 21);
+			this.firstComboBox.TabIndex = 9;
 			// 
 			// firstRemoveButton
 			// 
@@ -281,9 +295,9 @@
 			this.subTreesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.subTreesCheckBox.Location = new System.Drawing.Point(495, 181);
 			this.subTreesCheckBox.Name = "subTreesCheckBox";
-			this.subTreesCheckBox.Size = new System.Drawing.Size(92, 17);
+			this.subTreesCheckBox.Size = new System.Drawing.Size(91, 17);
 			this.subTreesCheckBox.TabIndex = 16;
-			this.subTreesCheckBox.Text = "with subTrees";
+			this.subTreesCheckBox.Text = "with sub trees";
 			this.subTreesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// exchangeButton
@@ -338,6 +352,7 @@
 			// 
 			// dataTabPage
 			// 
+			this.dataTabPage.Controls.Add(this.showSprintCheckBox);
 			this.dataTabPage.Controls.Add(this.showIterationCheckBox);
 			this.dataTabPage.Controls.Add(this.expandBlockersCheckBox);
 			this.dataTabPage.Controls.Add(this.ltOnlyCheckBox);
@@ -353,6 +368,17 @@
 			this.dataTabPage.TabIndex = 0;
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
+			// 
+			// showSprintCheckBox
+			// 
+			this.showSprintCheckBox.AutoSize = true;
+			this.showSprintCheckBox.Location = new System.Drawing.Point(777, 8);
+			this.showSprintCheckBox.Name = "showSprintCheckBox";
+			this.showSprintCheckBox.Size = new System.Drawing.Size(83, 17);
+			this.showSprintCheckBox.TabIndex = 16;
+			this.showSprintCheckBox.Text = "Show Sprint";
+			this.showSprintCheckBox.UseVisualStyleBackColor = true;
+			this.showSprintCheckBox.CheckedChanged += new System.EventHandler(this.ShowSprintCheckBoxCheckedChanged);
 			// 
 			// showIterationCheckBox
 			// 
@@ -443,6 +469,7 @@
 			this.scheduleDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Priority,
             this.Iteration,
+            this.Sprint,
             this.LeadTask,
             this.Docs,
             this.Task,
@@ -476,6 +503,15 @@
 			this.Iteration.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Iteration.Visible = false;
 			this.Iteration.Width = 180;
+			// 
+			// Sprint
+			// 
+			this.Sprint.Frozen = true;
+			this.Sprint.HeaderText = "Sprint";
+			this.Sprint.Name = "Sprint";
+			this.Sprint.ReadOnly = true;
+			this.Sprint.Visible = false;
+			this.Sprint.Width = 60;
 			// 
 			// LeadTask
 			// 
@@ -592,15 +628,18 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// firstComboBox
+			// sprintCheckBox
 			// 
-			this.firstComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.firstComboBox.FormattingEnabled = true;
-			this.firstComboBox.Location = new System.Drawing.Point(6, 18);
-			this.firstComboBox.Name = "firstComboBox";
-			this.firstComboBox.Size = new System.Drawing.Size(699, 21);
-			this.firstComboBox.TabIndex = 9;
+			this.sprintCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.sprintCheckBox.AutoSize = true;
+			this.sprintCheckBox.Checked = true;
+			this.sprintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.sprintCheckBox.Location = new System.Drawing.Point(593, 181);
+			this.sprintCheckBox.Name = "sprintCheckBox";
+			this.sprintCheckBox.Size = new System.Drawing.Size(73, 17);
+			this.sprintCheckBox.TabIndex = 18;
+			this.sprintCheckBox.Text = "with sprint";
+			this.sprintCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
@@ -667,15 +706,18 @@
 		private System.Windows.Forms.TextBox queryTextBox;
 		private System.Windows.Forms.GroupBox queryGroupBox;
 		private System.Windows.Forms.CheckBox showIterationCheckBox;
+		private System.Windows.Forms.ComboBox firstComboBox;
+		private System.Windows.Forms.CheckBox showSprintCheckBox;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint;
 		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
-		private System.Windows.Forms.ComboBox firstComboBox;
+		private System.Windows.Forms.CheckBox sprintCheckBox;
 	}
 }
 

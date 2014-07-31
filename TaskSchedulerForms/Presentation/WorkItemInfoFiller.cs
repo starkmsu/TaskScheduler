@@ -45,6 +45,9 @@ namespace TaskSchedulerForms.Presentation
 				iteration = iteration.Substring(ind + 1);
 			iterationCell.Value = iteration;
 
+			var sprintCell = leadTaskRow.Cells[m_viewColumnsIndexes.SprintColumnIndex];
+			sprintCell.Value = leadTask.Sprint();
+
 			var idCell = leadTaskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
 			idCell.Value = leadTask.Id;
 			idCell.ToolTipText = leadTask.IterationPath;

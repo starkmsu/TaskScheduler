@@ -11,9 +11,17 @@ namespace TaskSchedulerForms.Presentation
 		internal void ToggleIteration(
 			DataGridView dgv,
 			ViewColumnsIndexes viewColumnsIndexes,
-			bool showIterationGlag)
+			bool showIterationFlag)
 		{
-			dgv.Columns[viewColumnsIndexes.IterationColumnIndex].Visible = showIterationGlag;
+			dgv.Columns[viewColumnsIndexes.IterationColumnIndex].Visible = showIterationFlag;
+		}
+
+		internal void ToggleSprint(
+			DataGridView dgv,
+			ViewColumnsIndexes viewColumnsIndexes,
+			bool showSprintFlag)
+		{
+			dgv.Columns[viewColumnsIndexes.SprintColumnIndex].Visible = showSprintFlag;
 		}
 
 		internal ViewFiltersApplier PresentData(

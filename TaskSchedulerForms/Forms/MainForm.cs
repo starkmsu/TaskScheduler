@@ -134,7 +134,8 @@ namespace TaskSchedulerForms.Forms
 					tfsUrlTextBox.Text,
 					s_stateContainer.WorkMode == WorkMode.AreaFirst,
 					s_stateContainer.GetFirstList(),
-					subTreesCheckBox.Checked);
+					subTreesCheckBox.Checked,
+					sprintCheckBox.Checked);
 			}
 			catch (Exception e)
 			{
@@ -241,6 +242,7 @@ namespace TaskSchedulerForms.Forms
 			if (s_stateContainer.WorkMode != WorkMode.Query)
 			{
 				s_stateContainer.LastWithSubTree = subTreesCheckBox.Checked;
+				s_stateContainer.LastWithSprint = sprintCheckBox.Checked;
 
 				List<string> firstList = null;
 				List<string> secondList = null;
@@ -373,7 +375,8 @@ namespace TaskSchedulerForms.Forms
 					s_stateContainer.LastTfsUrl,
 					s_stateContainer.WorkMode == WorkMode.AreaFirst,
 					s_stateContainer.GetFirstList(),
-					s_stateContainer.LastWithSubTree);
+					s_stateContainer.LastWithSubTree,
+					s_stateContainer.LastWithSprint);
 			else
 				items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
 
@@ -644,6 +647,15 @@ namespace TaskSchedulerForms.Forms
 				scheduleDataGridView,
 				s_viewColumnsIndexes,
 				showIteration);
+		}
+
+		private void ShowSprintCheckBoxCheckedChanged(object sender, EventArgs e)
+		{
+			bool showSprint = showSprintCheckBox.Checked;
+			s_dataPresenter.ToggleSprint(
+				scheduleDataGridView,
+				s_viewColumnsIndexes,
+				showSprint);
 		}
 	}
 }

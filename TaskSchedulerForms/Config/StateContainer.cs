@@ -27,6 +27,8 @@ namespace TaskSchedulerForms.Config
 
 		internal bool LastWithSubTree { get; set; }
 
+		internal bool LastWithSprint { get; set; }
+
 		internal StateContainer()
 		{
 			ByArea = true;

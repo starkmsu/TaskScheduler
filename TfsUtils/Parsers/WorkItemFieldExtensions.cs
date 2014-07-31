@@ -63,6 +63,11 @@ namespace TfsUtils.Parsers
 			return GetStringValue(workItem, "Blocking Reason");
 		}
 
+		public static string Sprint(this WorkItem workItem)
+		{
+			return GetStringValue(workItem, "Sprint");
+		}
+
 		private static string GetStringValue(WorkItem workItem, string fieldName)
 		{
 			if (!workItem.Fields.Contains(fieldName))

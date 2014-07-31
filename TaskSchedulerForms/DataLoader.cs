@@ -20,12 +20,14 @@ namespace TaskSchedulerForms
 			string tfsUrl,
 			bool byArea,
 			List<string> values,
-			bool withSubTrees)
+			bool withSubTrees,
+			bool withSprint)
 		{
 			return GetLeadTasks(
 				tfsUrl,
 				values,
 				withSubTrees,
+				withSprint,
 				byArea ? "System.AreaPath" : "System.IterationPath",
 				byArea ? "areaPath" : "iteration",
 				byArea ? "System.IterationPath" : "System.AreaPath");
@@ -35,6 +37,7 @@ namespace TaskSchedulerForms
 			string tfsUrl,
 			List<string> values,
 			bool withSubTrees,
+			bool withSprint,
 			string systemFieldName,
 			string fieldAlias,
 			string additionalOrderField)
@@ -56,6 +59,8 @@ namespace TaskSchedulerForms
 			strBuilder.Append(" WHERE [System.TeamProject] = @project");
 			strBuilder.Append(" AND [System.WorkItemType] IN (@wiType)");
 			strBuilder.Append(" AND [System.State] IN (@wiState)");
+			if (withSprint)
+				strBuilder.Append(" AND [Sprint] <> ''");
 			strBuilder.Append(" AND [Microsoft.VSTS.Common.Discipline] IN (@discipline)");
 			if (withSubTrees)
 			{
