@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -139,9 +140,13 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception e)
 			{
-				secondComboBox.Invoke(new Action(() =>
+				HandleException(
+					e,
+					secondComboBox,
+					Resources.LeadTasksFetchingError);
+				secondComboBox.Invoke(
+					new Action(() =>
 					{
-						MessageBox.Show(e.Message, Resources.LeadTasksFetchingError);
 						subTreesCheckBox.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 					}));
@@ -298,7 +303,17 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception exc)
 			{
-				HandleException(exc);
+				HandleException(
+					exc,
+					scheduleDataGridView,
+					Resources.LeadTasksParsingError);
+				scheduleDataGridView.Invoke(
+					new Action(() =>
+					{
+						makeScheduleButton.Enabled = true;
+						loadLeadTasksButton.Enabled = true;
+						queryTextBox.Enabled = true;
+					}));
 				return;
 			}
 
@@ -315,7 +330,16 @@ namespace TaskSchedulerForms.Forms
 					}
 					catch (Exception exc)
 					{
-						HandleException(exc);
+						HandleException(
+							exc,
+							scheduleDataGridView,
+							Resources.LeadTasksParsingError);
+						scheduleDataGridView.Invoke(new Action(() =>
+						{
+							makeScheduleButton.Enabled = true;
+							loadLeadTasksButton.Enabled = true;
+							queryTextBox.Enabled = true;
+						}));
 						return;
 					}
 					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
@@ -332,27 +356,6 @@ namespace TaskSchedulerForms.Forms
 					refreshButton.Enabled = true;
 					mainTabControl.SelectTab(dataTabPage);
 				}));
-		}
-
-		private void HandleException(Exception exc)
-		{
-			scheduleDataGridView.Invoke(new Action(() =>
-			{
-				var strBuilder = new StringBuilder();
-				AppendExceptionString(exc, strBuilder);
-				MessageBox.Show(strBuilder.ToString(), Resources.LeadTasksParsingError);
-				makeScheduleButton.Enabled = true;
-				loadLeadTasksButton.Enabled = true;
-				queryTextBox.Enabled = true;
-			}));
-		}
-
-		private void AppendExceptionString(Exception exc, StringBuilder stringBuilder)
-		{
-			if (exc.InnerException != null)
-				AppendExceptionString(exc.InnerException, stringBuilder);
-			stringBuilder.AppendLine(exc.Message);
-			stringBuilder.AppendLine(exc.StackTrace);
 		}
 
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
@@ -468,13 +471,17 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception exc)
 			{
-				scheduleDataGridView.Invoke(new Action(() =>
-				{
-					MessageBox.Show(exc.Message + Environment.NewLine + exc.StackTrace, Resources.LeadTasksParsingError);
-					makeScheduleButton.Enabled = true;
-					loadLeadTasksButton.Enabled = true;
-					refreshButton.Enabled = true;
-				}));
+				HandleException(
+					exc,
+					scheduleDataGridView,
+					Resources.LeadTasksParsingError);
+				scheduleDataGridView.Invoke(
+					new Action(() =>
+					{
+						makeScheduleButton.Enabled = true;
+						loadLeadTasksButton.Enabled = true;
+						refreshButton.Enabled = true;
+					}));
 			}
 		}
 
@@ -656,6 +663,29 @@ namespace TaskSchedulerForms.Forms
 				scheduleDataGridView,
 				s_viewColumnsIndexes,
 				showSprint);
+		}
+
+		private void AppendExceptionString(Exception exc, StringBuilder stringBuilder)
+		{
+			if (exc.InnerException != null)
+				AppendExceptionString(exc.InnerException, stringBuilder);
+			stringBuilder.AppendLine(exc.Message);
+			stringBuilder.AppendLine(exc.StackTrace);
+		}
+
+		private void HandleException(
+			Exception exc,
+			Control control,
+			string caption)
+		{
+			var strBuilder = new StringBuilder();
+			AppendExceptionString(exc, strBuilder);
+			string text = strBuilder.ToString();
+			using (var fileWriter = new StreamWriter(DateTime.Now.ToString("yyyy-mm-dd HH-mm-ss") + ".txt", false))
+			{
+				fileWriter.WriteLine(text);
+			}
+			control.Invoke(new Action(() => MessageBox.Show(text, caption)));
 		}
 	}
 }
