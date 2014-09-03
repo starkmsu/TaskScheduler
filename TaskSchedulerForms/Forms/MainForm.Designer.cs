@@ -34,6 +34,7 @@
 			this.orLabel = new System.Windows.Forms.Label();
 			this.makeScheduleButton = new System.Windows.Forms.Button();
 			this.ParamsGroupBox = new System.Windows.Forms.GroupBox();
+			this.sprintCheckBox = new System.Windows.Forms.CheckBox();
 			this.loadLeadTasksButton = new System.Windows.Forms.Button();
 			this.firstGroupBox = new System.Windows.Forms.GroupBox();
 			this.firstComboBox = new System.Windows.Forms.ComboBox();
@@ -51,11 +52,6 @@
 			this.queryLabel = new System.Windows.Forms.Label();
 			this.queryTextBox = new System.Windows.Forms.TextBox();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
-			this.showSprintCheckBox = new System.Windows.Forms.CheckBox();
-			this.showIterationCheckBox = new System.Windows.Forms.CheckBox();
-			this.expandBlockersCheckBox = new System.Windows.Forms.CheckBox();
-			this.ltOnlyCheckBox = new System.Windows.Forms.CheckBox();
-			this.devCmpletedCheckBox = new System.Windows.Forms.CheckBox();
 			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
@@ -69,6 +65,14 @@
 			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.toggleMenuStrip = new System.Windows.Forms.MenuStrip();
+			this.columnsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleIterationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleSprintToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.rowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleDevCompletedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleLTOnlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleBlockersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.settingsPage = new System.Windows.Forms.TabPage();
 			this.vacationsButton = new System.Windows.Forms.Button();
 			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
@@ -76,7 +80,8 @@
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.sprintCheckBox = new System.Windows.Forms.CheckBox();
+			this.sprintLabel = new System.Windows.Forms.Label();
+			this.sprintFilterComboBox = new System.Windows.Forms.ComboBox();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -85,6 +90,7 @@
 			this.queryGroupBox.SuspendLayout();
 			this.dataTabPage.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).BeginInit();
+			this.toggleMenuStrip.SuspendLayout();
 			this.settingsPage.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -155,6 +161,19 @@
 			this.ParamsGroupBox.Size = new System.Drawing.Size(873, 410);
 			this.ParamsGroupBox.TabIndex = 18;
 			this.ParamsGroupBox.TabStop = false;
+			// 
+			// sprintCheckBox
+			// 
+			this.sprintCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.sprintCheckBox.AutoSize = true;
+			this.sprintCheckBox.Checked = true;
+			this.sprintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.sprintCheckBox.Location = new System.Drawing.Point(593, 181);
+			this.sprintCheckBox.Name = "sprintCheckBox";
+			this.sprintCheckBox.Size = new System.Drawing.Size(73, 17);
+			this.sprintCheckBox.TabIndex = 18;
+			this.sprintCheckBox.Text = "with sprint";
+			this.sprintCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// loadLeadTasksButton
 			// 
@@ -352,15 +371,13 @@
 			// 
 			// dataTabPage
 			// 
-			this.dataTabPage.Controls.Add(this.showSprintCheckBox);
-			this.dataTabPage.Controls.Add(this.showIterationCheckBox);
-			this.dataTabPage.Controls.Add(this.expandBlockersCheckBox);
-			this.dataTabPage.Controls.Add(this.ltOnlyCheckBox);
-			this.dataTabPage.Controls.Add(this.devCmpletedCheckBox);
+			this.dataTabPage.Controls.Add(this.sprintLabel);
+			this.dataTabPage.Controls.Add(this.sprintFilterComboBox);
 			this.dataTabPage.Controls.Add(this.refreshButton);
 			this.dataTabPage.Controls.Add(this.usersLabel);
 			this.dataTabPage.Controls.Add(this.usersFilterСomboBox);
 			this.dataTabPage.Controls.Add(this.scheduleDataGridView);
+			this.dataTabPage.Controls.Add(this.toggleMenuStrip);
 			this.dataTabPage.Location = new System.Drawing.Point(4, 22);
 			this.dataTabPage.Name = "dataTabPage";
 			this.dataTabPage.Padding = new System.Windows.Forms.Padding(3);
@@ -369,67 +386,10 @@
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
 			// 
-			// showSprintCheckBox
-			// 
-			this.showSprintCheckBox.AutoSize = true;
-			this.showSprintCheckBox.Location = new System.Drawing.Point(777, 8);
-			this.showSprintCheckBox.Name = "showSprintCheckBox";
-			this.showSprintCheckBox.Size = new System.Drawing.Size(83, 17);
-			this.showSprintCheckBox.TabIndex = 16;
-			this.showSprintCheckBox.Text = "Show Sprint";
-			this.showSprintCheckBox.UseVisualStyleBackColor = true;
-			this.showSprintCheckBox.CheckedChanged += new System.EventHandler(this.ShowSprintCheckBoxCheckedChanged);
-			// 
-			// showIterationCheckBox
-			// 
-			this.showIterationCheckBox.AutoSize = true;
-			this.showIterationCheckBox.Location = new System.Drawing.Point(683, 8);
-			this.showIterationCheckBox.Name = "showIterationCheckBox";
-			this.showIterationCheckBox.Size = new System.Drawing.Size(94, 17);
-			this.showIterationCheckBox.TabIndex = 15;
-			this.showIterationCheckBox.Text = "Show Iteration";
-			this.showIterationCheckBox.UseVisualStyleBackColor = true;
-			this.showIterationCheckBox.CheckedChanged += new System.EventHandler(this.ShowIterationCheckBoxCheckedChanged);
-			// 
-			// expandBlockersCheckBox
-			// 
-			this.expandBlockersCheckBox.AutoSize = true;
-			this.expandBlockersCheckBox.Location = new System.Drawing.Point(571, 8);
-			this.expandBlockersCheckBox.Name = "expandBlockersCheckBox";
-			this.expandBlockersCheckBox.Size = new System.Drawing.Size(106, 17);
-			this.expandBlockersCheckBox.TabIndex = 14;
-			this.expandBlockersCheckBox.Text = "Expand Blockers";
-			this.expandBlockersCheckBox.UseVisualStyleBackColor = true;
-			this.expandBlockersCheckBox.CheckedChanged += new System.EventHandler(this.ShowBlockersCheckBoxCheckedChanged);
-			// 
-			// ltOnlyCheckBox
-			// 
-			this.ltOnlyCheckBox.AutoSize = true;
-			this.ltOnlyCheckBox.Location = new System.Drawing.Point(503, 8);
-			this.ltOnlyCheckBox.Name = "ltOnlyCheckBox";
-			this.ltOnlyCheckBox.Size = new System.Drawing.Size(61, 17);
-			this.ltOnlyCheckBox.TabIndex = 13;
-			this.ltOnlyCheckBox.Text = "LT only";
-			this.ltOnlyCheckBox.UseVisualStyleBackColor = true;
-			this.ltOnlyCheckBox.CheckedChanged += new System.EventHandler(this.LtOnlyCheckBoxCheckedChanged);
-			// 
-			// devCmpletedCheckBox
-			// 
-			this.devCmpletedCheckBox.AutoSize = true;
-			this.devCmpletedCheckBox.Checked = true;
-			this.devCmpletedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.devCmpletedCheckBox.Location = new System.Drawing.Point(376, 8);
-			this.devCmpletedCheckBox.Name = "devCmpletedCheckBox";
-			this.devCmpletedCheckBox.Size = new System.Drawing.Size(124, 17);
-			this.devCmpletedCheckBox.TabIndex = 12;
-			this.devCmpletedCheckBox.Text = "With Dev Completed";
-			this.devCmpletedCheckBox.UseVisualStyleBackColor = true;
-			this.devCmpletedCheckBox.CheckedChanged += new System.EventHandler(this.DevCmpletedCheckBoxCheckedChanged);
-			// 
 			// refreshButton
 			// 
 			this.refreshButton.Enabled = false;
-			this.refreshButton.Location = new System.Drawing.Point(8, 4);
+			this.refreshButton.Location = new System.Drawing.Point(8, 28);
 			this.refreshButton.Name = "refreshButton";
 			this.refreshButton.Size = new System.Drawing.Size(75, 23);
 			this.refreshButton.TabIndex = 6;
@@ -441,7 +401,7 @@
 			// 
 			this.usersLabel.AutoSize = true;
 			this.usersLabel.Enabled = false;
-			this.usersLabel.Location = new System.Drawing.Point(89, 9);
+			this.usersLabel.Location = new System.Drawing.Point(89, 33);
 			this.usersLabel.Name = "usersLabel";
 			this.usersLabel.Size = new System.Drawing.Size(66, 13);
 			this.usersLabel.TabIndex = 5;
@@ -451,7 +411,7 @@
 			// 
 			this.usersFilterСomboBox.Enabled = false;
 			this.usersFilterСomboBox.FormattingEnabled = true;
-			this.usersFilterСomboBox.Location = new System.Drawing.Point(161, 6);
+			this.usersFilterСomboBox.Location = new System.Drawing.Point(161, 30);
 			this.usersFilterСomboBox.Name = "usersFilterСomboBox";
 			this.usersFilterСomboBox.Size = new System.Drawing.Size(209, 21);
 			this.usersFilterСomboBox.TabIndex = 4;
@@ -477,11 +437,11 @@
             this.AssignedTo,
             this.Past});
 			this.scheduleDataGridView.EnableHeadersVisualStyles = false;
-			this.scheduleDataGridView.Location = new System.Drawing.Point(3, 33);
+			this.scheduleDataGridView.Location = new System.Drawing.Point(3, 56);
 			this.scheduleDataGridView.Name = "scheduleDataGridView";
 			this.scheduleDataGridView.ReadOnly = true;
 			this.scheduleDataGridView.RowHeadersVisible = false;
-			this.scheduleDataGridView.Size = new System.Drawing.Size(880, 519);
+			this.scheduleDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.scheduleDataGridView.TabIndex = 0;
 			// 
 			// Priority
@@ -570,6 +530,71 @@
 			this.Past.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Past.Width = 40;
 			// 
+			// toggleMenuStrip
+			// 
+			this.toggleMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.columnsToolStripMenuItem,
+            this.rowsToolStripMenuItem});
+			this.toggleMenuStrip.Location = new System.Drawing.Point(3, 3);
+			this.toggleMenuStrip.Name = "toggleMenuStrip";
+			this.toggleMenuStrip.Size = new System.Drawing.Size(873, 24);
+			this.toggleMenuStrip.TabIndex = 17;
+			this.toggleMenuStrip.Text = "menuStrip1";
+			// 
+			// columnsToolStripMenuItem
+			// 
+			this.columnsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleIterationToolStripMenuItem,
+            this.toggleSprintToolStripMenuItem});
+			this.columnsToolStripMenuItem.Name = "columnsToolStripMenuItem";
+			this.columnsToolStripMenuItem.Size = new System.Drawing.Size(67, 20);
+			this.columnsToolStripMenuItem.Text = "Columns";
+			// 
+			// toggleIterationToolStripMenuItem
+			// 
+			this.toggleIterationToolStripMenuItem.Name = "toggleIterationToolStripMenuItem";
+			this.toggleIterationToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.toggleIterationToolStripMenuItem.Text = "Toggle Iteration";
+			this.toggleIterationToolStripMenuItem.Click += new System.EventHandler(this.ToggleIterationToolStripMenuItemClick);
+			// 
+			// toggleSprintToolStripMenuItem
+			// 
+			this.toggleSprintToolStripMenuItem.Name = "toggleSprintToolStripMenuItem";
+			this.toggleSprintToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.toggleSprintToolStripMenuItem.Text = "Toggle Sprint";
+			this.toggleSprintToolStripMenuItem.Click += new System.EventHandler(this.ToggleSprintToolStripMenuItemClick);
+			// 
+			// rowsToolStripMenuItem
+			// 
+			this.rowsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleDevCompletedToolStripMenuItem1,
+            this.toggleLTOnlyToolStripMenuItem,
+            this.toggleBlockersToolStripMenuItem});
+			this.rowsToolStripMenuItem.Name = "rowsToolStripMenuItem";
+			this.rowsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+			this.rowsToolStripMenuItem.Text = "Rows";
+			// 
+			// toggleDevCompletedToolStripMenuItem1
+			// 
+			this.toggleDevCompletedToolStripMenuItem1.Name = "toggleDevCompletedToolStripMenuItem1";
+			this.toggleDevCompletedToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
+			this.toggleDevCompletedToolStripMenuItem1.Text = "Toggle Dev Completed";
+			this.toggleDevCompletedToolStripMenuItem1.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
+			// 
+			// toggleLTOnlyToolStripMenuItem
+			// 
+			this.toggleLTOnlyToolStripMenuItem.Name = "toggleLTOnlyToolStripMenuItem";
+			this.toggleLTOnlyToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+			this.toggleLTOnlyToolStripMenuItem.Text = "Toggle LT Only";
+			this.toggleLTOnlyToolStripMenuItem.Click += new System.EventHandler(this.ToggleLtOnlyToolStripMenuItemClick);
+			// 
+			// toggleBlockersToolStripMenuItem
+			// 
+			this.toggleBlockersToolStripMenuItem.Name = "toggleBlockersToolStripMenuItem";
+			this.toggleBlockersToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+			this.toggleBlockersToolStripMenuItem.Text = "Toggle Blockers";
+			this.toggleBlockersToolStripMenuItem.Click += new System.EventHandler(this.ToggleBlockersToolStripMenuItemClick);
+			// 
 			// settingsPage
 			// 
 			this.settingsPage.Controls.Add(this.vacationsButton);
@@ -628,18 +653,25 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// sprintCheckBox
+			// sprintLabel
 			// 
-			this.sprintCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.sprintCheckBox.AutoSize = true;
-			this.sprintCheckBox.Checked = true;
-			this.sprintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.sprintCheckBox.Location = new System.Drawing.Point(593, 181);
-			this.sprintCheckBox.Name = "sprintCheckBox";
-			this.sprintCheckBox.Size = new System.Drawing.Size(73, 17);
-			this.sprintCheckBox.TabIndex = 18;
-			this.sprintCheckBox.Text = "with sprint";
-			this.sprintCheckBox.UseVisualStyleBackColor = true;
+			this.sprintLabel.AutoSize = true;
+			this.sprintLabel.Enabled = false;
+			this.sprintLabel.Location = new System.Drawing.Point(378, 33);
+			this.sprintLabel.Name = "sprintLabel";
+			this.sprintLabel.Size = new System.Drawing.Size(71, 13);
+			this.sprintLabel.TabIndex = 19;
+			this.sprintLabel.Text = "Filter by sprint";
+			// 
+			// sprintFilterComboBox
+			// 
+			this.sprintFilterComboBox.Enabled = false;
+			this.sprintFilterComboBox.FormattingEnabled = true;
+			this.sprintFilterComboBox.Location = new System.Drawing.Point(450, 30);
+			this.sprintFilterComboBox.Name = "sprintFilterComboBox";
+			this.sprintFilterComboBox.Size = new System.Drawing.Size(209, 21);
+			this.sprintFilterComboBox.TabIndex = 18;
+			this.sprintFilterComboBox.SelectionChangeCommitted += new System.EventHandler(this.SprintFilterComboBoxSelectionChangeCommitted);
 			// 
 			// MainForm
 			// 
@@ -647,6 +679,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(887, 574);
 			this.Controls.Add(this.mainTabControl);
+			this.MainMenuStrip = this.toggleMenuStrip;
 			this.Name = "MainForm";
 			this.Text = "Task Scheduler";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFormFormClosing);
@@ -662,6 +695,8 @@
 			this.dataTabPage.ResumeLayout(false);
 			this.dataTabPage.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).EndInit();
+			this.toggleMenuStrip.ResumeLayout(false);
+			this.toggleMenuStrip.PerformLayout();
 			this.settingsPage.ResumeLayout(false);
 			this.settingsPage.PerformLayout();
 			this.ResumeLayout(false);
@@ -692,12 +727,9 @@
 		private System.Windows.Forms.Button secondAddButton;
 		private System.Windows.Forms.ListBox secondListBox;
 		private System.Windows.Forms.Button secondRemoveButton;
-		private System.Windows.Forms.CheckBox devCmpletedCheckBox;
 		private System.Windows.Forms.CheckBox subTreesCheckBox;
-		private System.Windows.Forms.CheckBox ltOnlyCheckBox;
 		private System.Windows.Forms.Button vacationsButton;
 		private System.Windows.Forms.ComboBox usersVacationsComboBox;
-		private System.Windows.Forms.CheckBox expandBlockersCheckBox;
 		private System.Windows.Forms.ToolTip secondToolTip;
 		private System.Windows.Forms.Button exchangeButton;
 		private System.Windows.Forms.GroupBox ParamsGroupBox;
@@ -705,9 +737,7 @@
 		private System.Windows.Forms.Label queryLabel;
 		private System.Windows.Forms.TextBox queryTextBox;
 		private System.Windows.Forms.GroupBox queryGroupBox;
-		private System.Windows.Forms.CheckBox showIterationCheckBox;
 		private System.Windows.Forms.ComboBox firstComboBox;
-		private System.Windows.Forms.CheckBox showSprintCheckBox;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint;
@@ -718,6 +748,16 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox sprintCheckBox;
+		private System.Windows.Forms.MenuStrip toggleMenuStrip;
+		private System.Windows.Forms.ToolStripMenuItem columnsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toggleIterationToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toggleSprintToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem rowsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toggleDevCompletedToolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem toggleLTOnlyToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem toggleBlockersToolStripMenuItem;
+		private System.Windows.Forms.Label sprintLabel;
+		private System.Windows.Forms.ComboBox sprintFilterComboBox;
 	}
 }
 

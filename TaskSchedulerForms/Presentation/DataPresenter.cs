@@ -8,20 +8,16 @@ namespace TaskSchedulerForms.Presentation
 {
 	internal class DataPresenter
 	{
-		internal void ToggleIteration(
-			DataGridView dgv,
-			ViewColumnsIndexes viewColumnsIndexes,
-			bool showIterationFlag)
+		internal void ToggleIteration(DataGridView dgv, ViewColumnsIndexes viewColumnsIndexes)
 		{
-			dgv.Columns[viewColumnsIndexes.IterationColumnIndex].Visible = showIterationFlag;
+			var column = dgv.Columns[viewColumnsIndexes.IterationColumnIndex];
+			column.Visible = !column.Visible;
 		}
 
-		internal void ToggleSprint(
-			DataGridView dgv,
-			ViewColumnsIndexes viewColumnsIndexes,
-			bool showSprintFlag)
+		internal void ToggleSprint(DataGridView dgv, ViewColumnsIndexes viewColumnsIndexes)
 		{
-			dgv.Columns[viewColumnsIndexes.SprintColumnIndex].Visible = showSprintFlag;
+			var column = dgv.Columns[viewColumnsIndexes.SprintColumnIndex];
+			column.Visible = !column.Visible;
 		}
 
 		internal ViewFiltersApplier PresentData(

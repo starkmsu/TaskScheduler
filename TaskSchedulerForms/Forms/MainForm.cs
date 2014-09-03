@@ -233,6 +233,8 @@ namespace TaskSchedulerForms.Forms
 
 			usersLabel.Enabled = false;
 			usersFilterСomboBox.Enabled = false;
+			sprintLabel.Enabled = false;
+			sprintFilterComboBox.Enabled = false;
 			mainTabControl.SelectTab(mainTabPage);
 			scheduleDataGridView.Rows.Clear();
 			refreshButton.Enabled = false;
@@ -344,11 +346,16 @@ namespace TaskSchedulerForms.Forms
 					}
 					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
 					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
-					var users2 = new List<string>(m_viewFiltersApplier.Users);
-					users2.Insert(0, string.Empty);
-					usersFilterСomboBox.DataSource = users2;
+					var users = new List<string>(m_viewFiltersApplier.Users);
+					users.Insert(0, string.Empty);
+					usersFilterСomboBox.DataSource = users;
 					usersFilterСomboBox.Enabled = true;
 					usersLabel.Enabled = true;
+					var sprints = new List<string>(m_viewFiltersApplier.Sprints);
+					sprints.Insert(0, string.Empty);
+					sprintFilterComboBox.DataSource = sprints;
+					sprintFilterComboBox.Enabled = true;
+					sprintLabel.Enabled = true;
 					makeScheduleButton.Enabled = true;
 					loadLeadTasksButton.Enabled = true;
 					holidaysButton.Enabled = true;
@@ -362,6 +369,12 @@ namespace TaskSchedulerForms.Forms
 		{
 			string user = usersFilterСomboBox.SelectedItem.ToString();
 			m_viewFiltersApplier.FilterDataByUser(user);
+		}
+
+		private void SprintFilterComboBoxSelectionChangeCommitted(object sender, EventArgs e)
+		{
+			string sprint = sprintFilterComboBox.SelectedItem.ToString();
+			m_viewFiltersApplier.FilterDataBySprint(sprint);
 		}
 
 		private void RefreshButtonClick(object sender, EventArgs e)
@@ -397,9 +410,13 @@ namespace TaskSchedulerForms.Forms
 		private void RefreshData()
 		{
 			string currentUser = null;
+			string currentSprint = null;
 			tfsUrlTextBox.Invoke(new Action(() =>
 				{
-					currentUser = usersFilterСomboBox.SelectedItem.ToString();
+					if (usersFilterСomboBox.SelectedItem != null)
+						currentUser = usersFilterСomboBox.SelectedItem.ToString();
+					if (sprintFilterComboBox.SelectedItem != null)
+						currentSprint = sprintFilterComboBox.SelectedItem.ToString();
 					refreshButton.Enabled = false;
 					loadLeadTasksButton.Enabled = false;
 					makeScheduleButton.Enabled = false;
@@ -451,6 +468,12 @@ namespace TaskSchedulerForms.Forms
 						m_viewFiltersApplier.FilterDataByUser(currentUser);
 					}
 
+					if (!string.IsNullOrEmpty(currentSprint) && m_viewFiltersApplier.Sprints.Contains(currentSprint))
+					{
+						sprintFilterComboBox.SelectedItem = currentSprint;
+						m_viewFiltersApplier.FilterDataBySprint(currentSprint);
+					}
+
 					usersFilterСomboBox.Enabled = true;
 					usersLabel.Enabled = true;
 					makeScheduleButton.Enabled = true;
@@ -462,11 +485,6 @@ namespace TaskSchedulerForms.Forms
 						secondToolTip.SetToolTip(refreshButton,
 							Resources.NewItems + Environment.NewLine + string.Join(Environment.NewLine, newSecond));
 					}
-
-					if (ltOnlyCheckBox.Checked)
-						m_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnlyCheckBox.Checked);
-					if (expandBlockersCheckBox.Checked)
-						m_viewFiltersApplier.ExpandBlockers(expandBlockersCheckBox.Checked);
 				}));
 			}
 			catch (Exception exc)
@@ -559,16 +577,14 @@ namespace TaskSchedulerForms.Forms
 			secondRemoveButton.Enabled = false;
 		}
 
-		private void DevCmpletedCheckBoxCheckedChanged(object sender, EventArgs e)
+		private void ToggleDevCompletedToolStripMenuItem1Click(object sender, EventArgs e)
 		{
-			bool withDevCompleted = devCmpletedCheckBox.Checked;
-			m_viewFiltersApplier.FilterDataByDevCompleted(withDevCompleted);
+			m_viewFiltersApplier.ToggleDevCompletedMode();
 		}
 
-		private void LtOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
+		private void ToggleLtOnlyToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool ltOnly = ltOnlyCheckBox.Checked;
-			m_viewFiltersApplier.FilterDataByLeadTaskMode(ltOnly);
+			m_viewFiltersApplier.ToggleLeadTaskMode();
 		}
 
 		private void VacationsButtonClick(object sender, EventArgs e)
@@ -584,10 +600,9 @@ namespace TaskSchedulerForms.Forms
 			s_freeDaysCalculator.SetVacations(m_config.Vacations);
 		}
 
-		private void ShowBlockersCheckBoxCheckedChanged(object sender, EventArgs e)
+		private void ToggleBlockersToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool expandBlockers = expandBlockersCheckBox.Checked;
-			m_viewFiltersApplier.ExpandBlockers(expandBlockers);
+			m_viewFiltersApplier.ToggleBlockers();
 		}
 
 		private void ExchangeButtonClick(object sender, EventArgs e)
@@ -647,22 +662,14 @@ namespace TaskSchedulerForms.Forms
 			InitFirst();
 		}
 
-		private void ShowIterationCheckBoxCheckedChanged(object sender, EventArgs e)
+		private void ToggleIterationToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool showIteration = showIterationCheckBox.Checked;
-			s_dataPresenter.ToggleIteration(
-				scheduleDataGridView,
-				s_viewColumnsIndexes,
-				showIteration);
+			s_dataPresenter.ToggleIteration(scheduleDataGridView, s_viewColumnsIndexes);
 		}
 
-		private void ShowSprintCheckBoxCheckedChanged(object sender, EventArgs e)
+		private void ToggleSprintToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			bool showSprint = showSprintCheckBox.Checked;
-			s_dataPresenter.ToggleSprint(
-				scheduleDataGridView,
-				s_viewColumnsIndexes,
-				showSprint);
+			s_dataPresenter.ToggleSprint(scheduleDataGridView, s_viewColumnsIndexes);
 		}
 
 		private void AppendExceptionString(Exception exc, StringBuilder stringBuilder)

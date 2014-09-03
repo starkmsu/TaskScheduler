@@ -14,14 +14,18 @@ namespace TaskSchedulerForms.Presentation
 		private readonly Dictionary<int, int> m_taskToLeadTaskIndexesDict = new Dictionary<int, int>();
 		private readonly Dictionary<int, List<int>> m_leadTaskToTaskIndexesDict = new Dictionary<int, List<int>>();
 		private readonly Dictionary<string, List<int>> m_usersTasksIndexesDict = new Dictionary<string, List<int>>();
+		private readonly Dictionary<string, List<int>> m_sprintLeadtTasksIndexesDict = new Dictionary<string, List<int>>();
 		private readonly Dictionary<int, List<int>> m_blockersIndexesDict = new Dictionary<int, List<int>>();
 
 		private string m_filteringUser;
+		private string m_filteringSprint;
 		private bool m_filterByDevCompleted;
 		private bool m_filterByLeadTasks;
 		private bool m_expandBlockers;
 
 		internal List<string> Users { get; private set; }
+
+		internal List<string> Sprints { get; private set; }
 
 		internal ViewFiltersApplier(
 			DataGridView dataGridView,
@@ -30,6 +34,7 @@ namespace TaskSchedulerForms.Presentation
 			Dictionary<int, int> taskToLeadTasksIndexesDict,
 			Dictionary<int, List<int>> leadTaskToTaskIndexesDict,
 			Dictionary<string, List<int>> usersTasksIndexesDict,
+			Dictionary<string, List<int>> sprintLeadtTasksIndexesDict,
 			Dictionary<int, List<int>> blockersIndexesDict)
 		{
 			m_dataGridView = dataGridView;
@@ -40,11 +45,16 @@ namespace TaskSchedulerForms.Presentation
 			m_taskToLeadTaskIndexesDict = taskToLeadTasksIndexesDict;
 			m_leadTaskToTaskIndexesDict = leadTaskToTaskIndexesDict;
 			m_usersTasksIndexesDict = usersTasksIndexesDict;
+			m_sprintLeadtTasksIndexesDict = sprintLeadtTasksIndexesDict;
 			m_blockersIndexesDict = blockersIndexesDict;
 
 			List<string> users = m_usersTasksIndexesDict.Keys.ToList();
 			users.Sort();
 			Users = users;
+
+			List<string> sprints = m_sprintLeadtTasksIndexesDict.Keys.ToList();
+			sprints.Sort();
+			Sprints = sprints;
 		}
 
 		internal void FilterDataByUser(string user)
@@ -53,25 +63,31 @@ namespace TaskSchedulerForms.Presentation
 			DoFiltering();
 		}
 
-		internal void FilterDataByLeadTaskMode(bool ltOnly)
+		internal void FilterDataBySprint(string sprint)
 		{
-			m_filterByLeadTasks = ltOnly;
+			m_filteringSprint = sprint;
 			DoFiltering();
 		}
 
-		internal void FilterDataByDevCompleted(bool withDevCompleted)
+		internal void ToggleLeadTaskMode()
 		{
-			m_filterByDevCompleted = !withDevCompleted;
+			m_filterByLeadTasks = !m_filterByLeadTasks;
 			DoFiltering();
 		}
 
-		internal void ExpandBlockers(bool expandBlockers)
+		internal void ToggleDevCompletedMode()
 		{
-			m_expandBlockers = expandBlockers;
+			m_filterByDevCompleted = !m_filterByDevCompleted;
 			DoFiltering();
 		}
 
-		private void DoFiltering()
+		internal void ToggleBlockers()
+		{
+			m_expandBlockers = !m_expandBlockers;
+			DoFiltering();
+		}
+
+		internal void DoFiltering()
 		{
 			List<int> visibleIndexes = GetVisibleIndexes();
 			for (int i = 0; i < m_dataGridView.Rows.Count; i++)
@@ -95,6 +111,11 @@ namespace TaskSchedulerForms.Presentation
 				result.AddRange(
 					userTasksIndexes.Select(userTasksIndex =>
 						m_taskToLeadTaskIndexesDict[userTasksIndex]));
+			}
+
+			if (!string.IsNullOrEmpty(m_filteringSprint))
+			{
+				result.RemoveAll(lt => !m_sprintLeadtTasksIndexesDict[m_filteringSprint].Contains(lt));
 			}
 
 			if (m_filterByDevCompleted)

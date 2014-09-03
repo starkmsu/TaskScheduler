@@ -16,6 +16,7 @@ namespace TaskSchedulerForms.Presentation
 		private readonly Dictionary<int, int> m_taskToLeadTaskIndexesDict = new Dictionary<int, int>();
 		private readonly Dictionary<int, List<int>> m_leadTaskToTaskIndexesDict = new Dictionary<int, List<int>>();
 		private readonly Dictionary<string, List<int>> m_usersTasksIndexesDict = new Dictionary<string, List<int>>();
+		private readonly Dictionary<string, List<int>> m_sprintLeadtTasksIndexesDict = new Dictionary<string, List<int>>();
 		private readonly Dictionary<int, List<int>> m_blockersIndexesDict = new Dictionary<int, List<int>>();
 
 		private int m_currentLeadTaskRowIndex;
@@ -32,6 +33,11 @@ namespace TaskSchedulerForms.Presentation
 			m_currentRowIndex = m_dataGridView.Rows.IndexOf(row);
 			m_currentLeadTaskRowIndex = m_currentRowIndex;
 			m_leadTasksRowsIndexes.Add(m_currentLeadTaskRowIndex);
+			string sprint = row.Cells[m_viewColumnsIndexes.SprintColumnIndex].Value.ToString();
+			if (m_sprintLeadtTasksIndexesDict.ContainsKey(sprint))
+				m_sprintLeadtTasksIndexesDict[sprint].Add(m_currentLeadTaskRowIndex);
+			else
+				m_sprintLeadtTasksIndexesDict.Add(sprint, new List<int> {m_currentLeadTaskRowIndex});
 			bool isDevCompleted = row.Cells[m_viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.DevCompleted);
 			if (isDevCompleted)
 				m_leadTasksWithDevCompletedRowsIndexes.Add(m_currentLeadTaskRowIndex);
@@ -56,17 +62,10 @@ namespace TaskSchedulerForms.Presentation
 			if (user == Resources.AccessDenied)
 				return;
 
-			List<int> indexes;
 			if (m_usersTasksIndexesDict.ContainsKey(user))
-			{
-				indexes = m_usersTasksIndexesDict[user];
-			}
+				m_usersTasksIndexesDict[user].Add(m_currentRowIndex);
 			else
-			{
-				indexes = new List<int>();
-				m_usersTasksIndexesDict.Add(user, indexes);
-			}
-			indexes.Add(m_currentRowIndex);
+				m_usersTasksIndexesDict.Add(user, new List<int> {m_currentRowIndex});
 		}
 
 		internal void MarkBlockerRow(DataGridViewRow row)
@@ -87,6 +86,7 @@ namespace TaskSchedulerForms.Presentation
 				m_taskToLeadTaskIndexesDict,
 				m_leadTaskToTaskIndexesDict,
 				m_usersTasksIndexesDict,
+				m_sprintLeadtTasksIndexesDict,
 				m_blockersIndexesDict);
 		}
 	}
