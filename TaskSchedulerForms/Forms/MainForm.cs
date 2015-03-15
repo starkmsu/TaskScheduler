@@ -29,12 +29,17 @@ namespace TaskSchedulerForms.Forms
 		private static readonly FocusFactorCalculator s_focusFactorCalculator = new FocusFactorCalculator();
 
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
-		private static ScheduleColumnsPresenter s_columnsPresenter;
+		private static ViewColumnsIndexes s_planColumnsIndexes;
 
 		private WorkItemCollection m_leadTasks;
 		private List<DateTime> m_holidays;
 
 		private ViewFiltersApplier m_viewFiltersApplier;
+		private ViewFiltersApplier m_planFiltersApplier;
+
+		private readonly List<ToolStripMenuItem> m_viewMenuItems;
+
+		private DataContainer m_lastProcessedData;
 
 		public MainForm()
 		{
@@ -43,8 +48,9 @@ namespace TaskSchedulerForms.Forms
 			m_config = ConfigManager.LoadConfig();
 
 			s_viewColumnsIndexes = new ViewColumnsIndexes(scheduleDataGridView);
-			s_columnsPresenter = new ScheduleColumnsPresenter(s_viewColumnsIndexes.FirstDateColumnIndex);
-			s_columnsPresenter.InitColumns(scheduleDataGridView);
+			s_planColumnsIndexes = new ViewColumnsIndexes(planningDataGridView);
+			ScheduleColumnsPresenter.InitColumns(scheduleDataGridView, s_viewColumnsIndexes.FirstDateColumnIndex);
+			ScheduleColumnsPresenter.InitColumns(planningDataGridView, s_planColumnsIndexes.FirstDateColumnIndex);
 
 			m_holidays = m_config.Holidays;
 			s_freeDaysCalculator.SetHolidays(m_holidays);
@@ -75,6 +81,15 @@ namespace TaskSchedulerForms.Forms
 				ParamsGroupBox.Enabled = false;
 				makeScheduleButton.Enabled = true;
 			}
+
+			m_viewMenuItems = new List<ToolStripMenuItem>
+			{
+				toggleIterationToolStripMenuItem,
+				toggleSprintToolStripMenuItem,
+				toggleDevCompletedToolStripMenuItem,
+				toggleLTOnlyToolStripMenuItem,
+				toggleBlockersToolStripMenuItem,
+			};
 		}
 
 		private void InitFirst()
@@ -303,12 +318,11 @@ namespace TaskSchedulerForms.Forms
 		{
 			s_stateContainer.LastTfsUrl = tfsUrlTextBox.Text;
 
-			DataContainer data;
 			try
 			{
 				List<WorkItem> leadTasks = GetLeadTasks();
 
-				data = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
+				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
 			}
 			catch (Exception exc)
 			{
@@ -331,7 +345,8 @@ namespace TaskSchedulerForms.Forms
 					try
 					{
 						m_viewFiltersApplier = s_dataPresenter.PresentData(
-							data,
+							m_lastProcessedData,
+							null,
 							s_viewColumnsIndexes,
 							s_freeDaysCalculator,
 							s_focusFactorCalculator,
@@ -368,6 +383,7 @@ namespace TaskSchedulerForms.Forms
 					holidaysButton.Enabled = true;
 					queryTextBox.Enabled = true;
 					refreshButton.Enabled = true;
+					planButton.Enabled = true;
 					mainTabControl.SelectTab(dataTabPage);
 				}));
 		}
@@ -418,15 +434,15 @@ namespace TaskSchedulerForms.Forms
 		{
 			string currentUser = null;
 			string currentSprint = null;
-			tfsUrlTextBox.Invoke(new Action(() =>
+			refreshButton.Invoke(new Action(() =>
 				{
+					loadLeadTasksButton.Enabled = false;
+					makeScheduleButton.Enabled = false;
+					refreshButton.Enabled = false;
 					if (usersFilterСomboBox.SelectedItem != null)
 						currentUser = usersFilterСomboBox.SelectedItem.ToString();
 					if (sprintFilterComboBox.SelectedItem != null)
 						currentSprint = sprintFilterComboBox.SelectedItem.ToString();
-					refreshButton.Enabled = false;
-					loadLeadTasksButton.Enabled = false;
-					makeScheduleButton.Enabled = false;
 					usersLabel.Enabled = false;
 					usersFilterСomboBox.Enabled = false;
 					scheduleDataGridView.Rows.Clear();
@@ -450,15 +466,16 @@ namespace TaskSchedulerForms.Forms
 					}
 					leadTasks.Add(leadTask);
 				}
-				var data = s_dataFiller.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
 
 				scheduleDataGridView.Invoke(new Action(() =>
 				{
 					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
-						s_columnsPresenter.InitColumns(scheduleDataGridView);
+						ScheduleColumnsPresenter.InitColumns(scheduleDataGridView, s_viewColumnsIndexes.FirstDateColumnIndex);
 					m_viewFiltersApplier = s_dataPresenter.PresentData(
-						data,
+						m_lastProcessedData,
+						null,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
 						s_focusFactorCalculator,
@@ -598,12 +615,26 @@ namespace TaskSchedulerForms.Forms
 
 		private void ToggleDevCompletedToolStripMenuItem1Click(object sender, EventArgs e)
 		{
-			m_viewFiltersApplier.ToggleDevCompletedMode();
+			if (m_viewMenuItems.Contains(sender))
+				m_viewFiltersApplier.ToggleDevCompletedMode();
+			else
+				m_planFiltersApplier.ToggleDevCompletedMode();
 		}
 
 		private void ToggleLtOnlyToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			m_viewFiltersApplier.ToggleLeadTaskMode();
+			if (m_viewMenuItems.Contains(sender))
+				m_viewFiltersApplier.ToggleLeadTaskMode();
+			else
+				m_planFiltersApplier.ToggleLeadTaskMode();
+		}
+
+		private void ToggleBlockersToolStripMenuItemClick(object sender, EventArgs e)
+		{
+			if (m_viewMenuItems.Contains(sender))
+				m_viewFiltersApplier.ToggleBlockers();
+			else
+				m_planFiltersApplier.ToggleBlockers();
 		}
 
 		private void VacationsButtonClick(object sender, EventArgs e)
@@ -617,11 +648,6 @@ namespace TaskSchedulerForms.Forms
 			if (holidaysForm.Holidays.Count > 0)
 				m_config.Vacations.Add(new VacationData { User = user, VacationDays = holidaysForm.Holidays });
 			s_freeDaysCalculator.SetVacations(m_config.Vacations);
-		}
-
-		private void ToggleBlockersToolStripMenuItemClick(object sender, EventArgs e)
-		{
-			m_viewFiltersApplier.ToggleBlockers();
 		}
 
 		private void ExchangeButtonClick(object sender, EventArgs e)
@@ -683,12 +709,16 @@ namespace TaskSchedulerForms.Forms
 
 		private void ToggleIterationToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			s_dataPresenter.ToggleIteration(scheduleDataGridView, s_viewColumnsIndexes);
+			s_dataPresenter.ToggleIteration(
+				m_viewMenuItems.Contains(sender) ? scheduleDataGridView : planningDataGridView,
+				s_viewColumnsIndexes);
 		}
 
 		private void ToggleSprintToolStripMenuItemClick(object sender, EventArgs e)
 		{
-			s_dataPresenter.ToggleSprint(scheduleDataGridView, s_viewColumnsIndexes);
+			s_dataPresenter.ToggleSprint(
+				m_viewMenuItems.Contains(sender) ? scheduleDataGridView : planningDataGridView,
+				s_viewColumnsIndexes);
 		}
 
 		private void AppendExceptionString(Exception exc, StringBuilder stringBuilder)
@@ -712,6 +742,66 @@ namespace TaskSchedulerForms.Forms
 				fileWriter.WriteLine(text);
 			}
 			control.Invoke(new Action(() => MessageBox.Show(text, caption)));
+		}
+
+		private void PlanButtonClick(object sender, EventArgs e)
+		{
+			ThreadPool.QueueUserWorkItem(x => MakePlan());
+		}
+
+		private void MakePlan()
+		{
+			string currentUser = null;
+			planButton.Invoke(new Action(() =>
+			{
+				planButton.Enabled = false;
+				if (usersFilterComboBox2.SelectedItem != null)
+					currentUser = usersFilterComboBox2.SelectedItem.ToString();
+				usersLabel2.Enabled = false;
+				usersFilterComboBox2.Enabled = false;
+				planningDataGridView.Rows.Clear();
+			}));
+			try
+			{
+				planningDataGridView.Invoke(new Action(() =>
+				{
+					bool isDateChanged = planningDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
+					if (isDateChanged)
+						ScheduleColumnsPresenter.InitColumns(planningDataGridView, s_planColumnsIndexes.FirstDateColumnIndex);
+					m_planFiltersApplier = s_dataPresenter.PresentData(
+						m_lastProcessedData,
+						null,
+						s_viewColumnsIndexes,
+						s_freeDaysCalculator,
+						s_focusFactorCalculator,
+						planningDataGridView);
+
+					usersVacationsComboBox.DataSource = m_planFiltersApplier.Users;
+					vacationsButton.Enabled = m_planFiltersApplier.Users.Count > 0;
+
+					var users2 = new List<string>(m_planFiltersApplier.Users);
+					users2.Insert(0, string.Empty);
+					usersFilterComboBox2.DataSource = users2;
+
+					if (!string.IsNullOrEmpty(currentUser) && m_planFiltersApplier.Users.Contains(currentUser))
+					{
+						usersFilterComboBox2.SelectedItem = currentUser;
+						m_planFiltersApplier.FilterDataByUser(currentUser);
+					}
+
+					usersFilterComboBox2.Enabled = true;
+					usersLabel2.Enabled = true;
+					planButton.Enabled = true;
+				}));
+			}
+			catch (Exception exc)
+			{
+				HandleException(
+					exc,
+					planningDataGridView,
+					Resources.LeadTasksParsingError);
+				planningDataGridView.Invoke(new Action(() => { planButton.Enabled = true; }));
+			}
 		}
 	}
 }

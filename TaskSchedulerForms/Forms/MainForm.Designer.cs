@@ -52,6 +52,8 @@
 			this.queryLabel = new System.Windows.Forms.Label();
 			this.queryTextBox = new System.Windows.Forms.TextBox();
 			this.dataTabPage = new System.Windows.Forms.TabPage();
+			this.sprintLabel = new System.Windows.Forms.Label();
+			this.sprintFilterComboBox = new System.Windows.Forms.ComboBox();
 			this.refreshButton = new System.Windows.Forms.Button();
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
@@ -70,18 +72,38 @@
 			this.toggleIterationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleSprintToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.rowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toggleDevCompletedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleDevCompletedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleLTOnlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleBlockersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.settingsPage = new System.Windows.Forms.TabPage();
+			this.planningTabPage = new System.Windows.Forms.TabPage();
+			this.planButton = new System.Windows.Forms.Button();
+			this.usersLabel2 = new System.Windows.Forms.Label();
+			this.usersFilterComboBox2 = new System.Windows.Forms.ComboBox();
+			this.planningDataGridView = new System.Windows.Forms.DataGridView();
+			this.toggleMenuStrip2 = new System.Windows.Forms.MenuStrip();
+			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleIterationToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleSprintToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleDevCompletedToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleLTOnlyToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.toggleBlockersToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.settingsTabPage = new System.Windows.Forms.TabPage();
 			this.vacationsButton = new System.Windows.Forms.Button();
 			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
 			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.sprintLabel = new System.Windows.Forms.Label();
-			this.sprintFilterComboBox = new System.Windows.Forms.ComboBox();
+			this.Priority2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Iteration2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Sprint2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.LeadTask2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Docs2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Task2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Blockers2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Past2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -91,14 +113,18 @@
 			this.dataTabPage.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).BeginInit();
 			this.toggleMenuStrip.SuspendLayout();
-			this.settingsPage.SuspendLayout();
+			this.planningTabPage.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.planningDataGridView)).BeginInit();
+			this.toggleMenuStrip2.SuspendLayout();
+			this.settingsTabPage.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// mainTabControl
 			// 
 			this.mainTabControl.Controls.Add(this.mainTabPage);
 			this.mainTabControl.Controls.Add(this.dataTabPage);
-			this.mainTabControl.Controls.Add(this.settingsPage);
+			this.mainTabControl.Controls.Add(this.planningTabPage);
+			this.mainTabControl.Controls.Add(this.settingsTabPage);
 			this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.mainTabControl.Location = new System.Drawing.Point(0, 0);
 			this.mainTabControl.Name = "mainTabControl";
@@ -386,6 +412,26 @@
 			this.dataTabPage.Text = "Schedule";
 			this.dataTabPage.UseVisualStyleBackColor = true;
 			// 
+			// sprintLabel
+			// 
+			this.sprintLabel.AutoSize = true;
+			this.sprintLabel.Enabled = false;
+			this.sprintLabel.Location = new System.Drawing.Point(378, 33);
+			this.sprintLabel.Name = "sprintLabel";
+			this.sprintLabel.Size = new System.Drawing.Size(71, 13);
+			this.sprintLabel.TabIndex = 19;
+			this.sprintLabel.Text = "Filter by sprint";
+			// 
+			// sprintFilterComboBox
+			// 
+			this.sprintFilterComboBox.Enabled = false;
+			this.sprintFilterComboBox.FormattingEnabled = true;
+			this.sprintFilterComboBox.Location = new System.Drawing.Point(450, 30);
+			this.sprintFilterComboBox.Name = "sprintFilterComboBox";
+			this.sprintFilterComboBox.Size = new System.Drawing.Size(209, 21);
+			this.sprintFilterComboBox.TabIndex = 18;
+			this.sprintFilterComboBox.SelectionChangeCommitted += new System.EventHandler(this.SprintFilterComboBoxSelectionChangeCommitted);
+			// 
 			// refreshButton
 			// 
 			this.refreshButton.Enabled = false;
@@ -437,7 +483,7 @@
             this.AssignedTo,
             this.Past});
 			this.scheduleDataGridView.EnableHeadersVisualStyles = false;
-			this.scheduleDataGridView.Location = new System.Drawing.Point(3, 56);
+			this.scheduleDataGridView.Location = new System.Drawing.Point(0, 56);
 			this.scheduleDataGridView.Name = "scheduleDataGridView";
 			this.scheduleDataGridView.ReadOnly = true;
 			this.scheduleDataGridView.RowHeadersVisible = false;
@@ -567,19 +613,19 @@
 			// rowsToolStripMenuItem
 			// 
 			this.rowsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toggleDevCompletedToolStripMenuItem1,
+            this.toggleDevCompletedToolStripMenuItem,
             this.toggleLTOnlyToolStripMenuItem,
             this.toggleBlockersToolStripMenuItem});
 			this.rowsToolStripMenuItem.Name = "rowsToolStripMenuItem";
 			this.rowsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
 			this.rowsToolStripMenuItem.Text = "Rows";
 			// 
-			// toggleDevCompletedToolStripMenuItem1
+			// toggleDevCompletedToolStripMenuItem
 			// 
-			this.toggleDevCompletedToolStripMenuItem1.Name = "toggleDevCompletedToolStripMenuItem1";
-			this.toggleDevCompletedToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
-			this.toggleDevCompletedToolStripMenuItem1.Text = "Toggle Dev Completed";
-			this.toggleDevCompletedToolStripMenuItem1.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
+			this.toggleDevCompletedToolStripMenuItem.Name = "toggleDevCompletedToolStripMenuItem";
+			this.toggleDevCompletedToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+			this.toggleDevCompletedToolStripMenuItem.Text = "Toggle Dev Completed";
+			this.toggleDevCompletedToolStripMenuItem.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
 			// 
 			// toggleLTOnlyToolStripMenuItem
 			// 
@@ -595,19 +641,155 @@
 			this.toggleBlockersToolStripMenuItem.Text = "Toggle Blockers";
 			this.toggleBlockersToolStripMenuItem.Click += new System.EventHandler(this.ToggleBlockersToolStripMenuItemClick);
 			// 
-			// settingsPage
+			// planningTabPage
 			// 
-			this.settingsPage.Controls.Add(this.vacationsButton);
-			this.settingsPage.Controls.Add(this.usersVacationsComboBox);
-			this.settingsPage.Controls.Add(this.holidaysButton);
-			this.settingsPage.Controls.Add(this.tfsUrlTextBox);
-			this.settingsPage.Controls.Add(this.tfsUrlLabel);
-			this.settingsPage.Location = new System.Drawing.Point(4, 22);
-			this.settingsPage.Name = "settingsPage";
-			this.settingsPage.Size = new System.Drawing.Size(879, 548);
-			this.settingsPage.TabIndex = 2;
-			this.settingsPage.Text = "Settings";
-			this.settingsPage.UseVisualStyleBackColor = true;
+			this.planningTabPage.Controls.Add(this.planButton);
+			this.planningTabPage.Controls.Add(this.usersLabel2);
+			this.planningTabPage.Controls.Add(this.usersFilterComboBox2);
+			this.planningTabPage.Controls.Add(this.planningDataGridView);
+			this.planningTabPage.Controls.Add(this.toggleMenuStrip2);
+			this.planningTabPage.Location = new System.Drawing.Point(4, 22);
+			this.planningTabPage.Name = "planningTabPage";
+			this.planningTabPage.Size = new System.Drawing.Size(879, 548);
+			this.planningTabPage.TabIndex = 3;
+			this.planningTabPage.Text = "Planning";
+			this.planningTabPage.UseVisualStyleBackColor = true;
+			// 
+			// planButton
+			// 
+			this.planButton.Enabled = false;
+			this.planButton.Location = new System.Drawing.Point(8, 27);
+			this.planButton.Name = "planButton";
+			this.planButton.Size = new System.Drawing.Size(75, 23);
+			this.planButton.TabIndex = 22;
+			this.planButton.Text = "Plan";
+			this.planButton.UseVisualStyleBackColor = true;
+			this.planButton.Click += new System.EventHandler(this.PlanButtonClick);
+			// 
+			// usersLabel2
+			// 
+			this.usersLabel2.AutoSize = true;
+			this.usersLabel2.Enabled = false;
+			this.usersLabel2.Location = new System.Drawing.Point(89, 32);
+			this.usersLabel2.Name = "usersLabel2";
+			this.usersLabel2.Size = new System.Drawing.Size(66, 13);
+			this.usersLabel2.TabIndex = 23;
+			this.usersLabel2.Text = "Filter by user";
+			// 
+			// usersFilterComboBox2
+			// 
+			this.usersFilterComboBox2.Enabled = false;
+			this.usersFilterComboBox2.FormattingEnabled = true;
+			this.usersFilterComboBox2.Location = new System.Drawing.Point(161, 29);
+			this.usersFilterComboBox2.Name = "usersFilterComboBox2";
+			this.usersFilterComboBox2.Size = new System.Drawing.Size(209, 21);
+			this.usersFilterComboBox2.TabIndex = 24;
+			// 
+			// planningDataGridView
+			// 
+			this.planningDataGridView.AllowUserToAddRows = false;
+			this.planningDataGridView.AllowUserToDeleteRows = false;
+			this.planningDataGridView.AllowUserToResizeRows = false;
+			this.planningDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.planningDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.planningDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Priority2,
+            this.Iteration2,
+            this.Sprint2,
+            this.LeadTask2,
+            this.Docs2,
+            this.Task2,
+            this.Blockers2,
+            this.AssignedTo2,
+            this.Past2});
+			this.planningDataGridView.EnableHeadersVisualStyles = false;
+			this.planningDataGridView.Location = new System.Drawing.Point(0, 56);
+			this.planningDataGridView.Name = "planningDataGridView";
+			this.planningDataGridView.ReadOnly = true;
+			this.planningDataGridView.RowHeadersVisible = false;
+			this.planningDataGridView.Size = new System.Drawing.Size(880, 496);
+			this.planningDataGridView.TabIndex = 25;
+			// 
+			// toggleMenuStrip2
+			// 
+			this.toggleMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem1,
+            this.toolStripMenuItem4});
+			this.toggleMenuStrip2.Location = new System.Drawing.Point(0, 0);
+			this.toggleMenuStrip2.Name = "toggleMenuStrip2";
+			this.toggleMenuStrip2.Size = new System.Drawing.Size(879, 24);
+			this.toggleMenuStrip2.TabIndex = 26;
+			this.toggleMenuStrip2.Text = "menuStrip1";
+			// 
+			// toolStripMenuItem1
+			// 
+			this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleIterationToolStripMenuItem2,
+            this.toggleSprintToolStripMenuItem2});
+			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+			this.toolStripMenuItem1.Size = new System.Drawing.Size(67, 20);
+			this.toolStripMenuItem1.Text = "Columns";
+			// 
+			// toggleIterationToolStripMenuItem2
+			// 
+			this.toggleIterationToolStripMenuItem2.Name = "toggleIterationToolStripMenuItem2";
+			this.toggleIterationToolStripMenuItem2.Size = new System.Drawing.Size(158, 22);
+			this.toggleIterationToolStripMenuItem2.Text = "Toggle Iteration";
+			this.toggleIterationToolStripMenuItem2.Click += new System.EventHandler(this.ToggleIterationToolStripMenuItemClick);
+			// 
+			// toggleSprintToolStripMenuItem2
+			// 
+			this.toggleSprintToolStripMenuItem2.Name = "toggleSprintToolStripMenuItem2";
+			this.toggleSprintToolStripMenuItem2.Size = new System.Drawing.Size(158, 22);
+			this.toggleSprintToolStripMenuItem2.Text = "Toggle Sprint";
+			this.toggleSprintToolStripMenuItem2.Click += new System.EventHandler(this.ToggleSprintToolStripMenuItemClick);
+			// 
+			// toolStripMenuItem4
+			// 
+			this.toolStripMenuItem4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleDevCompletedToolStripMenuItem2,
+            this.toggleLTOnlyToolStripMenuItem2,
+            this.toggleBlockersToolStripMenuItem2});
+			this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+			this.toolStripMenuItem4.Size = new System.Drawing.Size(47, 20);
+			this.toolStripMenuItem4.Text = "Rows";
+			// 
+			// toggleDevCompletedToolStripMenuItem2
+			// 
+			this.toggleDevCompletedToolStripMenuItem2.Name = "toggleDevCompletedToolStripMenuItem2";
+			this.toggleDevCompletedToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
+			this.toggleDevCompletedToolStripMenuItem2.Text = "Toggle Dev Completed";
+			this.toggleDevCompletedToolStripMenuItem2.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
+			// 
+			// toggleLTOnlyToolStripMenuItem2
+			// 
+			this.toggleLTOnlyToolStripMenuItem2.Name = "toggleLTOnlyToolStripMenuItem2";
+			this.toggleLTOnlyToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
+			this.toggleLTOnlyToolStripMenuItem2.Text = "Toggle LT Only";
+			this.toggleLTOnlyToolStripMenuItem2.Click += new System.EventHandler(this.ToggleLtOnlyToolStripMenuItemClick);
+			// 
+			// toggleBlockersToolStripMenuItem2
+			// 
+			this.toggleBlockersToolStripMenuItem2.Name = "toggleBlockersToolStripMenuItem2";
+			this.toggleBlockersToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
+			this.toggleBlockersToolStripMenuItem2.Text = "Toggle Blockers";
+			this.toggleBlockersToolStripMenuItem2.Click += new System.EventHandler(this.ToggleBlockersToolStripMenuItemClick);
+			// 
+			// settingsTabPage
+			// 
+			this.settingsTabPage.Controls.Add(this.vacationsButton);
+			this.settingsTabPage.Controls.Add(this.usersVacationsComboBox);
+			this.settingsTabPage.Controls.Add(this.holidaysButton);
+			this.settingsTabPage.Controls.Add(this.tfsUrlTextBox);
+			this.settingsTabPage.Controls.Add(this.tfsUrlLabel);
+			this.settingsTabPage.Location = new System.Drawing.Point(4, 22);
+			this.settingsTabPage.Name = "settingsTabPage";
+			this.settingsTabPage.Size = new System.Drawing.Size(879, 548);
+			this.settingsTabPage.TabIndex = 2;
+			this.settingsTabPage.Text = "Settings";
+			this.settingsTabPage.UseVisualStyleBackColor = true;
 			// 
 			// vacationsButton
 			// 
@@ -653,25 +835,91 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// sprintLabel
+			// Priority2
 			// 
-			this.sprintLabel.AutoSize = true;
-			this.sprintLabel.Enabled = false;
-			this.sprintLabel.Location = new System.Drawing.Point(378, 33);
-			this.sprintLabel.Name = "sprintLabel";
-			this.sprintLabel.Size = new System.Drawing.Size(71, 13);
-			this.sprintLabel.TabIndex = 19;
-			this.sprintLabel.Text = "Filter by sprint";
+			this.Priority2.Frozen = true;
+			this.Priority2.HeaderText = "Pr";
+			this.Priority2.Name = "Priority2";
+			this.Priority2.ReadOnly = true;
+			this.Priority2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Priority2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Priority2.Width = 30;
 			// 
-			// sprintFilterComboBox
+			// Iteration2
 			// 
-			this.sprintFilterComboBox.Enabled = false;
-			this.sprintFilterComboBox.FormattingEnabled = true;
-			this.sprintFilterComboBox.Location = new System.Drawing.Point(450, 30);
-			this.sprintFilterComboBox.Name = "sprintFilterComboBox";
-			this.sprintFilterComboBox.Size = new System.Drawing.Size(209, 21);
-			this.sprintFilterComboBox.TabIndex = 18;
-			this.sprintFilterComboBox.SelectionChangeCommitted += new System.EventHandler(this.SprintFilterComboBoxSelectionChangeCommitted);
+			this.Iteration2.Frozen = true;
+			this.Iteration2.HeaderText = "Iteration";
+			this.Iteration2.Name = "Iteration2";
+			this.Iteration2.ReadOnly = true;
+			this.Iteration2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Iteration2.Visible = false;
+			this.Iteration2.Width = 180;
+			// 
+			// Sprint2
+			// 
+			this.Sprint2.Frozen = true;
+			this.Sprint2.HeaderText = "Sprint";
+			this.Sprint2.Name = "Sprint2";
+			this.Sprint2.ReadOnly = true;
+			this.Sprint2.Visible = false;
+			this.Sprint2.Width = 60;
+			// 
+			// LeadTask2
+			// 
+			this.LeadTask2.Frozen = true;
+			this.LeadTask2.HeaderText = "LeadTask";
+			this.LeadTask2.Name = "LeadTask2";
+			this.LeadTask2.ReadOnly = true;
+			this.LeadTask2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.LeadTask2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.LeadTask2.Width = 60;
+			// 
+			// Docs2
+			// 
+			this.Docs2.Frozen = true;
+			this.Docs2.HeaderText = "Docs";
+			this.Docs2.Name = "Docs2";
+			this.Docs2.ReadOnly = true;
+			this.Docs2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Docs2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Docs2.Width = 50;
+			// 
+			// Task2
+			// 
+			this.Task2.Frozen = true;
+			this.Task2.HeaderText = "Task";
+			this.Task2.Name = "Task2";
+			this.Task2.ReadOnly = true;
+			this.Task2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Task2.Width = 200;
+			// 
+			// Blockers2
+			// 
+			this.Blockers2.Frozen = true;
+			this.Blockers2.HeaderText = "Blockers";
+			this.Blockers2.Name = "Blockers2";
+			this.Blockers2.ReadOnly = true;
+			this.Blockers2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Blockers2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Blockers2.Width = 60;
+			// 
+			// AssignedTo2
+			// 
+			this.AssignedTo2.Frozen = true;
+			this.AssignedTo2.HeaderText = "AssignedTo";
+			this.AssignedTo2.Name = "AssignedTo2";
+			this.AssignedTo2.ReadOnly = true;
+			this.AssignedTo2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.AssignedTo2.Width = 80;
+			// 
+			// Past2
+			// 
+			this.Past2.HeaderText = "Past";
+			this.Past2.Name = "Past2";
+			this.Past2.ReadOnly = true;
+			this.Past2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Past2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Past2.Width = 40;
 			// 
 			// MainForm
 			// 
@@ -697,8 +945,13 @@
 			((System.ComponentModel.ISupportInitialize)(this.scheduleDataGridView)).EndInit();
 			this.toggleMenuStrip.ResumeLayout(false);
 			this.toggleMenuStrip.PerformLayout();
-			this.settingsPage.ResumeLayout(false);
-			this.settingsPage.PerformLayout();
+			this.planningTabPage.ResumeLayout(false);
+			this.planningTabPage.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.planningDataGridView)).EndInit();
+			this.toggleMenuStrip2.ResumeLayout(false);
+			this.toggleMenuStrip2.PerformLayout();
+			this.settingsTabPage.ResumeLayout(false);
+			this.settingsTabPage.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -715,7 +968,7 @@
 		private System.Windows.Forms.Button loadLeadTasksButton;
 		private System.Windows.Forms.ComboBox secondComboBox;
 		private System.Windows.Forms.Button refreshButton;
-		private System.Windows.Forms.TabPage settingsPage;
+		private System.Windows.Forms.TabPage settingsTabPage;
 		private System.Windows.Forms.TextBox tfsUrlTextBox;
 		private System.Windows.Forms.Label tfsUrlLabel;
 		private System.Windows.Forms.Button holidaysButton;
@@ -753,11 +1006,33 @@
 		private System.Windows.Forms.ToolStripMenuItem toggleIterationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toggleSprintToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem rowsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem toggleDevCompletedToolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem toggleDevCompletedToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toggleLTOnlyToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem toggleBlockersToolStripMenuItem;
 		private System.Windows.Forms.Label sprintLabel;
 		private System.Windows.Forms.ComboBox sprintFilterComboBox;
+		private System.Windows.Forms.TabPage planningTabPage;
+		private System.Windows.Forms.Button planButton;
+		private System.Windows.Forms.Label usersLabel2;
+		private System.Windows.Forms.ComboBox usersFilterComboBox2;
+		private System.Windows.Forms.MenuStrip toggleMenuStrip2;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem toggleIterationToolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toggleSprintToolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+		private System.Windows.Forms.ToolStripMenuItem toggleDevCompletedToolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toggleLTOnlyToolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem toggleBlockersToolStripMenuItem2;
+		private System.Windows.Forms.DataGridView planningDataGridView;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Priority2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Docs2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Task2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
 	}
 }
 

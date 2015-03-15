@@ -12,13 +12,14 @@ namespace TaskSchedulerForms
 	{
 		internal static Dictionary<int, Tuple<int?, int>> MakeSchedule(
 			DataContainer dataContainer,
+			Dictionary<int, string> planningAssignments,
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator)
 		{
 			var result = new Dictionary<int, Tuple<int?, int>>();
 			var usersBlockersDict = new Dictionary<string, Dictionary<int, BlockerData>>();
 
-			var usersTasksDict = SeparateByUser(dataContainer);
+			var usersTasksDict = SeparateByUser(dataContainer, planningAssignments);
 			short i = 0;
 			var numbersToUsersMapping = usersTasksDict.ToDictionary(u => ++i, u => u.Key);
 			i = 0;
@@ -36,6 +37,7 @@ namespace TaskSchedulerForms
 					freeDaysCalculator,
 					focusFactorCalculator,
 					dataContainer,
+					planningAssignments,
 					result);
 
 				var usersToRecalculate = ProcessBlockers(
@@ -147,7 +149,9 @@ namespace TaskSchedulerForms
 			return result;
 		}
 
-		private static Dictionary<string, List<Tuple<WorkItem, WorkItem>>> SeparateByUser(DataContainer dataContainer)
+		private static Dictionary<string, List<Tuple<WorkItem, WorkItem>>> SeparateByUser(
+			DataContainer dataContainer,
+			Dictionary<int, string> planningAssignments)
 		{
 			var result = new Dictionary<string, List<Tuple<WorkItem, WorkItem>>>();
 			foreach (var ltChildrenPair in dataContainer.LeadTaskChildrenDict)
@@ -156,7 +160,7 @@ namespace TaskSchedulerForms
 				foreach (int childId in ltChildrenPair.Value)
 				{
 					WorkItem child = dataContainer.WiDict[childId];
-					string assignee = child.AssignedTo();
+					string assignee = GetAssignee(child, planningAssignments);
 					var childTuple = new Tuple<WorkItem, WorkItem>(child, lt);
 					if (!result.ContainsKey(assignee))
 						result.Add(assignee, new List<Tuple<WorkItem, WorkItem>> { childTuple });
@@ -173,6 +177,7 @@ namespace TaskSchedulerForms
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator,
 			DataContainer dataContainer,
+			Dictionary<int, string> planningAssignments,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
 			var nonBlockedTasks = new List<Tuple<WorkItem, WorkItem>>();
@@ -209,6 +214,7 @@ namespace TaskSchedulerForms
 				proposedBlockedTasks,
 				schedule,
 				dataContainer,
+				planningAssignments,
 				focusFactorCalculator,
 				scheduledTasksDict,
 				result);
@@ -216,6 +222,7 @@ namespace TaskSchedulerForms
 				activeBlockedTasks,
 				schedule,
 				dataContainer,
+				planningAssignments,
 				focusFactorCalculator,
 				scheduledTasksDict,
 				result);
@@ -248,6 +255,7 @@ namespace TaskSchedulerForms
 
 		private static int? GetFinishDay(
 			WorkItem task,
+			Dictionary<int, string> planningAssignments,
 			FocusFactorCalculator focusFactorCalculator,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
@@ -264,7 +272,9 @@ namespace TaskSchedulerForms
 					? task.Estimate()
 					: task.Remaining();
 				if (remaining != null)
-					result = focusFactorCalculator.CalculateDaysByTime(remaining.Value, task.AssignedTo());
+					result = focusFactorCalculator.CalculateDaysByTime(
+						remaining.Value,
+						GetAssignee(task, planningAssignments));
 			}
 			return result;
 		}
@@ -272,11 +282,13 @@ namespace TaskSchedulerForms
 		private static Tuple<int?, Dictionary<string, HashSet<int>>> GetFinishDateForBlockedTask(
 			WorkItem blockedTask,
 			DataContainer dataContainer,
+			Dictionary<int, string> planningAssignments,
 			FocusFactorCalculator focusFactorCalculator,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict)
 		{
 			int? finish = GetFinishDay(
 				blockedTask,
+				planningAssignments,
 				focusFactorCalculator,
 				scheduledTasksDict);
 
@@ -291,11 +303,13 @@ namespace TaskSchedulerForms
 					var blockerData = GetFinishDateForBlockedTask(
 						blocker,
 						dataContainer,
+						planningAssignments,
 						focusFactorCalculator,
 						scheduledTasksDict);
 
 					int? currentFinish = GetFinishDay(
 						blocker,
+						planningAssignments,
 						focusFactorCalculator,
 						scheduledTasksDict);
 					currentFinish = MaxDay(currentFinish, blockerData.Item1);
@@ -312,7 +326,7 @@ namespace TaskSchedulerForms
 						}
 					}
 
-					string blockerAssignee = blocker.AssignedTo();
+					string blockerAssignee = GetAssignee(blocker, planningAssignments);
 					if (userBlockersDict.ContainsKey(blockerAssignee))
 						userBlockersDict[blockerAssignee].Add(blockerId);
 					else
@@ -333,6 +347,7 @@ namespace TaskSchedulerForms
 			IEnumerable<Tuple<WorkItem, WorkItem>> blockedTasks,
 			List<Tuple<Tuple<WorkItem, WorkItem>, int>> schedule,
 			DataContainer dataContainer,
+			Dictionary<int, string> planningAssignments,
 			FocusFactorCalculator focusFactorCalculator,
 			Dictionary<int, Tuple<int?, int>> scheduledTasksDict,
 			Dictionary<string, HashSet<int>> usersBlockers)
@@ -344,6 +359,7 @@ namespace TaskSchedulerForms
 				var finishData = GetFinishDateForBlockedTask(
 					blockedTask,
 					dataContainer,
+					planningAssignments,
 					focusFactorCalculator,
 					scheduledTasksDict);
 				if (finishData.Item1 == null)
@@ -357,7 +373,9 @@ namespace TaskSchedulerForms
 						: blockedTask.Estimate();
 					int taskDaysCount = remaining == null
 						? 0
-						: focusFactorCalculator.CalculateDaysByTime(remaining.Value, tuple.Item1.AssignedTo());
+						: focusFactorCalculator.CalculateDaysByTime(
+							remaining.Value,
+							GetAssignee(tuple.Item1, planningAssignments));
 					int startDay = 0;
 					bool added = false;
 					for (int i = 0; i < schedule.Count; i++)
@@ -441,7 +459,7 @@ namespace TaskSchedulerForms
 				double? remaining = task.Remaining();
 				if (remaining != null && remaining > 0)
 				{
-					int finishByRemaining = focusFactorCalculator.CalculateDaysByTime(remaining.Value, task.AssignedTo());
+					int finishByRemaining = focusFactorCalculator.CalculateDaysByTime(remaining.Value, user);
 					if (finish < finishByRemaining)
 						finish = finishByRemaining;
 				}
@@ -450,7 +468,16 @@ namespace TaskSchedulerForms
 			double? estimate = task.Estimate();
 			return estimate == null
 				? 0
-				: focusFactorCalculator.CalculateDaysByTime(estimate.Value, task.AssignedTo());
+				: focusFactorCalculator.CalculateDaysByTime(estimate.Value, user);
+		}
+
+		private static string GetAssignee(
+			WorkItem workItem,
+			Dictionary<int, string> planningAssignments)
+		{
+			if (planningAssignments != null && planningAssignments.ContainsKey(workItem.Id))
+				return planningAssignments[workItem.Id];
+			return workItem.AssignedTo();
 		}
 	}
 }

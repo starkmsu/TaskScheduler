@@ -43,23 +43,23 @@ namespace TaskSchedulerForms.Presentation
 			for (int i = 0; i < dataGridView.Columns.Count; i++)
 			{
 				var column = dataGridView.Columns[i];
-				if (column.Name == "Priority")
+				if (column.Name.StartsWith("Priority"))
 					m_priorityInd = i;
-				else if (column.Name == "Iteration")
+				else if (column.Name.StartsWith("Iteration"))
 					m_iterationInd = i;
-				else if (column.Name == "Sprint")
+				else if (column.Name.StartsWith("Sprint"))
 					m_sprintInd = i;
-				else if (column.Name == "LeadTask")
+				else if (column.Name.StartsWith("LeadTask"))
 					m_leadTaskIdInd = i;
-				else if (column.Name == "Docs")
+				else if (column.Name.StartsWith("Docs"))
 					m_docsInd = i;
-				else if (column.Name == "Task")
+				else if (column.Name.StartsWith("Task"))
 					m_titleInd = i;
-				else if (column.Name == "Blockers")
+				else if (column.Name.StartsWith("Blockers"))
 					m_blockersInd = i;
-				else if (column.Name == "AssignedTo")
+				else if (column.Name.StartsWith("AssignedTo"))
 					m_assignedToInd = i;
-				else if (column.Name == "Past")
+				else if (column.Name.StartsWith("Past"))
 					m_pastInd = i;
 			}
 			var listOfIndexes = new List<int?>

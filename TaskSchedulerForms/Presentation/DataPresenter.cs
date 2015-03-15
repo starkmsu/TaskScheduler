@@ -22,6 +22,7 @@ namespace TaskSchedulerForms.Presentation
 
 		internal ViewFiltersApplier PresentData(
 			DataContainer data,
+			Dictionary<int, string> planningAssignments,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator,
@@ -29,6 +30,7 @@ namespace TaskSchedulerForms.Presentation
 		{
 			var tasksSchedule = WorkItemsScheduler.MakeSchedule(
 				data,
+				planningAssignments,
 				freeDaysCalculator,
 				focusFactorCalculator);
 

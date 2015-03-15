@@ -6,18 +6,11 @@ namespace TaskSchedulerForms.Presentation
 {
 	internal class ScheduleColumnsPresenter
 	{
-		private readonly int m_indShift;
-
-		internal ScheduleColumnsPresenter(int indShift)
+		internal static void InitColumns(DataGridView dgv, int indShift)
 		{
-			m_indShift = indShift;
-		}
-
-		internal void InitColumns(DataGridView dgv)
-		{
-			while (dgv.Columns.Count > m_indShift)
+			while (dgv.Columns.Count > indShift)
 			{
-				dgv.Columns.RemoveAt(m_indShift);
+				dgv.Columns.RemoveAt(indShift);
 			}
 			DateTime start = DateTime.Now.Date;
 			DateTime finish = DateTime.Now.AddMonths(1).Date;
