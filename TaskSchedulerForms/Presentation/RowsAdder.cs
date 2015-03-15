@@ -22,7 +22,8 @@ namespace TaskSchedulerForms.Presentation
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator,
 			WorkItem leadTask,
-			DataContainer data)
+			DataContainer data,
+			Dictionary<int, string> planningAssignments)
 		{
 			dgv.Rows.Add(new DataGridViewRow());
 			var leadTaskRow = dgv.Rows[dgv.Rows.Count - 1];
@@ -47,6 +48,7 @@ namespace TaskSchedulerForms.Presentation
 						viewFiltersBuilder,
 						workItemInfoFiller,
 						data,
+						planningAssignments,
 						blockerId);
 				}
 
@@ -83,6 +85,8 @@ namespace TaskSchedulerForms.Presentation
 			List<WorkItem> siblings,
 			int? leadTaskPriority,
 			DataContainer data,
+			Dictionary<int, string> planningAssignments,
+			List<string> allUsers,
 			Dictionary<int, int> alreadyAdded,
 			Dictionary<string, int> tasksByUser,
 			Dictionary<int, Tuple<int?, int>> tasksSchedule)
@@ -100,6 +104,8 @@ namespace TaskSchedulerForms.Presentation
 				freeDaysCalculator,
 				focusFactorCalculator,
 				data,
+				planningAssignments,
+				allUsers,
 				task,
 				siblings,
 				leadTaskPriority,
@@ -118,6 +124,8 @@ namespace TaskSchedulerForms.Presentation
 				leadTaskPriority,
 				taskRow,
 				data,
+				planningAssignments,
+				allUsers,
 				blockerIds);
 
 			viewFiltersBuilder.MarkTaskRow(taskRow);
@@ -130,6 +138,7 @@ namespace TaskSchedulerForms.Presentation
 						viewFiltersBuilder,
 						workItemInfoFiller,
 						data,
+						planningAssignments,
 						blockerId);
 				}
 
@@ -139,7 +148,7 @@ namespace TaskSchedulerForms.Presentation
 				return viewColumnsIndexes.FirstDateColumnIndex;
 			}
 
-			string assignedTo = task.AssignedTo();
+			string assignedTo = planningAssignments.GetAssignee(task);
 			if (!assignedTo.IsUnassigned() && tasksByUser.ContainsKey(assignedTo))
 				nextInds.Add(tasksByUser[assignedTo]);
 
@@ -216,12 +225,16 @@ namespace TaskSchedulerForms.Presentation
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItemInfoFiller workItemInfoFiller,
 			DataContainer data,
+			Dictionary<int, string> planningAssignments,
 			int blockerId)
 		{
 			dgv.Rows.Add(new DataGridViewRow());
 			var blockerRow = dgv.Rows[dgv.Rows.Count - 1];
 			WorkItem blocker = data.WiDict[blockerId];
-			workItemInfoFiller.FillBlockerInfo(blockerRow, blocker);
+			workItemInfoFiller.FillBlockerInfo(
+				blockerRow,
+				blocker,
+				planningAssignments);
 			viewFiltersBuilder.MarkBlockerRow(blockerRow);
 		}
 
@@ -233,6 +246,8 @@ namespace TaskSchedulerForms.Presentation
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator,
 			DataContainer data,
+			Dictionary<int, string> planningAssignments,
+			List<string> allUsers,
 			WorkItem task,
 			List<WorkItem> childrenTasks,
 			int? leadTaskPriority,
@@ -272,6 +287,8 @@ namespace TaskSchedulerForms.Presentation
 						childrenTasks,
 						leadTaskPriority,
 						data,
+						planningAssignments,
+						allUsers,
 						alreadyAdded,
 						tasksByUser,
 						tasksSchedule);

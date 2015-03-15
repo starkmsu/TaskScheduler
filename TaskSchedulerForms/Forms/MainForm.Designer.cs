@@ -61,7 +61,7 @@
 			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Iteration = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Sprint = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.LeadTask = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -98,11 +98,11 @@
 			this.Priority2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Iteration2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Sprint2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.LeadTask2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Id2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Docs2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Task2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Blockers2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AssignedTo2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo2 = new System.Windows.Forms.DataGridViewComboBoxColumn();
 			this.Past2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
@@ -476,7 +476,7 @@
             this.Priority,
             this.Iteration,
             this.Sprint,
-            this.LeadTask,
+            this.Id,
             this.Docs,
             this.Task,
             this.Blockers,
@@ -519,15 +519,15 @@
 			this.Sprint.Visible = false;
 			this.Sprint.Width = 60;
 			// 
-			// LeadTask
+			// Id
 			// 
-			this.LeadTask.Frozen = true;
-			this.LeadTask.HeaderText = "LeadTask";
-			this.LeadTask.Name = "LeadTask";
-			this.LeadTask.ReadOnly = true;
-			this.LeadTask.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.LeadTask.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.LeadTask.Width = 60;
+			this.Id.Frozen = true;
+			this.Id.HeaderText = "Id";
+			this.Id.Name = "Id";
+			this.Id.ReadOnly = true;
+			this.Id.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Id.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Id.Width = 60;
 			// 
 			// Docs
 			// 
@@ -684,6 +684,7 @@
 			this.usersFilterComboBox2.Name = "usersFilterComboBox2";
 			this.usersFilterComboBox2.Size = new System.Drawing.Size(209, 21);
 			this.usersFilterComboBox2.TabIndex = 24;
+			this.usersFilterComboBox2.SelectionChangeCommitted += new System.EventHandler(this.UsersFilterСomboBoxSelectionChangeCommitted);
 			// 
 			// planningDataGridView
 			// 
@@ -698,7 +699,7 @@
             this.Priority2,
             this.Iteration2,
             this.Sprint2,
-            this.LeadTask2,
+            this.Id2,
             this.Docs2,
             this.Task2,
             this.Blockers2,
@@ -707,7 +708,6 @@
 			this.planningDataGridView.EnableHeadersVisualStyles = false;
 			this.planningDataGridView.Location = new System.Drawing.Point(0, 56);
 			this.planningDataGridView.Name = "planningDataGridView";
-			this.planningDataGridView.ReadOnly = true;
 			this.planningDataGridView.RowHeadersVisible = false;
 			this.planningDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.planningDataGridView.TabIndex = 25;
@@ -864,15 +864,15 @@
 			this.Sprint2.Visible = false;
 			this.Sprint2.Width = 60;
 			// 
-			// LeadTask2
+			// Id2
 			// 
-			this.LeadTask2.Frozen = true;
-			this.LeadTask2.HeaderText = "LeadTask";
-			this.LeadTask2.Name = "LeadTask2";
-			this.LeadTask2.ReadOnly = true;
-			this.LeadTask2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.LeadTask2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.LeadTask2.Width = 60;
+			this.Id2.Frozen = true;
+			this.Id2.HeaderText = "Id";
+			this.Id2.Name = "Id2";
+			this.Id2.ReadOnly = true;
+			this.Id2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Id2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Id2.Width = 60;
 			// 
 			// Docs2
 			// 
@@ -890,6 +890,7 @@
 			this.Task2.HeaderText = "Task";
 			this.Task2.Name = "Task2";
 			this.Task2.ReadOnly = true;
+			this.Task2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
 			this.Task2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
 			this.Task2.Width = 200;
 			// 
@@ -905,11 +906,12 @@
 			// 
 			// AssignedTo2
 			// 
+			this.AssignedTo2.DropDownWidth = 100;
 			this.AssignedTo2.Frozen = true;
 			this.AssignedTo2.HeaderText = "AssignedTo";
+			this.AssignedTo2.MaxDropDownItems = 16;
 			this.AssignedTo2.Name = "AssignedTo2";
-			this.AssignedTo2.ReadOnly = true;
-			this.AssignedTo2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.AssignedTo2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
 			this.AssignedTo2.Width = 80;
 			// 
 			// Past2
@@ -991,15 +993,6 @@
 		private System.Windows.Forms.TextBox queryTextBox;
 		private System.Windows.Forms.GroupBox queryGroupBox;
 		private System.Windows.Forms.ComboBox firstComboBox;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint;
-		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
-		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
-		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.CheckBox sprintCheckBox;
 		private System.Windows.Forms.MenuStrip toggleMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem columnsToolStripMenuItem;
@@ -1024,14 +1017,23 @@
 		private System.Windows.Forms.ToolStripMenuItem toggleLTOnlyToolStripMenuItem2;
 		private System.Windows.Forms.ToolStripMenuItem toggleBlockersToolStripMenuItem2;
 		private System.Windows.Forms.DataGridView planningDataGridView;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Id;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Docs;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
+		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint2;
-		private System.Windows.Forms.DataGridViewTextBoxColumn LeadTask2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Id2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Docs2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers2;
-		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo2;
+		private System.Windows.Forms.DataGridViewComboBoxColumn AssignedTo2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
 	}
 }

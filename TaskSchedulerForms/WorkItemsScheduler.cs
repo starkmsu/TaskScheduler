@@ -160,7 +160,7 @@ namespace TaskSchedulerForms
 				foreach (int childId in ltChildrenPair.Value)
 				{
 					WorkItem child = dataContainer.WiDict[childId];
-					string assignee = GetAssignee(child, planningAssignments);
+					string assignee = planningAssignments.GetAssignee(child);
 					var childTuple = new Tuple<WorkItem, WorkItem>(child, lt);
 					if (!result.ContainsKey(assignee))
 						result.Add(assignee, new List<Tuple<WorkItem, WorkItem>> { childTuple });
@@ -274,7 +274,7 @@ namespace TaskSchedulerForms
 				if (remaining != null)
 					result = focusFactorCalculator.CalculateDaysByTime(
 						remaining.Value,
-						GetAssignee(task, planningAssignments));
+						planningAssignments.GetAssignee(task));
 			}
 			return result;
 		}
@@ -326,7 +326,7 @@ namespace TaskSchedulerForms
 						}
 					}
 
-					string blockerAssignee = GetAssignee(blocker, planningAssignments);
+					string blockerAssignee = planningAssignments.GetAssignee(blocker);
 					if (userBlockersDict.ContainsKey(blockerAssignee))
 						userBlockersDict[blockerAssignee].Add(blockerId);
 					else
@@ -375,7 +375,7 @@ namespace TaskSchedulerForms
 						? 0
 						: focusFactorCalculator.CalculateDaysByTime(
 							remaining.Value,
-							GetAssignee(tuple.Item1, planningAssignments));
+							planningAssignments.GetAssignee(tuple.Item1));
 					int startDay = 0;
 					bool added = false;
 					for (int i = 0; i < schedule.Count; i++)
@@ -469,15 +469,6 @@ namespace TaskSchedulerForms
 			return estimate == null
 				? 0
 				: focusFactorCalculator.CalculateDaysByTime(estimate.Value, user);
-		}
-
-		private static string GetAssignee(
-			WorkItem workItem,
-			Dictionary<int, string> planningAssignments)
-		{
-			if (planningAssignments != null && planningAssignments.ContainsKey(workItem.Id))
-				return planningAssignments[workItem.Id];
-			return workItem.AssignedTo();
 		}
 	}
 }

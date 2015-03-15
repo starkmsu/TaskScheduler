@@ -23,6 +23,7 @@ namespace TaskSchedulerForms.Presentation
 		internal ViewFiltersApplier PresentData(
 			DataContainer data,
 			Dictionary<int, string> planningAssignments,
+			List<string> allUsers,
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
 			FocusFactorCalculator focusFactorCalculator,
@@ -52,7 +53,8 @@ namespace TaskSchedulerForms.Presentation
 					freeDaysCalculator,
 					focusFactorCalculator,
 					leadTask,
-					data);
+					data,
+					planningAssignments);
 				int ltRowInd = dgv.Rows.Count - 1;
 
 				var childrenTasks = leadTaskChildren.Value
@@ -76,6 +78,8 @@ namespace TaskSchedulerForms.Presentation
 								childrenTasks,
 								leadTask.Priority(),
 								data,
+								planningAssignments,
+								allUsers,
 								alreadyAdded,
 								tasksByUser,
 								tasksSchedule))

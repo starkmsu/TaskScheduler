@@ -74,5 +74,11 @@ namespace TaskSchedulerForms.Presentation
 				return cell.Style.BackColor == CellsPalette.StateDevCompleted;
 			throw new NotImplementedException("Unkonown state " + state);
 		}
+
+		internal static bool IsUncolored(this DataGridViewCell cell)
+		{
+			var style = cell.OwningColumn.DefaultCellStyle ?? cell.OwningColumn.InheritedStyle;
+			return cell.Style.BackColor == style.BackColor;
+		}
 	}
 }

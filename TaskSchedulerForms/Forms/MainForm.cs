@@ -347,6 +347,7 @@ namespace TaskSchedulerForms.Forms
 						m_viewFiltersApplier = s_dataPresenter.PresentData(
 							m_lastProcessedData,
 							null,
+							null,
 							s_viewColumnsIndexes,
 							s_freeDaysCalculator,
 							s_focusFactorCalculator,
@@ -390,8 +391,16 @@ namespace TaskSchedulerForms.Forms
 
 		private void UsersFilterСomboBoxSelectionChangeCommitted(object sender, EventArgs e)
 		{
-			string user = usersFilterСomboBox.SelectedItem.ToString();
-			m_viewFiltersApplier.FilterDataByUser(user);
+			if (sender == usersFilterСomboBox)
+			{
+				string user = usersFilterСomboBox.SelectedItem.ToString();
+				m_viewFiltersApplier.FilterDataByUser(user);
+			}
+			else
+			{
+				string user = usersFilterComboBox2.SelectedItem.ToString();
+				m_planFiltersApplier.FilterDataByUser(user);
+			}
 		}
 
 		private void SprintFilterComboBoxSelectionChangeCommitted(object sender, EventArgs e)
@@ -475,6 +484,7 @@ namespace TaskSchedulerForms.Forms
 						ScheduleColumnsPresenter.InitColumns(scheduleDataGridView, s_viewColumnsIndexes.FirstDateColumnIndex);
 					m_viewFiltersApplier = s_dataPresenter.PresentData(
 						m_lastProcessedData,
+						null,
 						null,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
@@ -751,6 +761,15 @@ namespace TaskSchedulerForms.Forms
 
 		private void MakePlan()
 		{
+			var planningAssignments = GetPlanningAssignments();
+
+			var allUsers = usersFilterСomboBox.Items.Cast<string>().Where(i => !string.IsNullOrEmpty(i)).ToList();
+			if (planningAssignments != null)
+				allUsers.AddRange(
+					planningAssignments.Values
+						.Distinct()
+						.Where(i => !allUsers.Contains(i)));
+
 			string currentUser = null;
 			planButton.Invoke(new Action(() =>
 			{
@@ -768,9 +787,13 @@ namespace TaskSchedulerForms.Forms
 					bool isDateChanged = planningDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
 						ScheduleColumnsPresenter.InitColumns(planningDataGridView, s_planColumnsIndexes.FirstDateColumnIndex);
+
+					var comboBoxColumn = planningDataGridView.Columns[s_planColumnsIndexes.AssignedToColumnIndex] as DataGridViewComboBoxColumn;
+					comboBoxColumn.DataSource = allUsers;
 					m_planFiltersApplier = s_dataPresenter.PresentData(
 						m_lastProcessedData,
-						null,
+						planningAssignments,
+						allUsers,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
 						s_focusFactorCalculator,
@@ -802,6 +825,28 @@ namespace TaskSchedulerForms.Forms
 					Resources.LeadTasksParsingError);
 				planningDataGridView.Invoke(new Action(() => { planButton.Enabled = true; }));
 			}
+		}
+
+		private Dictionary<int, string> GetPlanningAssignments()
+		{
+			if (planningDataGridView.Rows.Count == 0)
+				return null;
+			var result = new Dictionary<int, string>(planningDataGridView.Rows.Count);
+			int idInd = s_planColumnsIndexes.IdColumnIndex;
+			int assignInd = s_planColumnsIndexes.AssignedToColumnIndex;
+			for (int i = 0; i < planningDataGridView.Rows.Count; i++)
+			{
+				var row = planningDataGridView.Rows[i];
+				string assignee = row.Cells[assignInd].Value.ToString();
+				if (!row.Cells[idInd].IsUncolored())
+					continue;
+				int id;
+				bool isInt = int.TryParse(row.Cells[idInd].Value.ToString(), out id);
+				if (!isInt)
+					continue;
+				result.Add(id, assignee);
+			}
+			return result;
 		}
 	}
 }

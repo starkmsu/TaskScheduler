@@ -48,7 +48,7 @@ namespace TaskSchedulerForms.Presentation
 			var sprintCell = leadTaskRow.Cells[m_viewColumnsIndexes.SprintColumnIndex];
 			sprintCell.Value = leadTask.Sprint();
 
-			var idCell = leadTaskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
+			var idCell = leadTaskRow.Cells[m_viewColumnsIndexes.IdColumnIndex];
 			idCell.Value = leadTask.Id;
 			idCell.ToolTipText = leadTask.IterationPath;
 			idCell.Style.BackColor = priorityCell.Style.BackColor;
@@ -119,6 +119,8 @@ namespace TaskSchedulerForms.Presentation
 			int? leadTaskPriority,
 			DataGridViewRow taskRow,
 			DataContainer data,
+			Dictionary<int, string> planningAssignments,
+			List<string> allUsers,
 			List<int> blockerIds)
 		{
 			var priorityCell = taskRow.Cells[m_viewColumnsIndexes.PriorityColumnIndex];
@@ -126,16 +128,17 @@ namespace TaskSchedulerForms.Presentation
 			priorityCell.SetColorByState(task);
 			priorityCell.ToolTipText = task.State;
 
+			var idCell = taskRow.Cells[m_viewColumnsIndexes.IdColumnIndex];
+			idCell.Value = task.Id;
 			var verificationResult = WorkItemVerifier.VerifyTaskPriority(task, leadTaskPriority);
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
-				var priorityWarningCell = taskRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex];
-				priorityWarningCell.SetColorByVerification(verificationResult.Result);
-				priorityWarningCell.ToolTipText = verificationResult.AllMessagesString;
+				idCell.SetColorByVerification(verificationResult.Result);
+				idCell.ToolTipText = verificationResult.AllMessagesString;
 			}
 
 			var titleCell = taskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];
-			titleCell.Value = task.Id + " " + task.Title;
+			titleCell.Value = task.Title;
 			titleCell.ToolTipText =
 				task.Discipline() + " "
 				+ task.Title + " "
@@ -174,7 +177,10 @@ namespace TaskSchedulerForms.Presentation
 			}
 
 			var assignedCell = taskRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex];
-			assignedCell.Value = task.AssignedTo();
+			var comboBoxCell = assignedCell as DataGridViewComboBoxCell;
+			if (comboBoxCell != null)
+				comboBoxCell.DataSource = allUsers;
+			assignedCell.Value = planningAssignments.GetAssignee(task);
 			verificationResult = WorkItemVerifier.VerifyAssignation(task);
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
@@ -193,13 +199,16 @@ namespace TaskSchedulerForms.Presentation
 			taskRow.Cells[viewColumnsIndexes.AssignedToColumnIndex].Value = Resources.AccessDenied;
 		}
 
-		internal void FillBlockerInfo(DataGridViewRow blockerRow, WorkItem blocker)
+		internal void FillBlockerInfo(
+			DataGridViewRow blockerRow,
+			WorkItem blocker,
+			Dictionary<int, string> planningAssignments)
 		{
-			blockerRow.Cells[m_viewColumnsIndexes.LeadTaskColumnIndex].Value = m_blockersPrefix;
+			blockerRow.Cells[m_viewColumnsIndexes.IdColumnIndex].Value = m_blockersPrefix;
 			blockerRow.Cells[m_viewColumnsIndexes.DocsColumnIndex].Value = blocker.Type.Name;
 			blockerRow.Cells[m_viewColumnsIndexes.TitleColumnIndex].Value = blocker.Id + " " + blocker.Title;
 			blockerRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex].Value = blocker.State;
-			blockerRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex].Value = blocker.AssignedTo();
+			blockerRow.Cells[m_viewColumnsIndexes.AssignedToColumnIndex].Value = planningAssignments.GetAssignee(blocker);
 			blockerRow.Visible = false;
 		}
 	}

@@ -24,7 +24,7 @@ namespace TaskSchedulerForms.Presentation
 
 		internal int SprintColumnIndex { get { return m_sprintInd.Value; } }
 
-		internal int LeadTaskColumnIndex { get { return m_leadTaskIdInd.Value; } }
+		internal int IdColumnIndex { get { return m_leadTaskIdInd.Value; } }
 
 		internal int DocsColumnIndex { get { return m_docsInd.Value; } }
 
@@ -49,7 +49,7 @@ namespace TaskSchedulerForms.Presentation
 					m_iterationInd = i;
 				else if (column.Name.StartsWith("Sprint"))
 					m_sprintInd = i;
-				else if (column.Name.StartsWith("LeadTask"))
+				else if (column.Name.StartsWith("Id"))
 					m_leadTaskIdInd = i;
 				else if (column.Name.StartsWith("Docs"))
 					m_docsInd = i;
