@@ -192,26 +192,33 @@ namespace TaskSchedulerForms.Forms
 				validSecond = configSecond.Where(secondList.Contains).ToList();
 			validSecond.Sort();
 
+			var selectedSecond = secondListBox.Items
+				.Cast<string>()
+				.Where(i => secondList.Contains(i))
+				.ToList();
+
+			validSecond.ForEach(i =>
+			{
+				if (!selectedSecond.Contains(i))
+					selectedSecond.Add(i);
+			});
+
+			secondList = secondList
+				.Where(i => selectedSecond.All(j => j != i))
+				.ToList();
+
+			var sencondArray = selectedSecond
+				.Select(i => (object) i)
+				.ToArray();
+
 			secondComboBox.Invoke(new Action(() =>
 			{
 				secondComboBox.DataSource = secondList;
 				secondComboBox.Enabled = true;
 				secondAddButton.Enabled = secondList.Count > 0;
 
-				for (int i = 0; i < secondListBox.Items.Count; i++)
-				{
-					var second = secondListBox.Items[i];
-					if (secondList.Contains(second.ToString()))
-						continue;
-					secondListBox.Items.RemoveAt(i);
-					--i;
-				}
-
-				validSecond.ForEach(i =>
-				{
-					if (!secondListBox.Items.Contains(i))
-						secondListBox.Items.Add(i);
-				});
+				secondListBox.Items.Clear();
+				secondListBox.Items.AddRange(sencondArray);
 
 				subTreesCheckBox.Enabled = true;
 				loadLeadTasksButton.Enabled = true;
@@ -553,6 +560,11 @@ namespace TaskSchedulerForms.Forms
 			string second = secondComboBox.Text;
 			if (secondListBox.Items.Contains(second))
 				return;
+			var newList = secondComboBox.Items
+				.Cast<string>()
+				.Where(secondOption => second != secondOption)
+				.ToList();
+			secondComboBox.DataSource = newList;
 			int ind = 0;
 			for (; ind < secondListBox.Items.Count; ind++)
 			{
@@ -570,7 +582,14 @@ namespace TaskSchedulerForms.Forms
 
 		private void SecondRemoveButtonClick(object sender, EventArgs e)
 		{
-			secondListBox.Items.Remove(secondListBox.SelectedItem);
+			var toRemove = secondListBox.SelectedItem;
+			secondListBox.Items.Remove(toRemove);
+			var newList = secondComboBox.Items
+				.Cast<string>()
+				.ToList();
+			newList.Add(toRemove.ToString());
+			newList.Sort();
+			secondComboBox.DataSource = newList;
 			if (secondListBox.Items.Count > 0)
 				return;
 			makeScheduleButton.Enabled = false;
