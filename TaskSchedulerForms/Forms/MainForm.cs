@@ -765,10 +765,13 @@ namespace TaskSchedulerForms.Forms
 
 			var allUsers = usersFilterСomboBox.Items.Cast<string>().Where(i => !string.IsNullOrEmpty(i)).ToList();
 			if (planningAssignments != null)
+			{
 				allUsers.AddRange(
 					planningAssignments.Values
 						.Distinct()
 						.Where(i => !allUsers.Contains(i)));
+				allUsers.Sort();
+			}
 
 			string currentUser = null;
 			planButton.Invoke(new Action(() =>
@@ -847,6 +850,31 @@ namespace TaskSchedulerForms.Forms
 				result.Add(id, assignee);
 			}
 			return result;
+		}
+
+		private void AddUserButtonClick(object sender, EventArgs e)
+		{
+			var planningUsers = usersFilterComboBox2.Items
+				.Cast<string>()
+				.Where(i => !string.IsNullOrEmpty(i))
+				.ToList();
+			string newUser = addUserTextBox.Text;
+			if (!planningUsers.Contains(newUser))
+			{
+				planningUsers.Add(newUser);
+				planningUsers.Sort();
+			}
+			var comboBoxColumn = planningDataGridView.Columns[s_planColumnsIndexes.AssignedToColumnIndex] as DataGridViewComboBoxColumn;
+			if (comboBoxColumn != null)
+				comboBoxColumn.DataSource = planningUsers;
+			var usersToFilter = new List<string>(planningUsers);
+			usersToFilter.Insert(0, string.Empty);
+			usersFilterComboBox2.DataSource = usersToFilter;
+		}
+
+		private void AddUserTextBoxKeyUp(object sender, KeyEventArgs e)
+		{
+			addUserButton.Enabled = addUserTextBox.Text.Length > 0;
 		}
 	}
 }
