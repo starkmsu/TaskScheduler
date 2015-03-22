@@ -106,6 +106,7 @@
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.autoplanButton = new System.Windows.Forms.Button();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -645,6 +646,7 @@
 			// 
 			// planningTabPage
 			// 
+			this.planningTabPage.Controls.Add(this.autoplanButton);
 			this.planningTabPage.Controls.Add(this.addUserButton);
 			this.planningTabPage.Controls.Add(this.addUserTextBox);
 			this.planningTabPage.Controls.Add(this.planButton);
@@ -946,6 +948,18 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
+			// autoplanButton
+			// 
+			this.autoplanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.autoplanButton.Enabled = false;
+			this.autoplanButton.Location = new System.Drawing.Point(796, 26);
+			this.autoplanButton.Name = "autoplanButton";
+			this.autoplanButton.Size = new System.Drawing.Size(75, 23);
+			this.autoplanButton.TabIndex = 29;
+			this.autoplanButton.Text = "AutoPlan";
+			this.autoplanButton.UseVisualStyleBackColor = true;
+			this.autoplanButton.Click += new System.EventHandler(this.AutoplanButtonClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1060,6 +1074,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
 		private System.Windows.Forms.TextBox addUserTextBox;
 		private System.Windows.Forms.Button addUserButton;
+		private System.Windows.Forms.Button autoplanButton;
 	}
 }
 

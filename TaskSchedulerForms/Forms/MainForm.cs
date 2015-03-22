@@ -818,6 +818,7 @@ namespace TaskSchedulerForms.Forms
 					usersFilterComboBox2.Enabled = true;
 					usersLabel2.Enabled = true;
 					planButton.Enabled = true;
+					autoplanButton.Enabled = true;
 				}));
 			}
 			catch (Exception exc)
@@ -875,6 +876,37 @@ namespace TaskSchedulerForms.Forms
 		private void AddUserTextBoxKeyUp(object sender, KeyEventArgs e)
 		{
 			addUserButton.Enabled = addUserTextBox.Text.Length > 0;
+		}
+
+		private void AutoplanButtonClick(object sender, EventArgs e)
+		{
+			var disciplineUsers = new Dictionary<string, HashSet<string>>();
+			var idInd = s_planColumnsIndexes.IdColumnIndex;
+			for (int i = 0; i < planningDataGridView.Rows.Count; i++)
+			{
+				var planRow = planningDataGridView.Rows[i];
+				if (!planRow.Cells[idInd].IsUncolored())
+					continue;
+				int taskId;
+				Boolean isInt = int.TryParse(planRow.Cells[idInd].Value.ToString(), out taskId);
+				if (!isInt)
+					continue;
+				var task = m_lastProcessedData.WiDict[taskId];
+				string discipline = task.Discipline();
+				string user = planRow.Cells[s_planColumnsIndexes.AssignedToColumnIndex].Value.ToString();
+				if (user.IsUnassigned())
+					continue;
+				if (!disciplineUsers.ContainsKey(discipline))
+					disciplineUsers.Add(discipline, new HashSet<string>());
+				disciplineUsers[discipline].Add(user);
+			}
+
+			var autoPlanForm = new AutoPlanForm(disciplineUsers);
+			var dialogResult = autoPlanForm.ShowDialog();
+			if (dialogResult != DialogResult.OK)
+				return;
+
+			var userToPlanByDiscipline = autoPlanForm.UsersByDiscipline;
 		}
 	}
 }
