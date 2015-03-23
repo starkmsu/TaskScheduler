@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoPlanMaker.cs" />
     <Compile Include="Data\BlockerData.cs" />
     <Compile Include="Data\DayType.cs" />
     <Compile Include="Data\VerificationResult.cs" />

@@ -958,7 +958,7 @@
 			this.autoplanButton.TabIndex = 29;
 			this.autoplanButton.Text = "AutoPlan";
 			this.autoplanButton.UseVisualStyleBackColor = true;
-			this.autoplanButton.Click += new System.EventHandler(this.AutoplanButtonClick);
+			this.autoplanButton.Click += new System.EventHandler(this.AutoPlanButtonClick);
 			// 
 			// MainForm
 			// 

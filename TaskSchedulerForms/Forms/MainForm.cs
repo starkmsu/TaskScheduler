@@ -855,16 +855,26 @@ namespace TaskSchedulerForms.Forms
 
 		private void AddUserButtonClick(object sender, EventArgs e)
 		{
+			string newUser = addUserTextBox.Text;
+
+			AddUsers(new []{newUser});
+		}
+
+		private void AddUsers(IEnumerable<string> newUsers)
+		{
 			var planningUsers = usersFilterComboBox2.Items
 				.Cast<string>()
 				.Where(i => !string.IsNullOrEmpty(i))
 				.ToList();
-			string newUser = addUserTextBox.Text;
-			if (!planningUsers.Contains(newUser))
+
+			foreach (string newUser in newUsers)
 			{
+				if (planningUsers.Contains(newUser))
+					continue;
 				planningUsers.Add(newUser);
 				planningUsers.Sort();
 			}
+			
 			var comboBoxColumn = planningDataGridView.Columns[s_planColumnsIndexes.AssignedToColumnIndex] as DataGridViewComboBoxColumn;
 			if (comboBoxColumn != null)
 				comboBoxColumn.DataSource = planningUsers;
@@ -878,22 +888,27 @@ namespace TaskSchedulerForms.Forms
 			addUserButton.Enabled = addUserTextBox.Text.Length > 0;
 		}
 
-		private void AutoplanButtonClick(object sender, EventArgs e)
+		private void AutoPlanButtonClick(object sender, EventArgs e)
 		{
+			var planningAssignments = new List<Tuple<int, string>>(planningDataGridView.Rows.Count);
 			var disciplineUsers = new Dictionary<string, HashSet<string>>();
-			var idInd = s_planColumnsIndexes.IdColumnIndex;
+			var rowsToPlanDict = new Dictionary<int, DataGridViewRow>(planningDataGridView.Rows.Count);
+			int idInd = s_planColumnsIndexes.IdColumnIndex;
+			int assignedIndex = s_planColumnsIndexes.AssignedToColumnIndex;
 			for (int i = 0; i < planningDataGridView.Rows.Count; i++)
 			{
 				var planRow = planningDataGridView.Rows[i];
-				if (!planRow.Cells[idInd].IsUncolored())
-					continue;
 				int taskId;
 				Boolean isInt = int.TryParse(planRow.Cells[idInd].Value.ToString(), out taskId);
 				if (!isInt)
 					continue;
 				var task = m_lastProcessedData.WiDict[taskId];
+				if (task.Type.Name != TfsUtils.Const.WorkItemType.Task)
+					continue;
+				rowsToPlanDict.Add(taskId, planRow);
 				string discipline = task.Discipline();
-				string user = planRow.Cells[s_planColumnsIndexes.AssignedToColumnIndex].Value.ToString();
+				string user = planRow.Cells[assignedIndex].Value.ToString();
+				planningAssignments.Add(new Tuple<int, string>(taskId, user));
 				if (user.IsUnassigned())
 					continue;
 				if (!disciplineUsers.ContainsKey(discipline))
@@ -907,6 +922,19 @@ namespace TaskSchedulerForms.Forms
 				return;
 
 			var userToPlanByDiscipline = autoPlanForm.UsersByDiscipline;
+
+			var usersToPlan = userToPlanByDiscipline.Values.SelectMany(i => i).Distinct();
+			AddUsers(usersToPlan);
+
+			var autoPlan = AutoPlanMaker.Make(
+				userToPlanByDiscipline,
+				planningAssignments,
+				m_lastProcessedData);
+
+			foreach (var planPair in autoPlan)
+			{
+				rowsToPlanDict[planPair.Key].Cells[assignedIndex].Value = planPair.Value;
+			}
 		}
 	}
 }
