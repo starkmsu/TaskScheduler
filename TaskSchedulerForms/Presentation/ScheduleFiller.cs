@@ -9,8 +9,6 @@ namespace TaskSchedulerForms.Presentation
 {
 	internal static class ScheduleFiller
 	{
-		private static readonly int m_maxInd = (int)DateTime.Now.AddMonths(1).Date.Subtract(DateTime.Now.Date).TotalDays;
-
 		internal static int AddDatesActive(
 			ViewColumnsIndexes viewColumnsIndexes,
 			FreeDaysCalculator freeDaysCalculator,
@@ -50,13 +48,14 @@ namespace TaskSchedulerForms.Presentation
 			}
 			else if (taskStart.HasValue)
 			{
+				int maxInd = row.Cells.Count - viewColumnsIndexes.FirstDateColumnIndex - 1;
 				var indStart = (int)taskStart.Value.Date.Subtract(today).TotalDays;
 				if (indStart < 0)
 					row.Cells[viewColumnsIndexes.FirstDateColumnIndex - 1].Value = taskStart.Value.ToString("dd.MM");
-				indStart = Math.Min(Math.Max(1, indStart), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
+				indStart = Math.Min(Math.Max(1, indStart), maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
 				var indFinish = (int)taskFinish.Value.Date.Subtract(today).TotalDays;
-				indFinish = Math.Min(Math.Max(1, indFinish), m_maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
+				indFinish = Math.Min(Math.Max(1, indFinish), maxInd) + viewColumnsIndexes.FirstDateColumnIndex;
 
 				AddDates(
 					viewColumnsIndexes,
@@ -149,14 +148,15 @@ namespace TaskSchedulerForms.Presentation
 			string user,
 			string userMark)
 		{
-			if (startInd - viewColumnsIndexes.FirstDateColumnIndex > m_maxInd)
-				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+			int maxInd = row.Cells.Count - viewColumnsIndexes.FirstDateColumnIndex - 1;
+			if (startInd - viewColumnsIndexes.FirstDateColumnIndex > maxInd)
+				return viewColumnsIndexes.FirstDateColumnIndex + maxInd + 1;
 			int ind = 0;
 			while (length > 0)
 			{
 				int dateIndexShift = startInd - viewColumnsIndexes.FirstDateColumnIndex + ind;
-				if (dateIndexShift > m_maxInd)
-					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+				if (dateIndexShift > maxInd)
+					return viewColumnsIndexes.FirstDateColumnIndex + maxInd + 1;
 				var cell = row.Cells[startInd + ind];
 				++ind;
 				DateTime date = DateTime.Today.Date.AddDays(dateIndexShift);
@@ -179,16 +179,17 @@ namespace TaskSchedulerForms.Presentation
 			string user,
 			string userMark)
 		{
-			if (startInd > m_maxInd)
-				return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+			int maxInd = row.Cells.Count - viewColumnsIndexes.FirstDateColumnIndex - 1;
+			if (startInd > maxInd)
+				return viewColumnsIndexes.FirstDateColumnIndex + maxInd + 1;
 			int ind = 0;
 			DateTime date = freeDaysCalculator.GetWorkDayFromCount(startInd);
 			DateTime today = DateTime.Now.Date;
 			while (length > 0)
 			{
 				var dayIndex =  (int) Math.Ceiling(date.Subtract(today).TotalDays);
-				if (dayIndex > m_maxInd)
-					return viewColumnsIndexes.FirstDateColumnIndex + m_maxInd + 1;
+				if (dayIndex > maxInd)
+					return viewColumnsIndexes.FirstDateColumnIndex + maxInd + 1;
 				var cell = row.Cells[dayIndex + viewColumnsIndexes.FirstDateColumnIndex];
 				DayType dt = freeDaysCalculator.GetDayType(date, user);
 				if (dt == DayType.WorkDay)

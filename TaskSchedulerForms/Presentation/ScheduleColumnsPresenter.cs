@@ -6,14 +6,17 @@ namespace TaskSchedulerForms.Presentation
 {
 	internal class ScheduleColumnsPresenter
 	{
-		internal static void InitColumns(DataGridView dgv, int indShift)
+		internal static void InitColumns(
+			DataGridView dgv,
+			int indShift,
+			int monthsCount)
 		{
 			while (dgv.Columns.Count > indShift)
 			{
 				dgv.Columns.RemoveAt(indShift);
 			}
 			DateTime start = DateTime.Now.Date;
-			DateTime finish = DateTime.Now.AddMonths(1).Date;
+			DateTime finish = DateTime.Now.AddMonths(monthsCount).Date;
 			for (DateTime i = start; i <= finish; i = i.AddDays(1).Date)
 			{
 				string dateText = i.ToString("dd.MM");

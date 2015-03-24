@@ -49,8 +49,14 @@ namespace TaskSchedulerForms.Forms
 
 			s_viewColumnsIndexes = new ViewColumnsIndexes(scheduleDataGridView);
 			s_planColumnsIndexes = new ViewColumnsIndexes(planningDataGridView);
-			ScheduleColumnsPresenter.InitColumns(scheduleDataGridView, s_viewColumnsIndexes.FirstDateColumnIndex);
-			ScheduleColumnsPresenter.InitColumns(planningDataGridView, s_planColumnsIndexes.FirstDateColumnIndex);
+			ScheduleColumnsPresenter.InitColumns(
+				scheduleDataGridView,
+				s_viewColumnsIndexes.FirstDateColumnIndex,
+				1);
+			ScheduleColumnsPresenter.InitColumns(
+				planningDataGridView,
+				s_planColumnsIndexes.FirstDateColumnIndex,
+				3);
 
 			m_holidays = m_config.Holidays;
 			s_freeDaysCalculator.SetHolidays(m_holidays);
@@ -481,7 +487,10 @@ namespace TaskSchedulerForms.Forms
 				{
 					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
-						ScheduleColumnsPresenter.InitColumns(scheduleDataGridView, s_viewColumnsIndexes.FirstDateColumnIndex);
+						ScheduleColumnsPresenter.InitColumns(
+							scheduleDataGridView,
+							s_viewColumnsIndexes.FirstDateColumnIndex,
+							1);
 					m_viewFiltersApplier = s_dataPresenter.PresentData(
 						m_lastProcessedData,
 						null,
@@ -789,7 +798,10 @@ namespace TaskSchedulerForms.Forms
 				{
 					bool isDateChanged = planningDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
-						ScheduleColumnsPresenter.InitColumns(planningDataGridView, s_planColumnsIndexes.FirstDateColumnIndex);
+						ScheduleColumnsPresenter.InitColumns(
+							planningDataGridView,
+							s_planColumnsIndexes.FirstDateColumnIndex,
+							3);
 
 					var comboBoxColumn = planningDataGridView.Columns[s_planColumnsIndexes.AssignedToColumnIndex] as DataGridViewComboBoxColumn;
 					comboBoxColumn.DataSource = allUsers;
