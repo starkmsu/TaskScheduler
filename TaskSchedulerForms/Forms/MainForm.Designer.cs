@@ -58,15 +58,6 @@
 			this.usersLabel = new System.Windows.Forms.Label();
 			this.usersFilterСomboBox = new System.Windows.Forms.ComboBox();
 			this.scheduleDataGridView = new System.Windows.Forms.DataGridView();
-			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Iteration = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Sprint = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.toggleMenuStrip = new System.Windows.Forms.MenuStrip();
 			this.columnsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleIterationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,21 +67,13 @@
 			this.toggleLTOnlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleBlockersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.planningTabPage = new System.Windows.Forms.TabPage();
+			this.autoplanButton = new System.Windows.Forms.Button();
 			this.addUserButton = new System.Windows.Forms.Button();
 			this.addUserTextBox = new System.Windows.Forms.TextBox();
 			this.planButton = new System.Windows.Forms.Button();
 			this.usersLabel2 = new System.Windows.Forms.Label();
 			this.usersFilterComboBox2 = new System.Windows.Forms.ComboBox();
 			this.planningDataGridView = new System.Windows.Forms.DataGridView();
-			this.Priority2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Iteration2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Sprint2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Id2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Docs2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Task2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.Blockers2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.AssignedTo2 = new System.Windows.Forms.DataGridViewComboBoxColumn();
-			this.Past2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.toggleMenuStrip2 = new System.Windows.Forms.MenuStrip();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleIterationToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -106,7 +89,26 @@
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
 			this.secondToolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.autoplanButton = new System.Windows.Forms.Button();
+			this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Iteration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Sprint = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Docs = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Task = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Blockers = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Work = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Past = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Priority2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Iteration2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Sprint2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Id2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Docs2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Task2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Blockers2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.AssignedTo2 = new System.Windows.Forms.DataGridViewComboBoxColumn();
+			this.Work2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Past2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.mainTabControl.SuspendLayout();
 			this.mainTabPage.SuspendLayout();
 			this.ParamsGroupBox.SuspendLayout();
@@ -484,6 +486,7 @@
             this.Task,
             this.Blockers,
             this.AssignedTo,
+            this.Work,
             this.Past});
 			this.scheduleDataGridView.EnableHeadersVisualStyles = false;
 			this.scheduleDataGridView.Location = new System.Drawing.Point(0, 56);
@@ -492,92 +495,6 @@
 			this.scheduleDataGridView.RowHeadersVisible = false;
 			this.scheduleDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.scheduleDataGridView.TabIndex = 0;
-			// 
-			// Priority
-			// 
-			this.Priority.Frozen = true;
-			this.Priority.HeaderText = "Pr";
-			this.Priority.Name = "Priority";
-			this.Priority.ReadOnly = true;
-			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Priority.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Priority.Width = 30;
-			// 
-			// Iteration
-			// 
-			this.Iteration.Frozen = true;
-			this.Iteration.HeaderText = "Iteration";
-			this.Iteration.Name = "Iteration";
-			this.Iteration.ReadOnly = true;
-			this.Iteration.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Iteration.Visible = false;
-			this.Iteration.Width = 180;
-			// 
-			// Sprint
-			// 
-			this.Sprint.Frozen = true;
-			this.Sprint.HeaderText = "Sprint";
-			this.Sprint.Name = "Sprint";
-			this.Sprint.ReadOnly = true;
-			this.Sprint.Visible = false;
-			this.Sprint.Width = 60;
-			// 
-			// Id
-			// 
-			this.Id.Frozen = true;
-			this.Id.HeaderText = "Id";
-			this.Id.Name = "Id";
-			this.Id.ReadOnly = true;
-			this.Id.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Id.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Id.Width = 60;
-			// 
-			// Docs
-			// 
-			this.Docs.Frozen = true;
-			this.Docs.HeaderText = "Docs";
-			this.Docs.Name = "Docs";
-			this.Docs.ReadOnly = true;
-			this.Docs.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Docs.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Docs.Width = 50;
-			// 
-			// Task
-			// 
-			this.Task.Frozen = true;
-			this.Task.HeaderText = "Task";
-			this.Task.Name = "Task";
-			this.Task.ReadOnly = true;
-			this.Task.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Task.Width = 200;
-			// 
-			// Blockers
-			// 
-			this.Blockers.Frozen = true;
-			this.Blockers.HeaderText = "Blockers";
-			this.Blockers.Name = "Blockers";
-			this.Blockers.ReadOnly = true;
-			this.Blockers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.Blockers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Blockers.Width = 60;
-			// 
-			// AssignedTo
-			// 
-			this.AssignedTo.Frozen = true;
-			this.AssignedTo.HeaderText = "AssignedTo";
-			this.AssignedTo.Name = "AssignedTo";
-			this.AssignedTo.ReadOnly = true;
-			this.AssignedTo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.AssignedTo.Width = 80;
-			// 
-			// Past
-			// 
-			this.Past.HeaderText = "Past";
-			this.Past.Name = "Past";
-			this.Past.ReadOnly = true;
-			this.Past.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Past.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Past.Width = 40;
 			// 
 			// toggleMenuStrip
 			// 
@@ -661,6 +578,18 @@
 			this.planningTabPage.Text = "Planning";
 			this.planningTabPage.UseVisualStyleBackColor = true;
 			// 
+			// autoplanButton
+			// 
+			this.autoplanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.autoplanButton.Enabled = false;
+			this.autoplanButton.Location = new System.Drawing.Point(796, 26);
+			this.autoplanButton.Name = "autoplanButton";
+			this.autoplanButton.Size = new System.Drawing.Size(75, 23);
+			this.autoplanButton.TabIndex = 29;
+			this.autoplanButton.Text = "AutoPlan";
+			this.autoplanButton.UseVisualStyleBackColor = true;
+			this.autoplanButton.Click += new System.EventHandler(this.AutoPlanButtonClick);
+			// 
 			// addUserButton
 			// 
 			this.addUserButton.Enabled = false;
@@ -729,6 +658,7 @@
             this.Task2,
             this.Blockers2,
             this.AssignedTo2,
+            this.Work2,
             this.Past2});
 			this.planningDataGridView.EnableHeadersVisualStyles = false;
 			this.planningDataGridView.Location = new System.Drawing.Point(0, 56);
@@ -736,94 +666,6 @@
 			this.planningDataGridView.RowHeadersVisible = false;
 			this.planningDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.planningDataGridView.TabIndex = 25;
-			// 
-			// Priority2
-			// 
-			this.Priority2.Frozen = true;
-			this.Priority2.HeaderText = "Pr";
-			this.Priority2.Name = "Priority2";
-			this.Priority2.ReadOnly = true;
-			this.Priority2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Priority2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Priority2.Width = 30;
-			// 
-			// Iteration2
-			// 
-			this.Iteration2.Frozen = true;
-			this.Iteration2.HeaderText = "Iteration";
-			this.Iteration2.Name = "Iteration2";
-			this.Iteration2.ReadOnly = true;
-			this.Iteration2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Iteration2.Visible = false;
-			this.Iteration2.Width = 180;
-			// 
-			// Sprint2
-			// 
-			this.Sprint2.Frozen = true;
-			this.Sprint2.HeaderText = "Sprint";
-			this.Sprint2.Name = "Sprint2";
-			this.Sprint2.ReadOnly = true;
-			this.Sprint2.Visible = false;
-			this.Sprint2.Width = 60;
-			// 
-			// Id2
-			// 
-			this.Id2.Frozen = true;
-			this.Id2.HeaderText = "Id";
-			this.Id2.Name = "Id2";
-			this.Id2.ReadOnly = true;
-			this.Id2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Id2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Id2.Width = 60;
-			// 
-			// Docs2
-			// 
-			this.Docs2.Frozen = true;
-			this.Docs2.HeaderText = "Docs";
-			this.Docs2.Name = "Docs2";
-			this.Docs2.ReadOnly = true;
-			this.Docs2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Docs2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Docs2.Width = 50;
-			// 
-			// Task2
-			// 
-			this.Task2.Frozen = true;
-			this.Task2.HeaderText = "Task";
-			this.Task2.Name = "Task2";
-			this.Task2.ReadOnly = true;
-			this.Task2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.Task2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Task2.Width = 200;
-			// 
-			// Blockers2
-			// 
-			this.Blockers2.Frozen = true;
-			this.Blockers2.HeaderText = "Blockers";
-			this.Blockers2.Name = "Blockers2";
-			this.Blockers2.ReadOnly = true;
-			this.Blockers2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.Blockers2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Blockers2.Width = 60;
-			// 
-			// AssignedTo2
-			// 
-			this.AssignedTo2.DropDownWidth = 200;
-			this.AssignedTo2.Frozen = true;
-			this.AssignedTo2.HeaderText = "AssignedTo";
-			this.AssignedTo2.MaxDropDownItems = 16;
-			this.AssignedTo2.Name = "AssignedTo2";
-			this.AssignedTo2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.AssignedTo2.Width = 120;
-			// 
-			// Past2
-			// 
-			this.Past2.HeaderText = "Past";
-			this.Past2.Name = "Past2";
-			this.Past2.ReadOnly = true;
-			this.Past2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.Past2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-			this.Past2.Width = 40;
 			// 
 			// toggleMenuStrip2
 			// 
@@ -948,17 +790,195 @@
 			this.tfsUrlLabel.TabIndex = 10;
 			this.tfsUrlLabel.Text = "TFS url:";
 			// 
-			// autoplanButton
+			// Priority
 			// 
-			this.autoplanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.autoplanButton.Enabled = false;
-			this.autoplanButton.Location = new System.Drawing.Point(796, 26);
-			this.autoplanButton.Name = "autoplanButton";
-			this.autoplanButton.Size = new System.Drawing.Size(75, 23);
-			this.autoplanButton.TabIndex = 29;
-			this.autoplanButton.Text = "AutoPlan";
-			this.autoplanButton.UseVisualStyleBackColor = true;
-			this.autoplanButton.Click += new System.EventHandler(this.AutoPlanButtonClick);
+			this.Priority.Frozen = true;
+			this.Priority.HeaderText = "Pr";
+			this.Priority.Name = "Priority";
+			this.Priority.ReadOnly = true;
+			this.Priority.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Priority.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Priority.Width = 30;
+			// 
+			// Iteration
+			// 
+			this.Iteration.Frozen = true;
+			this.Iteration.HeaderText = "Iteration";
+			this.Iteration.Name = "Iteration";
+			this.Iteration.ReadOnly = true;
+			this.Iteration.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Iteration.Visible = false;
+			this.Iteration.Width = 180;
+			// 
+			// Sprint
+			// 
+			this.Sprint.Frozen = true;
+			this.Sprint.HeaderText = "Sprint";
+			this.Sprint.Name = "Sprint";
+			this.Sprint.ReadOnly = true;
+			this.Sprint.Visible = false;
+			this.Sprint.Width = 60;
+			// 
+			// Id
+			// 
+			this.Id.Frozen = true;
+			this.Id.HeaderText = "Id";
+			this.Id.Name = "Id";
+			this.Id.ReadOnly = true;
+			this.Id.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Id.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Id.Width = 60;
+			// 
+			// Docs
+			// 
+			this.Docs.Frozen = true;
+			this.Docs.HeaderText = "Docs";
+			this.Docs.Name = "Docs";
+			this.Docs.ReadOnly = true;
+			this.Docs.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Docs.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Docs.Width = 50;
+			// 
+			// Task
+			// 
+			this.Task.Frozen = true;
+			this.Task.HeaderText = "Task";
+			this.Task.Name = "Task";
+			this.Task.ReadOnly = true;
+			this.Task.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Task.Width = 200;
+			// 
+			// Blockers
+			// 
+			this.Blockers.Frozen = true;
+			this.Blockers.HeaderText = "Blockers";
+			this.Blockers.Name = "Blockers";
+			this.Blockers.ReadOnly = true;
+			this.Blockers.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Blockers.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Blockers.Width = 60;
+			// 
+			// AssignedTo
+			// 
+			this.AssignedTo.Frozen = true;
+			this.AssignedTo.HeaderText = "AssignedTo";
+			this.AssignedTo.Name = "AssignedTo";
+			this.AssignedTo.ReadOnly = true;
+			this.AssignedTo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.AssignedTo.Width = 80;
+			// 
+			// Work
+			// 
+			this.Work.Frozen = true;
+			this.Work.HeaderText = "Work";
+			this.Work.Name = "Work";
+			this.Work.ReadOnly = true;
+			this.Work.Width = 40;
+			// 
+			// Past
+			// 
+			this.Past.HeaderText = "Past";
+			this.Past.Name = "Past";
+			this.Past.ReadOnly = true;
+			this.Past.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Past.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Past.Width = 40;
+			// 
+			// Priority2
+			// 
+			this.Priority2.Frozen = true;
+			this.Priority2.HeaderText = "Pr";
+			this.Priority2.Name = "Priority2";
+			this.Priority2.ReadOnly = true;
+			this.Priority2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Priority2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Priority2.Width = 30;
+			// 
+			// Iteration2
+			// 
+			this.Iteration2.Frozen = true;
+			this.Iteration2.HeaderText = "Iteration";
+			this.Iteration2.Name = "Iteration2";
+			this.Iteration2.ReadOnly = true;
+			this.Iteration2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Iteration2.Visible = false;
+			this.Iteration2.Width = 180;
+			// 
+			// Sprint2
+			// 
+			this.Sprint2.Frozen = true;
+			this.Sprint2.HeaderText = "Sprint";
+			this.Sprint2.Name = "Sprint2";
+			this.Sprint2.ReadOnly = true;
+			this.Sprint2.Visible = false;
+			this.Sprint2.Width = 60;
+			// 
+			// Id2
+			// 
+			this.Id2.Frozen = true;
+			this.Id2.HeaderText = "Id";
+			this.Id2.Name = "Id2";
+			this.Id2.ReadOnly = true;
+			this.Id2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Id2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Id2.Width = 60;
+			// 
+			// Docs2
+			// 
+			this.Docs2.Frozen = true;
+			this.Docs2.HeaderText = "Docs";
+			this.Docs2.Name = "Docs2";
+			this.Docs2.ReadOnly = true;
+			this.Docs2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Docs2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Docs2.Width = 50;
+			// 
+			// Task2
+			// 
+			this.Task2.Frozen = true;
+			this.Task2.HeaderText = "Task";
+			this.Task2.Name = "Task2";
+			this.Task2.ReadOnly = true;
+			this.Task2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Task2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Task2.Width = 200;
+			// 
+			// Blockers2
+			// 
+			this.Blockers2.Frozen = true;
+			this.Blockers2.HeaderText = "Blockers";
+			this.Blockers2.Name = "Blockers2";
+			this.Blockers2.ReadOnly = true;
+			this.Blockers2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.Blockers2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Blockers2.Width = 60;
+			// 
+			// AssignedTo2
+			// 
+			this.AssignedTo2.DropDownWidth = 200;
+			this.AssignedTo2.Frozen = true;
+			this.AssignedTo2.HeaderText = "AssignedTo";
+			this.AssignedTo2.MaxDropDownItems = 16;
+			this.AssignedTo2.Name = "AssignedTo2";
+			this.AssignedTo2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.AssignedTo2.Width = 120;
+			// 
+			// Work2
+			// 
+			this.Work2.Frozen = true;
+			this.Work2.HeaderText = "Work";
+			this.Work2.Name = "Work2";
+			this.Work2.ReadOnly = true;
+			this.Work2.Width = 40;
+			// 
+			// Past2
+			// 
+			this.Past2.HeaderText = "Past";
+			this.Past2.Name = "Past2";
+			this.Past2.ReadOnly = true;
+			this.Past2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.Past2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+			this.Past2.Width = 40;
 			// 
 			// MainForm
 			// 
@@ -1054,6 +1074,9 @@
 		private System.Windows.Forms.ToolStripMenuItem toggleLTOnlyToolStripMenuItem2;
 		private System.Windows.Forms.ToolStripMenuItem toggleBlockersToolStripMenuItem2;
 		private System.Windows.Forms.DataGridView planningDataGridView;
+		private System.Windows.Forms.TextBox addUserTextBox;
+		private System.Windows.Forms.Button addUserButton;
+		private System.Windows.Forms.Button autoplanButton;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Sprint;
@@ -1062,6 +1085,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers;
 		private System.Windows.Forms.DataGridViewTextBoxColumn AssignedTo;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Work;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Priority2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Iteration2;
@@ -1071,10 +1095,8 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Task2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Blockers2;
 		private System.Windows.Forms.DataGridViewComboBoxColumn AssignedTo2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Work2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
-		private System.Windows.Forms.TextBox addUserTextBox;
-		private System.Windows.Forms.Button addUserButton;
-		private System.Windows.Forms.Button autoplanButton;
 	}
 }
 

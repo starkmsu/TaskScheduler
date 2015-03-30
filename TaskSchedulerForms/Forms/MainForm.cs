@@ -601,6 +601,8 @@ namespace TaskSchedulerForms.Forms
 				.Where(secondOption => second != secondOption)
 				.ToList();
 			secondComboBox.DataSource = newList;
+			if (newList.Count == 0)
+				secondComboBox.SelectedItem = null;
 			int ind = 0;
 			for (; ind < secondListBox.Items.Count; ind++)
 			{

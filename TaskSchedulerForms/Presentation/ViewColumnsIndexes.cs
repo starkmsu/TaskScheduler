@@ -15,6 +15,7 @@ namespace TaskSchedulerForms.Presentation
 		private readonly int? m_titleInd;
 		private readonly int? m_blockersInd;
 		private readonly int? m_assignedToInd;
+		private readonly int? m_workInd;
 		private readonly int? m_pastInd;
 		private readonly int? m_indShift;
 
@@ -33,6 +34,8 @@ namespace TaskSchedulerForms.Presentation
 		internal int BlockersColumnIndex { get { return m_blockersInd.Value; } }
 
 		internal int AssignedToColumnIndex { get { return m_assignedToInd.Value; } }
+
+		internal int WorkColumnIndex { get { return m_workInd.Value; } }
 
 		internal int PastColumnIndex { get { return m_pastInd.Value; } }
 
@@ -59,6 +62,8 @@ namespace TaskSchedulerForms.Presentation
 					m_blockersInd = i;
 				else if (column.Name.StartsWith("AssignedTo"))
 					m_assignedToInd = i;
+				else if (column.Name.StartsWith("Work"))
+					m_workInd = i;
 				else if (column.Name.StartsWith("Past"))
 					m_pastInd = i;
 			}
@@ -72,7 +77,8 @@ namespace TaskSchedulerForms.Presentation
 				m_titleInd,
 				m_blockersInd,
 				m_assignedToInd,
-				m_pastInd
+				m_workInd,
+				m_pastInd,
 			};
 			if (listOfIndexes.Any(i => i == null))
 				throw new InvalidOperationException("DatagridView does not have necessary columns");
