@@ -268,7 +268,16 @@ namespace TaskSchedulerForms.Forms
 			refreshButton.Enabled = false;
 			refreshButton.BackColor = Color.Transparent;
 
+			Text = GetFirstShortName();
+
 			ThreadPool.QueueUserWorkItem(x => ProcessData());
+		}
+
+		private string GetFirstShortName()
+		{
+			string first = firstListBox.Items[0].ToString();
+			var parts = first.Split(new[] {'/', '\\'}, StringSplitOptions.RemoveEmptyEntries);
+			return parts[parts.Length - 1];
 		}
 
 		private List<WorkItem> GetLeadTasks()
@@ -461,6 +470,8 @@ namespace TaskSchedulerForms.Forms
 					usersLabel.Enabled = false;
 					usersFilterСomboBox.Enabled = false;
 					scheduleDataGridView.Rows.Clear();
+
+					Text = GetFirstShortName();
 				}));
 			try
 			{

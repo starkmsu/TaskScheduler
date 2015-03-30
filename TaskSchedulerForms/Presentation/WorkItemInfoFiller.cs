@@ -139,12 +139,7 @@ namespace TaskSchedulerForms.Presentation
 
 			var titleCell = taskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];
 			titleCell.Value = task.Title;
-			titleCell.ToolTipText =
-				task.Discipline() + " "
-				+ task.Title + " "
-				+ (task.IsActive()
-					? "Remaining " + task.Remaining()
-					: "Estimate " + task.Estimate());
+			titleCell.ToolTipText = task.Discipline() + " " + task.Title;
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
 			var blockersCell = taskRow.Cells[m_viewColumnsIndexes.BlockersColumnIndex];
@@ -188,6 +183,12 @@ namespace TaskSchedulerForms.Presentation
 				assignedCell.SetColorByVerification(verificationResult.Result);
 				assignedCell.ToolTipText = verificationResult.AllMessagesString;
 			}
+
+			var workCell = taskRow.Cells[m_viewColumnsIndexes.WorkColumnIndex];
+			workCell.Value = task.IsActive()
+				? task.Remaining()
+				: task.Estimate();
+			workCell.Style.BackColor = priorityCell.Style.BackColor;
 		}
 
 		internal void FillNotAccessibleTaskInfo(

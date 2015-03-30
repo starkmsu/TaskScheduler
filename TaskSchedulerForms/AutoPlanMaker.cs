@@ -29,6 +29,8 @@ namespace TaskSchedulerForms
 					continue;
 				}
 				string discinpline = workItem.Discipline();
+				if (!usersToPlanByDiscipline.ContainsKey(discinpline))
+					continue;
 				var availableUsers = usersToPlanByDiscipline[discinpline];
 				if (availableUsers.Count == 0)
 					continue;
