@@ -44,7 +44,7 @@ namespace TaskSchedulerForms.Config
 				config.AreaPathsByArea = values;
 				foreach (string value in values)
 				{
-					if (config.AllAreaPaths.Contains(value))
+					if (!config.AllAreaPaths.Contains(value))
 						config.AllAreaPaths.Add(value);
 				}
 				
@@ -54,7 +54,7 @@ namespace TaskSchedulerForms.Config
 				config.IterationPathsByIteration = values;
 				foreach (string value in values)
 				{
-					if (config.AllIterationPaths.Contains(value))
+					if (!config.AllIterationPaths.Contains(value))
 						config.AllIterationPaths.Add(value);
 				}
 			}

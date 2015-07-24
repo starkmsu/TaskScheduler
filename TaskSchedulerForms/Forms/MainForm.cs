@@ -31,7 +31,7 @@ namespace TaskSchedulerForms.Forms
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
 		private static ViewColumnsIndexes s_planColumnsIndexes;
 
-		private WorkItemCollection m_leadTasks;
+		private List<WorkItem> m_leadTasks;
 		private List<DateTime> m_holidays;
 
 		private ViewFiltersApplier m_viewFiltersApplier;
@@ -244,11 +244,6 @@ namespace TaskSchedulerForms.Forms
 				subTreesCheckBox.Enabled = true;
 				loadLeadTasksButton.Enabled = true;
 				makeScheduleButton.Enabled = secondListBox.Items.Count > 0;
-				if (secondListBox.Items.Count > 0)
-				{
-					secondAddButton.Enabled = true;
-					secondRemoveButton.Enabled = true;
-				}
 			}));
 		}
 
@@ -432,7 +427,7 @@ namespace TaskSchedulerForms.Forms
 		private List<WorkItem> GetLastLeadTasks()
 		{
 
-			WorkItemCollection items;
+			List<WorkItem> items;
 			if (s_stateContainer.WorkMode != WorkMode.Query)
 				items = s_dataLoader.GetLeadTasks(
 					s_stateContainer.LastTfsUrl,
@@ -588,24 +583,24 @@ namespace TaskSchedulerForms.Forms
 				return;
 			firstListBox.Items.Add(first);
 			loadLeadTasksButton.Enabled = true;
-			firstRemoveButton.Enabled = true;
 			makeScheduleButton.Enabled = false;
 		}
 
 		private void FirstRemoveButtonClick(object sender, EventArgs e)
 		{
 			firstListBox.Items.Remove(firstListBox.SelectedItem);
+			firstRemoveButton.Enabled = false;
 			if (firstListBox.Items.Count > 0)
 				return;
 			loadLeadTasksButton.Enabled = false;
-			firstRemoveButton.Enabled = false;
 			makeScheduleButton.Enabled = false;
 		}
 
 		private void SecondAddButtonClick(object sender, EventArgs e)
 		{
 			string second = secondComboBox.Text;
-			if (secondListBox.Items.Contains(second))
+			if (string.IsNullOrEmpty(second)
+				|| secondListBox.Items.Contains(second))
 				return;
 			var newList = secondComboBox.Items
 				.Cast<string>()
@@ -613,7 +608,11 @@ namespace TaskSchedulerForms.Forms
 				.ToList();
 			secondComboBox.DataSource = newList;
 			if (newList.Count == 0)
+			{
 				secondComboBox.SelectedItem = null;
+				secondComboBox.Text = string.Empty;
+				secondAddButton.Enabled = false;
+			}
 			int ind = 0;
 			for (; ind < secondListBox.Items.Count; ind++)
 			{
@@ -626,12 +625,16 @@ namespace TaskSchedulerForms.Forms
 				secondListBox.Items.Add(second);
 			
 			makeScheduleButton.Enabled = true;
-			secondRemoveButton.Enabled = true;
 		}
 
 		private void SecondRemoveButtonClick(object sender, EventArgs e)
 		{
 			var toRemove = secondListBox.SelectedItem;
+			if (toRemove == null)
+			{
+				secondRemoveButton.Enabled = false;
+				return;
+			}
 			secondListBox.Items.Remove(toRemove);
 			var newList = secondComboBox.Items
 				.Cast<string>()
@@ -639,10 +642,12 @@ namespace TaskSchedulerForms.Forms
 			newList.Add(toRemove.ToString());
 			newList.Sort();
 			secondComboBox.DataSource = newList;
+			if (newList.Count == 1)
+				secondAddButton.Enabled = true;
+			secondRemoveButton.Enabled = false;
 			if (secondListBox.Items.Count > 0)
 				return;
 			makeScheduleButton.Enabled = false;
-			secondRemoveButton.Enabled = false;
 		}
 
 		private void ToggleDevCompletedToolStripMenuItem1Click(object sender, EventArgs e)
@@ -960,6 +965,20 @@ namespace TaskSchedulerForms.Forms
 			{
 				rowsToPlanDict[planPair.Key].Cells[assignedIndex].Value = planPair.Value;
 			}
+		}
+
+		private void SecondListBoxSelectedValueChanged(object sender, EventArgs e)
+		{
+			if (secondListBox.SelectedItem != null
+				&& !secondRemoveButton.Enabled)
+				secondRemoveButton.Enabled = true;
+		}
+
+		private void FirstListBoxSelectedValueChanged(object sender, EventArgs e)
+		{
+			if (firstListBox.SelectedItem != null
+				&& !firstRemoveButton.Enabled)
+				firstRemoveButton.Enabled = true;
 		}
 	}
 }

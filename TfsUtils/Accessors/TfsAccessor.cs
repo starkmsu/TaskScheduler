@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -8,6 +11,16 @@ namespace TfsUtils.Accessors
 	public class TfsAccessor : IDisposable
 	{
 		private TfsTeamProjectCollection m_tpc;
+
+		static TfsAccessor()
+		{
+			ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(ValidateServerCertificate);
+		}
+
+		public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		{
+			return true;
+		}
 
 		public TfsAccessor(string tfsUrl)
 		{

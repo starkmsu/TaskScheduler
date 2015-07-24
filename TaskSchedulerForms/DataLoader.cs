@@ -8,7 +8,7 @@ namespace TaskSchedulerForms
 {
 	internal class DataLoader
 	{
-		internal WorkItemCollection GetLeadTasks(string tfsUrl, string queryPath)
+		internal List<WorkItem> GetLeadTasks(string tfsUrl, string queryPath)
 		{
 			using (var queryAccessor = new TfsQueryAccessor(tfsUrl))
 			{
@@ -16,7 +16,7 @@ namespace TaskSchedulerForms
 			}
 		}
 
-		internal WorkItemCollection GetLeadTasks(
+		internal List<WorkItem> GetLeadTasks(
 			string tfsUrl,
 			bool byArea,
 			List<string> values,
@@ -33,7 +33,7 @@ namespace TaskSchedulerForms
 				byArea ? "System.IterationPath" : "System.AreaPath");
 		}
 
-		private WorkItemCollection GetLeadTasks(
+		private List<WorkItem> GetLeadTasks(
 			string tfsUrl,
 			List<string> values,
 			bool withSubTrees,
@@ -83,13 +83,15 @@ namespace TaskSchedulerForms
 			strBuilder.Append(" ORDER BY [Priority], [");
 			strBuilder.Append(additionalOrderField + "]");
 
+			List<WorkItem> result;
 			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
-				return wiqlAccessor.QueryWorkItems(
+				result = wiqlAccessor.QueryWorkItems(
 					strBuilder.ToString(),
 					paramValues,
 					complexParamValues);
 			}
+			return result;
 		}
 	}
 }

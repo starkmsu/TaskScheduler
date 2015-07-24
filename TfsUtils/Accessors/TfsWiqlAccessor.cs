@@ -40,7 +40,7 @@ namespace TfsUtils.Accessors
 			return wiqlString + GenerateUsersConditions(users);
 		}
 
-		public WorkItemCollection QueryWorkItemsByIds(ICollection<int> ids)
+		public List<WorkItem> QueryWorkItemsByIds(ICollection<int> ids)
 		{
 			const string queryStr = "SELECT * FROM WorkItems WHERE [System.Id] IN (@ids)";
 
@@ -57,7 +57,7 @@ namespace TfsUtils.Accessors
 				complexParamValues);
 		}
 
-		public WorkItemCollection QueryWorkItems(
+		public List<WorkItem> QueryWorkItems(
 			string wiqlString,
 			Dictionary<string, object> paramValues,
 			Dictionary<string, List<object>> complexParamValues)
@@ -67,7 +67,16 @@ namespace TfsUtils.Accessors
 
 			var query = new Query(m_workItemStore, wiqlString, paramValues);
 
-			return query.RunQuery();
+			var queryResult = query.RunQuery();
+			var result = new List<WorkItem>(queryResult.Count);
+			for (int i = 0; i < queryResult.Count; i++)
+			{
+				var wi = queryResult[i];
+				//wi.IsValid();
+				wi.SyncToLatest();
+				result.Add(wi);
+			}
+			return result;
 		}
 
 		private string UpdateParams(
