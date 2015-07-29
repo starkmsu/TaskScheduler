@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,6 @@ namespace TaskSchedulerForms.Forms
 		private static readonly DataPresenter s_dataPresenter = new DataPresenter();
 		private static readonly StateContainer s_stateContainer = new StateContainer();
 		private static readonly FreeDaysCalculator s_freeDaysCalculator = new FreeDaysCalculator();
-		private static readonly FocusFactorCalculator s_focusFactorCalculator = new FocusFactorCalculator();
 
 		private static ViewColumnsIndexes s_viewColumnsIndexes;
 		private static ViewColumnsIndexes s_planColumnsIndexes;
@@ -40,12 +40,15 @@ namespace TaskSchedulerForms.Forms
 		private readonly List<ToolStripMenuItem> m_viewMenuItems;
 
 		private DataContainer m_lastProcessedData;
+		private readonly FocusFactorCalculator m_focusFactorCalculator;
 
 		public MainForm()
 		{
 			InitializeComponent();
 
 			m_config = ConfigManager.LoadConfig();
+
+			m_focusFactorCalculator = new FocusFactorCalculator(m_config.FocusFactors);
 
 			s_viewColumnsIndexes = new ViewColumnsIndexes(scheduleDataGridView);
 			s_planColumnsIndexes = new ViewColumnsIndexes(planningDataGridView);
@@ -68,7 +71,7 @@ namespace TaskSchedulerForms.Forms
 				vacationsButton.Enabled = true;
 				var vacationsUsers = m_config.Vacations.Select(v => v.User).ToList();
 				vacationsUsers.Sort();
-				usersVacationsComboBox.DataSource = vacationsUsers;
+				workersComboBox.DataSource = vacationsUsers;
 				s_freeDaysCalculator.SetVacations(m_config.Vacations);
 			}
 
@@ -360,7 +363,7 @@ namespace TaskSchedulerForms.Forms
 							null,
 							s_viewColumnsIndexes,
 							s_freeDaysCalculator,
-							s_focusFactorCalculator,
+							m_focusFactorCalculator,
 							scheduleDataGridView);
 					}
 					catch (Exception exc)
@@ -377,7 +380,7 @@ namespace TaskSchedulerForms.Forms
 						}));
 						return;
 					}
-					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
+					workersComboBox.DataSource = m_viewFiltersApplier.Users.Where(u => !u.IsUnassigned()).ToList();
 					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 					var users = new List<string>(m_viewFiltersApplier.Users);
 					users.Insert(0, string.Empty);
@@ -503,9 +506,9 @@ namespace TaskSchedulerForms.Forms
 						null,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
-						s_focusFactorCalculator,
+						m_focusFactorCalculator,
 						scheduleDataGridView);
-					usersVacationsComboBox.DataSource = m_viewFiltersApplier.Users;
+					workersComboBox.DataSource = m_viewFiltersApplier.Users;
 					vacationsButton.Enabled = m_viewFiltersApplier.Users.Count > 0;
 					var users2 = new List<string>(m_viewFiltersApplier.Users);
 					users2.Insert(0, string.Empty);
@@ -676,7 +679,7 @@ namespace TaskSchedulerForms.Forms
 
 		private void VacationsButtonClick(object sender, EventArgs e)
 		{
-			string user = usersVacationsComboBox.Text;
+			string user = workersComboBox.Text;
 			var userVacations = m_config.Vacations.FirstOrDefault(v => v.User == user);
 			var holidaysForm = new HolidaysForm(userVacations != null ? userVacations.VacationDays : new List<DateTime>(), user);
 			holidaysForm.ShowDialog();
@@ -829,10 +832,10 @@ namespace TaskSchedulerForms.Forms
 						allUsers,
 						s_viewColumnsIndexes,
 						s_freeDaysCalculator,
-						s_focusFactorCalculator,
+						m_focusFactorCalculator,
 						planningDataGridView);
 
-					usersVacationsComboBox.DataSource = m_planFiltersApplier.Users;
+					workersComboBox.DataSource = m_planFiltersApplier.Users;
 					vacationsButton.Enabled = m_planFiltersApplier.Users.Count > 0;
 
 					var users2 = new List<string>(m_planFiltersApplier.Users);
@@ -979,6 +982,20 @@ namespace TaskSchedulerForms.Forms
 			if (firstListBox.SelectedItem != null
 				&& !firstRemoveButton.Enabled)
 				firstRemoveButton.Enabled = true;
+		}
+
+		private void UsersVacationsComboBoxSelectedIndexChanged(object sender, EventArgs e)
+		{
+			string worker = workersComboBox.Text;
+			focusFactorTextBox.Text = (m_focusFactorCalculator.FocusFactors.ContainsKey(worker)
+				? m_focusFactorCalculator.FocusFactors[worker]
+				: m_focusFactorCalculator.DefaultFocusFactor)
+				.ToString(CultureInfo.InvariantCulture);
+		}
+
+		private void planningDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+		{
+
 		}
 	}
 }

@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>66</ApplicationRevision>
+    <ApplicationRevision>68</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -56,7 +56,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>35BB059972B3F539CCC8073199FE198596BA09DA</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>04B20A52F837D0151D70793579D13A009E080B97</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>TaskSchedulerForms_TemporaryKey.pfx</ManifestKeyFile>
@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoPlanMaker.cs" />
+    <Compile Include="Config\WorkerFocusFactor.cs" />
     <Compile Include="Data\BlockerData.cs" />
     <Compile Include="Data\DayType.cs" />
     <Compile Include="Data\VerificationResult.cs" />

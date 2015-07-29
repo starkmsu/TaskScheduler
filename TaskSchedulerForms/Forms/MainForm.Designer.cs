@@ -103,8 +103,9 @@
 			this.toggleLTOnlyToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleBlockersToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
 			this.settingsTabPage = new System.Windows.Forms.TabPage();
+			this.focusFactorTextBox = new System.Windows.Forms.TextBox();
 			this.vacationsButton = new System.Windows.Forms.Button();
-			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
+			this.workersComboBox = new System.Windows.Forms.ComboBox();
 			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
@@ -616,14 +617,14 @@
 			// toggleIterationToolStripMenuItem
 			// 
 			this.toggleIterationToolStripMenuItem.Name = "toggleIterationToolStripMenuItem";
-			this.toggleIterationToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+			this.toggleIterationToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.toggleIterationToolStripMenuItem.Text = "Toggle Iteration";
 			this.toggleIterationToolStripMenuItem.Click += new System.EventHandler(this.ToggleIterationToolStripMenuItemClick);
 			// 
 			// toggleSprintToolStripMenuItem
 			// 
 			this.toggleSprintToolStripMenuItem.Name = "toggleSprintToolStripMenuItem";
-			this.toggleSprintToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+			this.toggleSprintToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.toggleSprintToolStripMenuItem.Text = "Toggle Sprint";
 			this.toggleSprintToolStripMenuItem.Click += new System.EventHandler(this.ToggleSprintToolStripMenuItemClick);
 			// 
@@ -640,21 +641,21 @@
 			// toggleDevCompletedToolStripMenuItem
 			// 
 			this.toggleDevCompletedToolStripMenuItem.Name = "toggleDevCompletedToolStripMenuItem";
-			this.toggleDevCompletedToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+			this.toggleDevCompletedToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
 			this.toggleDevCompletedToolStripMenuItem.Text = "Toggle Dev Completed";
 			this.toggleDevCompletedToolStripMenuItem.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
 			// 
 			// toggleLTOnlyToolStripMenuItem
 			// 
 			this.toggleLTOnlyToolStripMenuItem.Name = "toggleLTOnlyToolStripMenuItem";
-			this.toggleLTOnlyToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+			this.toggleLTOnlyToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
 			this.toggleLTOnlyToolStripMenuItem.Text = "Toggle LT Only";
 			this.toggleLTOnlyToolStripMenuItem.Click += new System.EventHandler(this.ToggleLtOnlyToolStripMenuItemClick);
 			// 
 			// toggleBlockersToolStripMenuItem
 			// 
 			this.toggleBlockersToolStripMenuItem.Name = "toggleBlockersToolStripMenuItem";
-			this.toggleBlockersToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+			this.toggleBlockersToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
 			this.toggleBlockersToolStripMenuItem.Text = "Toggle Blockers";
 			this.toggleBlockersToolStripMenuItem.Click += new System.EventHandler(this.ToggleBlockersToolStripMenuItemClick);
 			// 
@@ -763,6 +764,7 @@
 			this.planningDataGridView.RowHeadersVisible = false;
 			this.planningDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.planningDataGridView.TabIndex = 25;
+			this.planningDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.planningDataGridView_DataError);
 			// 
 			// Priority2
 			// 
@@ -883,14 +885,14 @@
 			// toggleIterationToolStripMenuItem2
 			// 
 			this.toggleIterationToolStripMenuItem2.Name = "toggleIterationToolStripMenuItem2";
-			this.toggleIterationToolStripMenuItem2.Size = new System.Drawing.Size(157, 22);
+			this.toggleIterationToolStripMenuItem2.Size = new System.Drawing.Size(158, 22);
 			this.toggleIterationToolStripMenuItem2.Text = "Toggle Iteration";
 			this.toggleIterationToolStripMenuItem2.Click += new System.EventHandler(this.ToggleIterationToolStripMenuItemClick);
 			// 
 			// toggleSprintToolStripMenuItem2
 			// 
 			this.toggleSprintToolStripMenuItem2.Name = "toggleSprintToolStripMenuItem2";
-			this.toggleSprintToolStripMenuItem2.Size = new System.Drawing.Size(157, 22);
+			this.toggleSprintToolStripMenuItem2.Size = new System.Drawing.Size(158, 22);
 			this.toggleSprintToolStripMenuItem2.Text = "Toggle Sprint";
 			this.toggleSprintToolStripMenuItem2.Click += new System.EventHandler(this.ToggleSprintToolStripMenuItemClick);
 			// 
@@ -907,28 +909,29 @@
 			// toggleDevCompletedToolStripMenuItem2
 			// 
 			this.toggleDevCompletedToolStripMenuItem2.Name = "toggleDevCompletedToolStripMenuItem2";
-			this.toggleDevCompletedToolStripMenuItem2.Size = new System.Drawing.Size(195, 22);
+			this.toggleDevCompletedToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
 			this.toggleDevCompletedToolStripMenuItem2.Text = "Toggle Dev Completed";
 			this.toggleDevCompletedToolStripMenuItem2.Click += new System.EventHandler(this.ToggleDevCompletedToolStripMenuItem1Click);
 			// 
 			// toggleLTOnlyToolStripMenuItem2
 			// 
 			this.toggleLTOnlyToolStripMenuItem2.Name = "toggleLTOnlyToolStripMenuItem2";
-			this.toggleLTOnlyToolStripMenuItem2.Size = new System.Drawing.Size(195, 22);
+			this.toggleLTOnlyToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
 			this.toggleLTOnlyToolStripMenuItem2.Text = "Toggle LT Only";
 			this.toggleLTOnlyToolStripMenuItem2.Click += new System.EventHandler(this.ToggleLtOnlyToolStripMenuItemClick);
 			// 
 			// toggleBlockersToolStripMenuItem2
 			// 
 			this.toggleBlockersToolStripMenuItem2.Name = "toggleBlockersToolStripMenuItem2";
-			this.toggleBlockersToolStripMenuItem2.Size = new System.Drawing.Size(195, 22);
+			this.toggleBlockersToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
 			this.toggleBlockersToolStripMenuItem2.Text = "Toggle Blockers";
 			this.toggleBlockersToolStripMenuItem2.Click += new System.EventHandler(this.ToggleBlockersToolStripMenuItemClick);
 			// 
 			// settingsTabPage
 			// 
+			this.settingsTabPage.Controls.Add(this.focusFactorTextBox);
 			this.settingsTabPage.Controls.Add(this.vacationsButton);
-			this.settingsTabPage.Controls.Add(this.usersVacationsComboBox);
+			this.settingsTabPage.Controls.Add(this.workersComboBox);
 			this.settingsTabPage.Controls.Add(this.holidaysButton);
 			this.settingsTabPage.Controls.Add(this.tfsUrlTextBox);
 			this.settingsTabPage.Controls.Add(this.tfsUrlLabel);
@@ -939,9 +942,16 @@
 			this.settingsTabPage.Text = "Settings";
 			this.settingsTabPage.UseVisualStyleBackColor = true;
 			// 
+			// focusFactorTextBox
+			// 
+			this.focusFactorTextBox.Location = new System.Drawing.Point(302, 69);
+			this.focusFactorTextBox.Name = "focusFactorTextBox";
+			this.focusFactorTextBox.Size = new System.Drawing.Size(64, 20);
+			this.focusFactorTextBox.TabIndex = 16;
+			// 
 			// vacationsButton
 			// 
-			this.vacationsButton.Location = new System.Drawing.Point(302, 67);
+			this.vacationsButton.Location = new System.Drawing.Point(372, 67);
 			this.vacationsButton.Name = "vacationsButton";
 			this.vacationsButton.Size = new System.Drawing.Size(158, 23);
 			this.vacationsButton.TabIndex = 14;
@@ -949,13 +959,14 @@
 			this.vacationsButton.UseVisualStyleBackColor = true;
 			this.vacationsButton.Click += new System.EventHandler(this.VacationsButtonClick);
 			// 
-			// usersVacationsComboBox
+			// workersComboBox
 			// 
-			this.usersVacationsComboBox.FormattingEnabled = true;
-			this.usersVacationsComboBox.Location = new System.Drawing.Point(8, 69);
-			this.usersVacationsComboBox.Name = "usersVacationsComboBox";
-			this.usersVacationsComboBox.Size = new System.Drawing.Size(288, 21);
-			this.usersVacationsComboBox.TabIndex = 13;
+			this.workersComboBox.FormattingEnabled = true;
+			this.workersComboBox.Location = new System.Drawing.Point(8, 69);
+			this.workersComboBox.Name = "workersComboBox";
+			this.workersComboBox.Size = new System.Drawing.Size(288, 21);
+			this.workersComboBox.TabIndex = 13;
+			this.workersComboBox.SelectedIndexChanged += new System.EventHandler(this.UsersVacationsComboBoxSelectedIndexChanged);
 			// 
 			// holidaysButton
 			// 
@@ -1044,7 +1055,7 @@
 		private System.Windows.Forms.Button secondRemoveButton;
 		private System.Windows.Forms.CheckBox subTreesCheckBox;
 		private System.Windows.Forms.Button vacationsButton;
-		private System.Windows.Forms.ComboBox usersVacationsComboBox;
+		private System.Windows.Forms.ComboBox workersComboBox;
 		private System.Windows.Forms.ToolTip secondToolTip;
 		private System.Windows.Forms.Button exchangeButton;
 		private System.Windows.Forms.GroupBox ParamsGroupBox;
@@ -1100,6 +1111,7 @@
 		private System.Windows.Forms.DataGridViewComboBoxColumn AssignedTo2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Work2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
+		private System.Windows.Forms.TextBox focusFactorTextBox;
 	}
 }
 
