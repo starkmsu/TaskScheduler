@@ -41,6 +41,8 @@ namespace TaskSchedulerForms.Presentation
 			bool isDevCompleted = row.Cells[m_viewColumnsIndexes.PriorityColumnIndex].IsColorForState(WorkItemState.DevCompleted);
 			if (isDevCompleted)
 				m_leadTasksWithDevCompletedRowsIndexes.Add(m_currentLeadTaskRowIndex);
+
+			AddUser(row);
 		}
 
 		internal void MarkTaskRow(DataGridViewRow row)
@@ -58,14 +60,8 @@ namespace TaskSchedulerForms.Presentation
 			}
 			leadTaskChildrenIndexes.Add(m_currentRowIndex);
 			m_taskToLeadTaskIndexesDict[m_currentRowIndex] = m_currentLeadTaskRowIndex;
-			string user = row.Cells[m_viewColumnsIndexes.AssignedToColumnIndex].Value.ToString();
-			if (user == Resources.AccessDenied)
-				return;
 
-			if (m_usersTasksIndexesDict.ContainsKey(user))
-				m_usersTasksIndexesDict[user].Add(m_currentRowIndex);
-			else
-				m_usersTasksIndexesDict.Add(user, new List<int> {m_currentRowIndex});
+			AddUser(row);
 		}
 
 		internal void MarkBlockerRow(DataGridViewRow row)
@@ -88,6 +84,18 @@ namespace TaskSchedulerForms.Presentation
 				m_usersTasksIndexesDict,
 				m_sprintLeadtTasksIndexesDict,
 				m_blockersIndexesDict);
+		}
+
+		private void AddUser(DataGridViewRow row)
+		{
+			string user = row.Cells[m_viewColumnsIndexes.AssignedToColumnIndex].Value.ToString();
+			if (user == Resources.AccessDenied)
+				return;
+
+			if (m_usersTasksIndexesDict.ContainsKey(user))
+				m_usersTasksIndexesDict[user].Add(m_currentRowIndex);
+			else
+				m_usersTasksIndexesDict.Add(user, new List<int> { m_currentRowIndex });
 		}
 	}
 }

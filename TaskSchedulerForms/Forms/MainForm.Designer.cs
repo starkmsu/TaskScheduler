@@ -104,8 +104,9 @@
 			this.toggleLTOnlyToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleBlockersToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
 			this.settingsTabPage = new System.Windows.Forms.TabPage();
+			this.focusFactorTextBox = new System.Windows.Forms.TextBox();
 			this.vacationsButton = new System.Windows.Forms.Button();
-			this.usersVacationsComboBox = new System.Windows.Forms.ComboBox();
+			this.workersComboBox = new System.Windows.Forms.ComboBox();
 			this.holidaysButton = new System.Windows.Forms.Button();
 			this.tfsUrlTextBox = new System.Windows.Forms.TextBox();
 			this.tfsUrlLabel = new System.Windows.Forms.Label();
@@ -776,6 +777,7 @@
 			this.planningDataGridView.RowHeadersVisible = false;
 			this.planningDataGridView.Size = new System.Drawing.Size(880, 496);
 			this.planningDataGridView.TabIndex = 25;
+			this.planningDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.planningDataGridView_DataError);
 			// 
 			// Priority2
 			// 
@@ -940,8 +942,9 @@
 			// 
 			// settingsTabPage
 			// 
+			this.settingsTabPage.Controls.Add(this.focusFactorTextBox);
 			this.settingsTabPage.Controls.Add(this.vacationsButton);
-			this.settingsTabPage.Controls.Add(this.usersVacationsComboBox);
+			this.settingsTabPage.Controls.Add(this.workersComboBox);
 			this.settingsTabPage.Controls.Add(this.holidaysButton);
 			this.settingsTabPage.Controls.Add(this.tfsUrlTextBox);
 			this.settingsTabPage.Controls.Add(this.tfsUrlLabel);
@@ -952,9 +955,16 @@
 			this.settingsTabPage.Text = "Settings";
 			this.settingsTabPage.UseVisualStyleBackColor = true;
 			// 
+			// focusFactorTextBox
+			// 
+			this.focusFactorTextBox.Location = new System.Drawing.Point(302, 69);
+			this.focusFactorTextBox.Name = "focusFactorTextBox";
+			this.focusFactorTextBox.Size = new System.Drawing.Size(64, 20);
+			this.focusFactorTextBox.TabIndex = 16;
+			// 
 			// vacationsButton
 			// 
-			this.vacationsButton.Location = new System.Drawing.Point(302, 67);
+			this.vacationsButton.Location = new System.Drawing.Point(372, 67);
 			this.vacationsButton.Name = "vacationsButton";
 			this.vacationsButton.Size = new System.Drawing.Size(158, 23);
 			this.vacationsButton.TabIndex = 14;
@@ -962,13 +972,14 @@
 			this.vacationsButton.UseVisualStyleBackColor = true;
 			this.vacationsButton.Click += new System.EventHandler(this.VacationsButtonClick);
 			// 
-			// usersVacationsComboBox
+			// workersComboBox
 			// 
-			this.usersVacationsComboBox.FormattingEnabled = true;
-			this.usersVacationsComboBox.Location = new System.Drawing.Point(8, 69);
-			this.usersVacationsComboBox.Name = "usersVacationsComboBox";
-			this.usersVacationsComboBox.Size = new System.Drawing.Size(288, 21);
-			this.usersVacationsComboBox.TabIndex = 13;
+			this.workersComboBox.FormattingEnabled = true;
+			this.workersComboBox.Location = new System.Drawing.Point(8, 69);
+			this.workersComboBox.Name = "workersComboBox";
+			this.workersComboBox.Size = new System.Drawing.Size(288, 21);
+			this.workersComboBox.TabIndex = 13;
+			this.workersComboBox.SelectedIndexChanged += new System.EventHandler(this.UsersVacationsComboBoxSelectedIndexChanged);
 			// 
 			// holidaysButton
 			// 
@@ -1057,7 +1068,7 @@
 		private System.Windows.Forms.Button secondRemoveButton;
 		private System.Windows.Forms.CheckBox subTreesCheckBox;
 		private System.Windows.Forms.Button vacationsButton;
-		private System.Windows.Forms.ComboBox usersVacationsComboBox;
+		private System.Windows.Forms.ComboBox workersComboBox;
 		private System.Windows.Forms.ToolTip secondToolTip;
 		private System.Windows.Forms.Button exchangeButton;
 		private System.Windows.Forms.GroupBox ParamsGroupBox;
@@ -1113,7 +1124,11 @@
 		private System.Windows.Forms.DataGridViewComboBoxColumn AssignedTo2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Work2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Past2;
+<<<<<<< HEAD
 		private System.Windows.Forms.Label percentLabel;
+=======
+		private System.Windows.Forms.TextBox focusFactorTextBox;
+>>>>>>> origin/master
 	}
 }
 

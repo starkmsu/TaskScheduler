@@ -30,6 +30,8 @@ namespace TaskSchedulerForms.Config
 
 		public List<VacationData> Vacations { get; set; }
 
+		public List<WorkerFocusFactor> FocusFactors { get; set; }
+
 		public bool WithSubAreaPaths { get; set; }
 
 		public WorkMode WorkMode { get; set; }
@@ -47,6 +49,7 @@ namespace TaskSchedulerForms.Config
 			ByArea = true;
 			AllAreaPaths = new List<string>();
 			AllIterationPaths = new List<string>();
+			FocusFactors = new List<WorkerFocusFactor>();
 		}
 
 		public Config Copy()
@@ -69,6 +72,7 @@ namespace TaskSchedulerForms.Config
 				AllIterationPaths = CopyIfNotNull(AllIterationPaths),
 				Holidays = CopyIfNotNull(Holidays),
 				Vacations = CopyIfNotNull(Vacations),
+				FocusFactors = CopyIfNotNull(FocusFactors),
 			};
 		}
 
@@ -90,14 +94,15 @@ namespace TaskSchedulerForms.Config
 				&& CollectionsEquals(AllAreaPaths, other.AllAreaPaths)
 				&& CollectionsEquals(AllIterationPaths, other.AllIterationPaths)
 				&& CollectionsEquals(Holidays, other.Holidays)
-				&& CollectionsEquals(Vacations, other.Vacations);
+				&& CollectionsEquals(Vacations, other.Vacations)
+				&& CollectionsEquals(FocusFactors, other.FocusFactors);
 		}
 
 		private List<T> CopyIfNotNull<T>(IEnumerable<T> target)
 		{
 			if (target == null)
 				return null;
-			return new List<T>(target);
+			return new List<T>(target.Distinct());
 		}
 
 		private bool CollectionsEquals<T>(List<T> first, List<T> second)
@@ -113,8 +118,8 @@ namespace TaskSchedulerForms.Config
 				return first.Count == 0;
 			if (first.Count != second.Count)
 				return false;
-			return first.All(i => second.Any(i.Equals))
-				&& second.All(j => first.Any(j.Equals));
+			return first.All(i => second.Any(arg => i.Equals(arg)))
+				&& second.All(j => first.Any(arg => j.Equals(arg)));
 		}
 	}
 }

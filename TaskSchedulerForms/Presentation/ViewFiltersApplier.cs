@@ -109,14 +109,13 @@ namespace TaskSchedulerForms.Presentation
 			{
 				List<int> userTasksIndexes = m_usersTasksIndexesDict[m_filteringUser];
 				result.AddRange(
-					userTasksIndexes.Select(userTasksIndex =>
-						m_taskToLeadTaskIndexesDict[userTasksIndex]));
+					userTasksIndexes
+						.Where(i => m_taskToLeadTaskIndexesDict.ContainsKey(i))
+						.Select(i => m_taskToLeadTaskIndexesDict[i]));
 			}
 
 			if (!string.IsNullOrEmpty(m_filteringSprint))
-			{
 				result.RemoveAll(lt => !m_sprintLeadtTasksIndexesDict[m_filteringSprint].Contains(lt));
-			}
 
 			if (m_filterByDevCompleted)
 				result.RemoveAll(i => m_leadTasksWithDevCompletedRowsIndexes.Contains(i));

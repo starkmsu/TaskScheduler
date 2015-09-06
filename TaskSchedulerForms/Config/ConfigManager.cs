@@ -37,7 +37,7 @@ namespace TaskSchedulerForms.Config
 					var config = configObj as Config;
 					if (config != null)
 						m_lastConfig = config.Copy();
-					return config;
+					return m_lastConfig;
 				}
 				catch (Exception)
 				{
