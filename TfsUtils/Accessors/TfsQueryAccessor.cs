@@ -22,7 +22,7 @@ namespace TfsUtils.Accessors
 			m_tfsAccessor.Dispose();
 		}
 
-		public List<WorkItem> QueryWorkItems(string queryPath)
+		public List<WorkItem> QueryWorkItems(string queryPath, Action<int> progressReportHandler)
 		{
 			List<string> paths = queryPath.Split(Path.DirectorySeparatorChar).ToList();
 			if (paths.Count == 1)
@@ -53,7 +53,7 @@ namespace TfsUtils.Accessors
 				}
 				using (var wiqlAccessor = new TfsWiqlAccessor(m_tfsAccessor))
 				{
-					return wiqlAccessor.QueryWorkItemsByIds(workItemIds);
+					return wiqlAccessor.QueryWorkItemsByIds(workItemIds, progressReportHandler);
 				}
 			}
 			var qResult = query.RunQuery();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using TaskSchedulerForms.Data;
@@ -12,7 +13,12 @@ namespace TaskSchedulerForms
 {
 	internal class DataFiller
 	{
-		internal DataContainer ProcessLeadTasks(string tfsUrl, List<WorkItem> leadTasks)
+		private const int LoadingPart = 50;
+
+		internal DataContainer ProcessLeadTasks(
+			string tfsUrl,
+			List<WorkItem> leadTasks,
+			Action<int> progressReportHandler)
 		{
 			var result = new DataContainer
 			{
@@ -26,7 +32,12 @@ namespace TaskSchedulerForms
 			using (var wiqlAccessor = new TfsWiqlAccessor(tfsUrl))
 			{
 				List<int> ltChildrenIds = result.LeadTaskChildrenDict.Values.SelectMany(i => i).ToList();
-				AppendTasks(ltChildrenIds, null, result, wiqlAccessor);
+				AppendTasks(
+					ltChildrenIds,
+					null,
+					result,
+					wiqlAccessor,
+					progressReportHandler);
 
 				CleanDict(
 					result.LeadTaskChildrenDict,
@@ -70,12 +81,17 @@ namespace TaskSchedulerForms
 			List<int> childrenIds,
 			int? rootLeadTasskId,
 			DataContainer dataContainer,
-			TfsWiqlAccessor wiqlAccessor)
+			TfsWiqlAccessor wiqlAccessor,
+			Action<int> progressReportHandler)
 		{
 			if (childrenIds.Count == 0)
 				return;
 
-			var childrenTasks = wiqlAccessor.QueryWorkItemsByIds(childrenIds);
+			var childrenTasks = wiqlAccessor.QueryWorkItemsByIds(
+				childrenIds,
+				progressReportHandler == null
+					? null
+					: new Action<int>(x => progressReportHandler(LoadingPart * x / 100)));
 			for (int i = 0; i < childrenTasks.Count; i++)
 			{
 				WorkItem task = childrenTasks[i];
@@ -104,13 +120,15 @@ namespace TaskSchedulerForms
 					if (!ltChildren.Contains(task.Id))
 						ltChildren.Add(task.Id);
 				}
-				if (!taskLinkDict.ContainsKey(WorkItemLinkType.Child))
-					continue;
-				AppendTasks(
-					taskLinkDict[WorkItemLinkType.Child],
-					currentParentLtId,
-					dataContainer,
-					wiqlAccessor);
+				if (taskLinkDict.ContainsKey(WorkItemLinkType.Child))
+					AppendTasks(
+						taskLinkDict[WorkItemLinkType.Child],
+						currentParentLtId,
+						dataContainer,
+						wiqlAccessor,
+						null);
+				if (progressReportHandler != null)
+					progressReportHandler(LoadingPart + (100 - LoadingPart) * i / childrenTasks.Count);
 			}
 		}
 
@@ -148,7 +166,7 @@ namespace TaskSchedulerForms
 			}
 			if (notFoundIdsDict.Keys.Count > 0)
 			{
-				var workItems = wiqlAccessor.QueryWorkItemsByIds(notFoundIdsDict.Keys.ToList());
+				var workItems = wiqlAccessor.QueryWorkItemsByIds(notFoundIdsDict.Keys.ToList(), null);
 				for (int i = 0; i < workItems.Count; i++)
 				{
 					WorkItem workItem = workItems[i];
@@ -184,7 +202,7 @@ namespace TaskSchedulerForms
 			if (notFound.Count == 0)
 				return;
 
-			var workItems = wiqlAccessor.QueryWorkItemsByIds(notFound);
+			var workItems = wiqlAccessor.QueryWorkItemsByIds(notFound, null);
 			for (int i = 0; i < workItems.Count; i++)
 			{
 				WorkItem workItem = workItems[i];

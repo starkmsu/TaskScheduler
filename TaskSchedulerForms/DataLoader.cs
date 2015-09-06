@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -8,11 +9,14 @@ namespace TaskSchedulerForms
 {
 	internal class DataLoader
 	{
-		internal List<WorkItem> GetLeadTasks(string tfsUrl, string queryPath)
+		internal List<WorkItem> GetLeadTasks(
+			string tfsUrl,
+			string queryPath,
+			Action<int> progressReportHandler)
 		{
 			using (var queryAccessor = new TfsQueryAccessor(tfsUrl))
 			{
-				return queryAccessor.QueryWorkItems(queryPath);
+				return queryAccessor.QueryWorkItems(queryPath, progressReportHandler);
 			}
 		}
 
@@ -89,7 +93,8 @@ namespace TaskSchedulerForms
 				result = wiqlAccessor.QueryWorkItems(
 					strBuilder.ToString(),
 					paramValues,
-					complexParamValues);
+					complexParamValues,
+					null);
 			}
 			return result;
 		}

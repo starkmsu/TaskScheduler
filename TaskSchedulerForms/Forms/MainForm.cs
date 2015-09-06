@@ -161,11 +161,8 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception e)
 			{
-				HandleException(
-					e,
-					secondComboBox,
-					Resources.LeadTasksFetchingError);
-				secondComboBox.Invoke(
+				HandleException(e, Resources.LeadTasksFetchingError);
+				Invoke(
 					new Action(() =>
 					{
 						subTreesCheckBox.Enabled = true;
@@ -194,7 +191,7 @@ namespace TaskSchedulerForms.Forms
 			if (oldSecond != null && oldSecond.Count > 0)
 				newSecond.AddRange(secondList.Where(i => !oldSecond.Contains(i)));
 
-			secondComboBox.Invoke(new Action(() =>
+			Invoke(new Action(() =>
 			{
 				secondComboBox.BackColor = newSecond.Count > 0 ? Color.Yellow : Color.White;
 				if (newSecond.Count > 0)
@@ -232,7 +229,7 @@ namespace TaskSchedulerForms.Forms
 				.Select(i => (object) i)
 				.ToArray();
 
-			secondComboBox.Invoke(new Action(() =>
+			Invoke(new Action(() =>
 			{
 				secondComboBox.DataSource = secondList;
 				secondComboBox.Enabled = true;
@@ -262,6 +259,8 @@ namespace TaskSchedulerForms.Forms
 			scheduleDataGridView.Rows.Clear();
 			refreshButton.Enabled = false;
 			refreshButton.BackColor = Color.Transparent;
+			percentLabel.Text = "0%";
+			percentLabel.Visible = true;
 
 			Text = GetFirstShortName();
 
@@ -285,7 +284,7 @@ namespace TaskSchedulerForms.Forms
 
 				List<string> firstList = null;
 				List<string> secondList = null;
-				secondComboBox.Invoke(new Action(() =>
+				Invoke(new Action(() =>
 					{
 						firstList = firstListBox.Items.Cast<string>().ToList();
 						secondList = secondListBox.Items.Cast<string>().ToList();
@@ -307,7 +306,10 @@ namespace TaskSchedulerForms.Forms
 			}
 			else
 			{
-				var items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
+				var items = s_dataLoader.GetLeadTasks(
+					tfsUrlTextBox.Text,
+					queryTextBox.Text,
+					null);
 				m_config.TfsUrl = tfsUrlTextBox.Text;
 				m_config.WorkMode = WorkMode.Query;
 				m_config.QueryPath = queryTextBox.Text;
@@ -324,6 +326,17 @@ namespace TaskSchedulerForms.Forms
 			return result;
 		}
 
+		private void ReportProgress(int percent)
+		{
+			string percentStr = percent + "%";
+			if (percentStr == percentLabel.Text)
+				return;
+			if (percentLabel.InvokeRequired)
+				percentLabel.Invoke(new Action(() => percentLabel.Text = percentStr));
+			else
+				percentLabel.Text = percentStr;
+		}
+
 		private void ProcessData()
 		{
 			s_stateContainer.LastTfsUrl = tfsUrlTextBox.Text;
@@ -332,25 +345,26 @@ namespace TaskSchedulerForms.Forms
 			{
 				List<WorkItem> leadTasks = GetLeadTasks();
 
-				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(s_stateContainer.LastTfsUrl, leadTasks);
+				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(
+					s_stateContainer.LastTfsUrl,
+					leadTasks,
+					ReportProgress);
 			}
 			catch (Exception exc)
 			{
-				HandleException(
-					exc,
-					scheduleDataGridView,
-					Resources.LeadTasksParsingError);
-				scheduleDataGridView.Invoke(
+				HandleException(exc, Resources.LeadTasksParsingError);
+				Invoke(
 					new Action(() =>
 					{
 						makeScheduleButton.Enabled = true;
 						loadLeadTasksButton.Enabled = true;
 						queryTextBox.Enabled = true;
+						percentLabel.Visible = false;
 					}));
 				return;
 			}
 
-			scheduleDataGridView.Invoke(new Action(() =>
+			Invoke(new Action(() =>
 				{
 					try
 					{
@@ -365,11 +379,8 @@ namespace TaskSchedulerForms.Forms
 					}
 					catch (Exception exc)
 					{
-						HandleException(
-							exc,
-							scheduleDataGridView,
-							Resources.LeadTasksParsingError);
-						scheduleDataGridView.Invoke(new Action(() =>
+						HandleException(exc, Resources.LeadTasksParsingError);
+						Invoke(new Action(() =>
 						{
 							makeScheduleButton.Enabled = true;
 							loadLeadTasksButton.Enabled = true;
@@ -395,6 +406,7 @@ namespace TaskSchedulerForms.Forms
 					queryTextBox.Enabled = true;
 					refreshButton.Enabled = true;
 					planButton.Enabled = true;
+					percentLabel.Visible = false;
 					mainTabControl.SelectTab(dataTabPage);
 				}));
 		}
@@ -436,7 +448,10 @@ namespace TaskSchedulerForms.Forms
 					s_stateContainer.LastWithSubTree,
 					s_stateContainer.LastWithSprint);
 			else
-				items = s_dataLoader.GetLeadTasks(tfsUrlTextBox.Text, queryTextBox.Text);
+				items = s_dataLoader.GetLeadTasks(
+					tfsUrlTextBox.Text,
+					queryTextBox.Text,
+					null);
 
 			var result = new List<WorkItem>(items.Count);
 			for (int i = 0; i < items.Count; i++)
@@ -453,7 +468,7 @@ namespace TaskSchedulerForms.Forms
 		{
 			string currentUser = null;
 			string currentSprint = null;
-			refreshButton.Invoke(new Action(() =>
+			Invoke(new Action(() =>
 				{
 					loadLeadTasksButton.Enabled = false;
 					makeScheduleButton.Enabled = false;
@@ -487,9 +502,12 @@ namespace TaskSchedulerForms.Forms
 					}
 					leadTasks.Add(leadTask);
 				}
-				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(tfsUrlTextBox.Text, leadTasks);
+				m_lastProcessedData = s_dataFiller.ProcessLeadTasks(
+					tfsUrlTextBox.Text,
+					leadTasks,
+					ReportProgress);
 
-				scheduleDataGridView.Invoke(new Action(() =>
+				Invoke(new Action(() =>
 				{
 					bool isDateChanged = scheduleDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
@@ -538,11 +556,8 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception exc)
 			{
-				HandleException(
-					exc,
-					scheduleDataGridView,
-					Resources.LeadTasksParsingError);
-				scheduleDataGridView.Invoke(
+				HandleException(exc, Resources.LeadTasksParsingError);
+				Invoke(
 					new Action(() =>
 					{
 						makeScheduleButton.Enabled = true;
@@ -766,19 +781,17 @@ namespace TaskSchedulerForms.Forms
 			stringBuilder.AppendLine(exc.StackTrace);
 		}
 
-		private void HandleException(
-			Exception exc,
-			Control control,
-			string caption)
+		private void HandleException(Exception exc, string caption)
 		{
 			var strBuilder = new StringBuilder();
 			AppendExceptionString(exc, strBuilder);
 			string text = strBuilder.ToString();
-			using (var fileWriter = new StreamWriter(DateTime.Now.ToString("yyyy-mm-dd HH-mm-ss") + ".txt", false))
+			using (var fileWriter =
+				new StreamWriter(DateTime.Now.ToString("yyyy-mm-dd HH-mm-ss") + ".txt", false))
 			{
 				fileWriter.WriteLine(text);
 			}
-			control.Invoke(new Action(() => MessageBox.Show(text, caption)));
+			Invoke(new Action(() => MessageBox.Show(text, caption)));
 		}
 
 		private void PlanButtonClick(object sender, EventArgs e)
@@ -801,7 +814,7 @@ namespace TaskSchedulerForms.Forms
 			}
 
 			string currentUser = null;
-			planButton.Invoke(new Action(() =>
+			Invoke(new Action(() =>
 			{
 				planButton.Enabled = false;
 				if (usersFilterComboBox2.SelectedItem != null)
@@ -812,7 +825,7 @@ namespace TaskSchedulerForms.Forms
 			}));
 			try
 			{
-				planningDataGridView.Invoke(new Action(() =>
+				Invoke(new Action(() =>
 				{
 					bool isDateChanged = planningDataGridView.Columns[s_viewColumnsIndexes.FirstDateColumnIndex].HeaderText != DateTime.Now.ToString("dd.MM");
 					if (isDateChanged)
@@ -853,11 +866,8 @@ namespace TaskSchedulerForms.Forms
 			}
 			catch (Exception exc)
 			{
-				HandleException(
-					exc,
-					planningDataGridView,
-					Resources.LeadTasksParsingError);
-				planningDataGridView.Invoke(new Action(() => { planButton.Enabled = true; }));
+				HandleException(exc, Resources.LeadTasksParsingError);
+				Invoke(new Action(() => { planButton.Enabled = true; }));
 			}
 		}
 

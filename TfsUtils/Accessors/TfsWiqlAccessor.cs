@@ -40,7 +40,7 @@ namespace TfsUtils.Accessors
 			return wiqlString + GenerateUsersConditions(users);
 		}
 
-		public List<WorkItem> QueryWorkItemsByIds(ICollection<int> ids)
+		public List<WorkItem> QueryWorkItemsByIds(ICollection<int> ids, Action<int> progressReportHandler)
 		{
 			const string queryStr = "SELECT * FROM WorkItems WHERE [System.Id] IN (@ids)";
 
@@ -54,13 +54,15 @@ namespace TfsUtils.Accessors
 			return QueryWorkItems(
 				queryStr,
 				paramValues,
-				complexParamValues);
+				complexParamValues,
+				progressReportHandler);
 		}
 
 		public List<WorkItem> QueryWorkItems(
 			string wiqlString,
 			Dictionary<string, object> paramValues,
-			Dictionary<string, List<object>> complexParamValues)
+			Dictionary<string, List<object>> complexParamValues,
+			Action<int> progressReportHandler)
 		{
 			if (complexParamValues != null && complexParamValues.Count > 0)
 				wiqlString = UpdateParams(wiqlString, paramValues, complexParamValues);
@@ -72,9 +74,35 @@ namespace TfsUtils.Accessors
 			for (int i = 0; i < queryResult.Count; i++)
 			{
 				var wi = queryResult[i];
-				//wi.IsValid();
 				wi.SyncToLatest();
 				result.Add(wi);
+				if (progressReportHandler != null)
+					progressReportHandler(i * 100 / queryResult.Count);
+			}
+			return result;
+		}
+
+		public Dictionary<int, List<int>> QueryIdsFromLinks(
+			string wiqlString,
+			Dictionary<string, object> paramValues,
+			Dictionary<string, List<object>> complexParamValues)
+		{
+			if (complexParamValues != null && complexParamValues.Count > 0)
+				wiqlString = UpdateParams(wiqlString, paramValues, complexParamValues);
+
+			var query = new Query(m_workItemStore, wiqlString, paramValues);
+
+			var queryResult = query.RunLinkQuery();
+			var result = new Dictionary<int, List<int>>();
+			for (int i = 0; i < queryResult.Length; i++)
+			{
+				var link = queryResult[i];
+				if (link.SourceId == 0)
+				{
+					result.Add(link.TargetId, new List<int>());
+					continue;
+				}
+				result[link.SourceId].Add(link.TargetId);
 			}
 			return result;
 		}
