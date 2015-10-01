@@ -37,7 +37,7 @@ namespace TaskSchedulerForms
 			return new WorkItemVerificationResult
 			{
 				Result = VerificationResult.Warning,
-				Messages = new List<string>(1) { Messages.LTHasNoChildren() },
+				Messages = new List<string>(1) { Messages.LeadTaskHasNoChildren() },
 			};
 		}
 
@@ -52,7 +52,7 @@ namespace TaskSchedulerForms
 			return new WorkItemVerificationResult
 			{
 				Result = VerificationResult.Warning,
-				Messages = new List<string>(1) { Messages.TaskHasPriorityLowerThanLT() },
+				Messages = new List<string>(1) { Messages.TaskHasPriorityLowerThanLeadTask() },
 			};
 		}
 
@@ -138,7 +138,7 @@ namespace TaskSchedulerForms
 			};
 		}
 
-		internal static WorkItemVerificationResult VerifyNoProposedChildTaks(WorkItem leadTask, DataContainer dataContainer)
+		internal static WorkItemVerificationResult VerifyNoProposedChildTask(WorkItem leadTask, DataContainer dataContainer)
 		{
 			if ((leadTask.IsProposed())
 				&& dataContainer.LeadTaskChildrenDict.ContainsKey(leadTask.Id))
@@ -159,39 +159,15 @@ namespace TaskSchedulerForms
 			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
 		}
 
-		/*
-		private static void UpdateResult(
-			WorkItemVerificationResult result,
-			VerificationResult currentResult,
-			string message)
+		internal static WorkItemVerificationResult VerifyTaskWithParentOnSameIteration(WorkItem task, WorkItem leadTask)
 		{
-			if (currentResult == VerificationResult.Ok)
-				return;
-
-			switch (result.Result)
-			{
-				case VerificationResult.Error:
-					if (currentResult != VerificationResult.Error)
-						break;
-					result.Messages.Add(message);
-					break;
-				case VerificationResult.Warning:
-					if (currentResult == VerificationResult.Error)
-					{
-						result.Result = VerificationResult.Error;
-						result.Messages = new List<string> {message};
-					}
-					else
-					{
-						result.Messages.Add(message);
-					}
-					break;
-				default:
-					result.Result = currentResult;
-					result.Messages = new List<string> { message };
-					break;
-			}
+			if (task.IterationPath != leadTask.IterationPath)
+				return new WorkItemVerificationResult
+				{
+					Result = VerificationResult.Error,
+					Messages = new List<string>(1) { Messages.TaskHasDifferentIteration() },
+				};
+			return new WorkItemVerificationResult { Result = VerificationResult.Ok };
 		}
-		*/
 	}
 }

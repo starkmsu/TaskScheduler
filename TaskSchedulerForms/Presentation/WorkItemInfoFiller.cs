@@ -84,7 +84,7 @@ namespace TaskSchedulerForms.Presentation
 				FontStyle.Underline);
 			titleCell.Style.BackColor = priorityCell.Style.BackColor;
 
-			verificationResult = WorkItemVerifier.VerifyNoProposedChildTaks(leadTask, data);
+			verificationResult = WorkItemVerifier.VerifyNoProposedChildTask(leadTask, data);
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				priorityCell.SetColorByVerification(verificationResult.Result);
@@ -116,7 +116,7 @@ namespace TaskSchedulerForms.Presentation
 			ViewFiltersBuilder viewFiltersBuilder,
 			WorkItem task,
 			List<WorkItem> siblings,
-			int? leadTaskPriority,
+			WorkItem leadTask,
 			DataGridViewRow taskRow,
 			DataContainer data,
 			Dictionary<int, string> planningAssignments,
@@ -130,11 +130,20 @@ namespace TaskSchedulerForms.Presentation
 
 			var idCell = taskRow.Cells[m_viewColumnsIndexes.IdColumnIndex];
 			idCell.Value = task.Id;
-			var verificationResult = WorkItemVerifier.VerifyTaskPriority(task, leadTaskPriority);
+			var verificationResult = WorkItemVerifier.VerifyTaskPriority(task, leadTask.Priority());
 			if (verificationResult.Result != VerificationResult.Ok)
 			{
 				idCell.SetColorByVerification(verificationResult.Result);
 				idCell.ToolTipText = verificationResult.AllMessagesString;
+			}
+			else
+			{
+				verificationResult = WorkItemVerifier.VerifyTaskWithParentOnSameIteration(task, leadTask);
+				if (verificationResult.Result != VerificationResult.Ok)
+				{
+					idCell.SetColorByVerification(verificationResult.Result);
+					idCell.ToolTipText = verificationResult.AllMessagesString;
+				}
 			}
 
 			var titleCell = taskRow.Cells[m_viewColumnsIndexes.TitleColumnIndex];

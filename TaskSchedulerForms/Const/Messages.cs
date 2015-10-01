@@ -47,14 +47,19 @@
 			return "Vision agreement state is " + state;
 		}
 
-		internal static string LTHasNoChildren()
+		internal static string LeadTaskHasNoChildren()
 		{
 			return "LeadTask has no child tasks";
 		}
 
-		internal static string TaskHasPriorityLowerThanLT()
+		internal static string TaskHasPriorityLowerThanLeadTask()
 		{
 			return "Task has priority lower than LeadTask";
+		}
+
+		internal static string TaskHasDifferentIteration()
+		{
+			return "Task has different iteration";
 		}
 	}
 }

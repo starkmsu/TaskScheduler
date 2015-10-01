@@ -76,7 +76,7 @@ namespace TaskSchedulerForms.Presentation
 								focusFactorCalculator,
 								task,
 								childrenTasks,
-								leadTask.Priority(),
+								leadTask,
 								data,
 								planningAssignments,
 								allUsers,
